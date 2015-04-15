@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:p="http://primefaces.org/ui" xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <h:head/>
+
+    <!--<link href="#{request.contextPath}/css/miscibility.css" rel="stylesheet" type="text/css"/>-->
+
+    <h:form enctype="multipart/form-data">
+        <h2>Ladda upp fil</h2>
+
+        <h:messages />
+
+        <p:fileUpload id="fileUploadInput" update="@form" label="Välj fil" uploadLabel="Ladda upp" cancelLabel="Avbryt"
+                      dragDropSupport="true" mode="advanced" fileUploadListener="#{uploadBackingBean.fileUploadListener}"/>
+
+        <!--<p:fileUpload id="fileUploadInput" dragDropSupport="true" value="#{uploadBackingBean.file}" mode="advanced" fileUploadListener="#{uploadBackingBean.fileUploadListener}"/>-->
+
+        <!--<p:commandButton actionListener="#{uploadBackingBean.upload}" ajax="false" value="Ladda upp" update="@form"/>-->
+        <!--<h:commandButton value="Ladda upp" actionListener="#{uploadBackingBean.upload}">
+            &lt;!&ndash;<f:ajax execute="fileUploadInput" render="@form"/>&ndash;&gt;
+            &lt;!&ndash;<f:ajax listener="#ddd{viewBackingBean.upload}" execute="fileUploadInput" render="@form"/>&ndash;&gt;
+        </h:commandButton>-->
+
+        <h:outputText value="#{viewBackingBean.uploadedFileName}"/>
+    </h:form>
+
+</f:view>

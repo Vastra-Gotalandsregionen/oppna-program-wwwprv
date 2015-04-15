@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:p="http://primefaces.org/ui" xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <h:head/>
+
+    <link href="#{request.contextPath}/css/wwwprv.css" rel="stylesheet" type="text/css"/>
+
+    <div class="portlet-content-wrapper">
+        <h:form id="theForm" onkeypress="javascript:formKeyPress(event);">
+
+
+            <h1>Administration</h1>
+
+            <!--<h:messages id="usersMessage" globalOnly="false"/>-->
+
+            <section>
+                <h2>Användare med rollen "Filuppladdare"</h2>
+
+                 <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.userMessage}">#{adminBackingBean.userMessage}</h:panelGroup>
+
+                 <h:panelGroup id="userTable">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Namn</td>
+                            <td>Leverantör</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <ui:repeat value="#{adminBackingBean.allUsers}" var="userContainer">
+                            <tr>
+                                <td>#{userContainer.liferayUser.fullName}</td>
+                                <td>
+                                    <h:selectOneMenu value="#{userContainer.dataPrivataUser.supplier}"
+                                                     converter="#{supplierConverter}" onchange="javascript:showSaveButton(this);">
+                                        <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
+                                        <f:selectItems value="#{adminBackingBean.allSuppliers}" var="supplier"
+                                                       itemLabel="#{supplier.enhetsKod}" itemValue="#{supplier}"/>
+                                    </h:selectOneMenu>
+
+                                </td>
+                                <td>
+                                    <h:commandLink value="Spara" styleClass="save-link" style="display: none;">
+                                        <f:ajax listener="#{adminBackingBean.saveUser(userContainer)}"
+                                                execute=":theForm:userTable" render="@form"/>
+                                    </h:commandLink>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+            </section>
+
+            <!--<h:messages id="suppliersMessage" globalOnly="false"/>-->
+
+            <section>
+                <h2>Leverantörer</h2>
+
+                <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.supplierMessage}">#{adminBackingBean.supplierMessage}</h:panelGroup>
+
+                <h:panelGroup id="supplierTable">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Enhetskod</td>
+                            <td>Enhetsnamn</td>
+                            <td>Ansvarigt kansli</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <ui:repeat value="#{adminBackingBean.allSuppliers}" var="supplier">
+                            <tr>
+                                <td>
+                                    <p:inplace editor="true" emptyLabel="Ej angiven">
+                                        <h:inputText value="#{supplier.enhetsKod}" onchange="javascript:showSaveButton(this);"/>
+                                    </p:inplace>
+                                </td>
+                                <td>
+                                    <p:inplace editor="true" emptyLabel="Ej angiven">
+                                        <h:inputText value="#{supplier.enhetsNamn}" onchange="javascript:showSaveButton(this);"/>
+                                    </p:inplace>
+                                </td>
+                                <td>
+                                    <!--#{supplier.ansvarigtKansli}-->
+                                    <p:inplace editor="true" emptyLabel="Ej angiven">
+                                        <h:selectOneMenu value="#{supplier.ansvarigtKansli}" onchange="javascript:showSaveButton(this);">
+                                            <f:selectItem itemLabel="Välj..." itemValue=""/>
+                                            <f:selectItem itemLabel="Borås" itemValue="Borås"/>
+                                            <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
+                                            <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
+                                            <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
+                                        </h:selectOneMenu>
+                                    </p:inplace>
+                                </td>
+                                <td>
+                                    <h:commandLink styleClass="save-link" style="display: none;" value="Spara">
+                                        <f:ajax listener="#{adminBackingBean.saveSupplier(supplier)}"
+                                                execute=":theForm:supplierTable" render="@form"/>
+                                    </h:commandLink>
+                                </td>
+                                <td>
+                                    <h:commandLink value="Ta bort">
+                                        <f:ajax listener="#{adminBackingBean.removeSupplier(supplier)}"
+                                                execute=":theForm:supplierTable" render="@form"/>
+                                    </h:commandLink>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                        <tr class="label">
+                            <td>Lägg till leverantör:</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h:inputText value="#{adminBackingBean.supplierToAdd.enhetsKod}"/>
+                            </td>
+                            <td>
+                                <h:inputText value="#{adminBackingBean.supplierToAdd.enhetsNamn}"/>
+                            </td>
+                            <td>
+                                <h:selectOneMenu value="#{adminBackingBean.supplierToAdd.ansvarigtKansli}">
+                                    <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
+                                    <f:selectItem itemLabel="Borås" itemValue="Borås"/>
+                                    <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
+                                    <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
+                                    <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
+                                </h:selectOneMenu>
+                            </td>
+                            <td>
+                                <h:commandButton value="Lägg till">
+                                    <f:ajax execute="supplierTable" listener="#{adminBackingBean.addSupplier}"
+                                            render="@form"/>
+                                </h:commandButton>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+            </section>
+
+            <!--    <h:inputText value="#{adminBackingBean.supplierToAddEnhetsKod}"/>
+                <h:commandButton value="Lägg till" actionListener="#d{adminBackingBean.addSupplier}">
+                    &lt;!&ndash;<f:ajax execute="@form" listener="#d{adminBackingBean.addSupplier}" render="@form"/>&ndash;&gt;
+                </h:commandButton>-->
+        </h:form>
+    </div>
+
+    <script type="application/javascript">
+        function showSaveButton(element) {
+            $(element).closest('tr').find('.save-link').fadeToggle(200);
+        }
+
+        /* Catch enter-press. */
+        formKeyPress = function(event) {
+            if (event.keyCode == 13) {
+                event.returnValue = false; /* IE8 */
+                if (event.preventDefault) {
+                    event.preventDefault();
+                }
+
+                var submitButton = $(event.target).closest('tr').find('input[type=submit]');
+
+                if (submitButton) {
+                    submitButton.click();
+                }
+                return false;
+            }
+        };
+    </script>
+</f:view>

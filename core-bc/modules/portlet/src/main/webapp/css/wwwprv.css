@@ -1,0 +1,31 @@
+.aui .wwwprv-portlet-wrapper ul {
+    margin-left: 0;
+}
+
+.aui .wwwprv-portlet-wrapper .label {
+    margin-top: 10px;
+    font-size: 1.0em;
+}
+
+.wwwprv-portlet-wrapper .portlet-content-wrapper {
+    font-size: 1.2em;
+}
+
+.wwwprv-portlet-wrapper td {
+    padding: 3px 6px;
+}
+
+.wwwprv-portlet-wrapper thead {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.wwwprv-portlet-wrapper .ui-inplace .ui-inplace-display {
+    padding: 2px;
+    transition: all 0.05s ease;
+    border-radius: 2px;
+}
+
+.wwwprv-portlet-wrapper tbody tr:hover {
+    background: #DFEEFF;
+}

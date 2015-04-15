@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+       xmlns:b="http://www.springframework.org/schema/beans">
+
+    <context:component-scan base-package="se.vgregion.portal.wwwprv.jsf"/>
+    <context:component-scan base-package="se.vgregion.portal.wwwprv.backingbean"/>
+    <context:component-scan base-package="se.vgregion.portal.wwwprv.repository"/>
+    <context:component-scan base-package="se.vgregion.portal.wwwprv.service"/>
+
+    <context:annotation-config/>
+
+    <!--<bean class="se.vgregion.portal.wwwprv.service.LiferayService"/>-->
+    <!--<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+        <property name="scopes">
+            <map>
+                <entry key="view">
+                    <bean class="se.vgregion.miscibility.jsf.ViewScope"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+-->
+
+    <context:annotation-config />
+
+    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+
+    <!-- Uses by default transaction bean with name transactionManager -->
+    <tx:annotation-driven />
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="persistenceXmlLocation" value="classpath:persistence.xml"></property>
+        <property name="jpaVendorAdapter" ref="jpaVendor" />
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="hibernate.format_sql" value="false" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="jpaVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="database" value="POSTGRESQL" />
+        <property name="databasePlatform" value="org.hibernate.dialect.PostgreSQLDialect" />
+        <property name="generateDdl" value="true" />
+        <property name="showSql" value="false" />
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="java:comp/env/jdbc/HotellDbPool" />
+    </bean>
+</beans>
