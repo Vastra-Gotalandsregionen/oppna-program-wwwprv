@@ -1,14 +1,13 @@
 package se.vgregion.portal.wwwprv.model.jpa;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.Set;
 
 /**
  * @author Patrik Bergström
@@ -18,32 +17,32 @@ import javax.persistence.Table;
 public class DataPrivataUser {
 
     @Id
-    private Long id;
+    private Long liferayUserId;
 
     public DataPrivataUser() {
     }
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.CASCADE) // Hibernate specific
-    private Supplier supplier;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "vgr_dataprivata_user_supplier")
+    private Set<Supplier> suppliers;
 
-    public DataPrivataUser(Long id) {
-        this.id = id;
+    public DataPrivataUser(Long liferayUserId) {
+        this.liferayUserId = liferayUserId;
     }
 
-    public Long getId() {
-        return id;
+    public Long getLiferayUserId() {
+        return liferayUserId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLiferayUserId(Long id) {
+        this.liferayUserId = id;
     }
 
-    public Supplier getSupplier() {
-        return supplier;
+    public Set<Supplier> getSuppliers() {
+        return suppliers;
     }
 
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
+    public void setSuppliers(Set<Supplier> supplier) {
+        this.suppliers = supplier;
     }
 }

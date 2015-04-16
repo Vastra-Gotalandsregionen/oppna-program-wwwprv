@@ -13,16 +13,8 @@
 
         <h:messages />
 
-        <p:fileUpload id="fileUploadInput" update="@form" label="Välj fil" uploadLabel="Ladda upp" cancelLabel="Avbryt"
+        <p:fileUpload  id="fileUploadInput" update="@form" label="Välj fil" uploadLabel="Ladda upp" cancelLabel="Avbryt"
                       dragDropSupport="true" mode="advanced" fileUploadListener="#{uploadBackingBean.fileUploadListener}"/>
-
-        <!--<p:fileUpload id="fileUploadInput" dragDropSupport="true" value="#{uploadBackingBean.file}" mode="advanced" fileUploadListener="#{uploadBackingBean.fileUploadListener}"/>-->
-
-        <!--<p:commandButton actionListener="#{uploadBackingBean.upload}" ajax="false" value="Ladda upp" update="@form"/>-->
-        <!--<h:commandButton value="Ladda upp" actionListener="#{uploadBackingBean.upload}">
-            &lt;!&ndash;<f:ajax execute="fileUploadInput" render="@form"/>&ndash;&gt;
-            &lt;!&ndash;<f:ajax listener="#ddd{viewBackingBean.upload}" execute="fileUploadInput" render="@form"/>&ndash;&gt;
-        </h:commandButton>-->
 
         <h:outputText value="#{viewBackingBean.uploadedFileName}"/>
     </h:form>

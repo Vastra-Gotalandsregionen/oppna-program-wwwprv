@@ -19,7 +19,9 @@ import javax.portlet.PortletRequest;
 import java.lang.management.ManagementFactory;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,10 +41,14 @@ public class AdminBackingBean {
     @Autowired
     private DataPrivataRepository repository;
 
+    @Autowired
+    private RequestScopedModelBean requestScopedModelBean;
+
     private Supplier supplierToAdd;
     private String supplierMessage;
     private String userMessage;
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private Map<Long, Boolean> usersSupplierChooserExpanded = new HashMap<>();
 
     public List<UserContainer> getAllUsers() {
         ThemeDisplay themeDisplay = (ThemeDisplay) ((PortletRequest) FacesContext.getCurrentInstance()
@@ -93,7 +99,6 @@ public class AdminBackingBean {
 
     public void saveUser(UserContainer userContainer) {
         repository.saveUser(userContainer.getDataPrivataUser());
-//        FacesContext.getCurrentInstance().addMessage(":theForm:usersMessage", new FacesMessage("Lyckades spara till " + userContainer.getLiferayUser().getFullName() + "."));
 
         String message = "Lyckades spara till " + userContainer.getLiferayUser().getFullName() + ".";
 
@@ -116,6 +121,67 @@ public class AdminBackingBean {
             supplierToAdd = new Supplier();
         }
         return supplierToAdd;
+    }
+
+    public Map<UserContainer, Map<Supplier, Boolean>> getUserWithSuppliersHelper() {
+        // By this way we only do initUserWithSuppliersMap() once for each request, since the bean we find is request
+        // scope.
+        RequestScopedModelBean bean = UtilBean.findBean("requestScopedModelBean");
+
+        Map<UserContainer, Map<Supplier, Boolean>> userWithSuppliersHelper = bean.getUserWithSuppliersHelper();
+
+        if (userWithSuppliersHelper == null) {
+            userWithSuppliersHelper = initUserWithSuppliersMap();
+            bean.setUserWithSuppliersHelper(userWithSuppliersHelper);
+        }
+
+        return userWithSuppliersHelper;
+    }
+
+    private Map<UserContainer, Map<Supplier, Boolean>> initUserWithSuppliersMap() {
+        Map<UserContainer, Map<Supplier, Boolean>> userWithSuppliersHelper = new HashMap<>();
+
+        List<UserContainer> allUsers = getAllUsers();
+
+        for (UserContainer user : allUsers) {
+            userWithSuppliersHelper.put(user, new HashMap<Supplier, Boolean>());
+
+            List<Supplier> allSuppliers = getAllSuppliers();
+
+            for (Supplier supplier : allSuppliers) {
+                userWithSuppliersHelper.get(user).put(supplier, user.getDataPrivataUser().getSuppliers().contains(supplier));
+            }
+        }
+        return userWithSuppliersHelper;
+    }
+
+    public void toggleSupplier(UserContainer userContainer, Supplier supplier) {
+        DataPrivataUser dataPrivataUser = userContainer.getDataPrivataUser();
+        if (dataPrivataUser.getSuppliers().contains(supplier)) {
+            dataPrivataUser.getSuppliers().remove(supplier);
+        } else {
+            dataPrivataUser.getSuppliers().add(supplier);
+        }
+
+        repository.saveUser(dataPrivataUser);
+
+        FacesContext context = FacesContext.getCurrentInstance();
+
+        context.addMessage(null, new FacesMessage("Sparat!"));
+    }
+
+    public void toggleSupplierChooser() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map map = context.getExternalContext().getRequestParameterMap();
+        String userId = (String) map.get("userId");
+        String isExpanded = (String) map.get("isExpanded");
+
+        usersSupplierChooserExpanded.put(Long.parseLong(userId), Boolean.parseBoolean(isExpanded));
+    }
+
+    public boolean showSupplierChooser(UserContainer userContainer) {
+        Long userId = userContainer.getDataPrivataUser().getLiferayUserId();
+        return usersSupplierChooserExpanded.containsKey(userId) && usersSupplierChooserExpanded.get(userId) == true;
     }
 
     public void setSupplierMessage(String supplierMessage) {

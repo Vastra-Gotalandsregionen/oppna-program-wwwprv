@@ -11,10 +11,11 @@
     <div class="portlet-content-wrapper">
         <h:form id="theForm" onkeypress="javascript:formKeyPress(event);">
 
+            <p:remoteCommand name="toggleSupplierChooser" actionListener="#{adminBackingBean.toggleSupplierChooser()}"/>
+
+            <p:growl autoUpdate="true" sticky="false" />
 
             <h1>Administration</h1>
-
-            <!--<h:messages id="usersMessage" globalOnly="false"/>-->
 
             <section>
                 <h2>Användare med rollen "Filuppladdare"</h2>
@@ -34,13 +35,25 @@
                             <tr>
                                 <td>#{userContainer.liferayUser.fullName}</td>
                                 <td>
-                                    <h:selectOneMenu value="#{userContainer.dataPrivataUser.supplier}"
-                                                     converter="#{supplierConverter}" onchange="javascript:showSaveButton(this);">
-                                        <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
-                                        <f:selectItems value="#{adminBackingBean.allSuppliers}" var="supplier"
-                                                       itemLabel="#{supplier.enhetsKod}" itemValue="#{supplier}"/>
-                                    </h:selectOneMenu>
+                                    <div class="chosen-suppliers" data-userid="#{userContainer.dataPrivataUser.liferayUserId}">
+                                        <h:commandLink class="toggle-choose-suppliers #{adminBackingBean.showSupplierChooser(userContainer) ? 'expanded' : ''}" value="#{utilBean.chosenSupplierString(userContainer)}">
+                                            <f:ajax execute="" render=""/>
+                                        </h:commandLink>
 
+                                        <div class="supplier-chooser" style="#{adminBackingBean.showSupplierChooser(userContainer) ? '' : 'display: none;'}">
+
+                                            <ui:repeat value="#{adminBackingBean.allSuppliers}"
+                                                       var="supplier">
+                                                <div class="supplier-select">
+                                                    <h:selectBooleanCheckbox value="#{adminBackingBean.getUserWithSuppliersHelper()[userContainer][supplier]}">
+                                                        <f:ajax render="@form"
+                                                                listener="#{adminBackingBean.toggleSupplier(userContainer, supplier)}" onevent="reinitAfterPageUpdate"/>
+                                                    </h:selectBooleanCheckbox>
+                                                    #{supplier.enhetsKod}
+                                                </div>
+                                            </ui:repeat>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <h:commandLink value="Spara" styleClass="save-link" style="display: none;">
@@ -54,8 +67,6 @@
                     </table>
                 </h:panelGroup>
             </section>
-
-            <!--<h:messages id="suppliersMessage" globalOnly="false"/>-->
 
             <section>
                 <h2>Leverantörer</h2>
@@ -141,33 +152,53 @@
                 </h:panelGroup>
             </section>
 
-            <!--    <h:inputText value="#{adminBackingBean.supplierToAddEnhetsKod}"/>
-                <h:commandButton value="Lägg till" actionListener="#d{adminBackingBean.addSupplier}">
-                    &lt;!&ndash;<f:ajax execute="@form" listener="#d{adminBackingBean.addSupplier}" render="@form"/>&ndash;&gt;
-                </h:commandButton>-->
         </h:form>
+
+        <script type="application/javascript">
+
+            initPage();
+
+            function reinitAfterPageUpdate(data) {
+                if (data.status='complete') {
+                    initPage();
+                }
+            }
+
+            function initPage() {
+                var chooseSuppliersTrigger = $('.toggle-choose-suppliers');
+                chooseSuppliersTrigger.on('click', function (e) {
+                    var chosenSuppliersDiv = $(e.target).parent();
+                    chosenSuppliersDiv.find('.supplier-chooser').slideToggle(200);
+                    var toggleLink = chosenSuppliersDiv.find('.toggle-choose-suppliers');
+                    toggleLink.toggleClass('expanded');
+
+                    var userId = chosenSuppliersDiv.closest('.chosen-suppliers').attr('data-userid');
+                    toggleSupplierChooser([{name: 'userId', value: userId}, {name: 'isExpanded', value: toggleLink.hasClass('expanded')}]); /* Primefaces remoteCommand */
+                });
+
+                /* Catch enter-press. */
+                formKeyPress = function(event) {
+                    if (event.keyCode == 13) {
+                        event.returnValue = false; /* IE8 */
+                        if (event.preventDefault) {
+                            event.preventDefault();
+                        }
+
+                        var submitButton = $(event.target).closest('tr').find('input[type=submit]');
+
+                        if (submitButton) {
+                            submitButton.click();
+                        }
+                        return false;
+                    }
+                };
+            }
+
+            function showSaveButton(element) {
+                $(element).closest('tr').find('.save-link').fadeToggle(200);
+            }
+
+        </script>
     </div>
 
-    <script type="application/javascript">
-        function showSaveButton(element) {
-            $(element).closest('tr').find('.save-link').fadeToggle(200);
-        }
-
-        /* Catch enter-press. */
-        formKeyPress = function(event) {
-            if (event.keyCode == 13) {
-                event.returnValue = false; /* IE8 */
-                if (event.preventDefault) {
-                    event.preventDefault();
-                }
-
-                var submitButton = $(event.target).closest('tr').find('input[type=submit]');
-
-                if (submitButton) {
-                    submitButton.click();
-                }
-                return false;
-            }
-        };
-    </script>
 </f:view>

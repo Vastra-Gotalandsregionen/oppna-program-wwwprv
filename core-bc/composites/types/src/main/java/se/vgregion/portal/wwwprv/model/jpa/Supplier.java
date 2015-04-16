@@ -1,11 +1,14 @@
 package se.vgregion.portal.wwwprv.model.jpa;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author Patrik Bergström
@@ -23,6 +26,9 @@ public class Supplier implements Serializable {
     private String enhetsNamn;
 
     private String enhetsKod;
+
+    @ManyToMany(mappedBy = "suppliers", cascade = CascadeType.ALL)
+    private Set<DataPrivataUser> dataPrivataUsers;
 
     public Supplier() {
     }
@@ -53,6 +59,14 @@ public class Supplier implements Serializable {
 
     public void setEnhetsKod(String enhetsKod) {
         this.enhetsKod = enhetsKod;
+    }
+
+    public Set<DataPrivataUser> getDataPrivataUsers() {
+        return dataPrivataUsers;
+    }
+
+    public void setDataPrivataUsers(Set<DataPrivataUser> dataPrivataUsers) {
+        this.dataPrivataUsers = dataPrivataUsers;
     }
 
     @Override

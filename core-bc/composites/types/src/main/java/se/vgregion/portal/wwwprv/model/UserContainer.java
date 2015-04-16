@@ -23,4 +23,19 @@ public class UserContainer {
     public DataPrivataUser getDataPrivataUser() {
         return dataPrivataUser;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserContainer that = (UserContainer) o;
+
+        return !(dataPrivataUser.getLiferayUserId() != null ? !dataPrivataUser.getLiferayUserId().equals(that.dataPrivataUser.getLiferayUserId()) : that.dataPrivataUser.getLiferayUserId() != null);
+    }
+
+    @Override
+    public int hashCode() {
+        return dataPrivataUser.getLiferayUserId() != null ? dataPrivataUser.getLiferayUserId().hashCode() : 0;
+    }
 }
