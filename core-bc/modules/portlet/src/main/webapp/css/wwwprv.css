@@ -49,3 +49,59 @@
 .wwwprv-portlet-wrapper .chosen-suppliers {
     padding-right: 15px;
 }
+
+/* File upload */
+.wwwprv-portlet-wrapper .file-upload-section {
+    margin-top: 20px;
+}
+
+.wwwprv-portlet-wrapper .ui-fileupload {
+    padding-bottom: 40px;
+    position: relative;
+}
+
+.wwwprv-portlet-wrapper .ui-fileupload-upload {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+}
+
+.wwwprv-portlet-wrapper .ui-fileupload-cancel.ui-button-text-icon-left {
+    bottom: 0;
+    left: 125px;
+    position: absolute;
+}
+
+.aui .wwwprv-portlet-wrapper .label {
+    padding-left: 0;
+}
+
+.wwwprv-portlet-wrapper .uploaded-file-list {
+    margin-top: 20px;
+}
+
+.wwwprv-portlet-wrapper .uploaded-file-list ul {
+    list-style: none;
+}
+
+.ui-confirm-dialog-severity {
+    display: none !important;
+}
+
+.ui-dialog-buttonpane input:first-child {
+    margin-right: 20px;
+}
+
+.ui-widget-overlay {
+    background: #aaaaaa;
+}
+
+.wwwprv-portlet-wrapper .ui-fileupload-buttonbar {
+    background: none;
+    border: none;
+}
+
+.wwwprv-portlet-wrapper .ui-fileupload-content {
+    background: none;
+    border: none;
+}

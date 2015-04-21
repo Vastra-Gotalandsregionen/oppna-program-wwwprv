@@ -18,5 +18,12 @@
         <requires-namespaced-parameters>false</requires-namespaced-parameters>
         <css-class-wrapper>wwwprv-portlet-wrapper</css-class-wrapper>
     </portlet>
+    <portlet>
+        <portlet-name>listfiles</portlet-name>
+        <action-url-redirect>true</action-url-redirect>
+        <instanceable>false</instanceable>
+        <requires-namespaced-parameters>false</requires-namespaced-parameters>
+        <css-class-wrapper>wwwprv-portlet-wrapper</css-class-wrapper>
+    </portlet>
 
 </liferay-portlet-app>

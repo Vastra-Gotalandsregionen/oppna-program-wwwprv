@@ -1,7 +1,6 @@
 package se.vgregion.portal.wwwprv.backingbean;
 
 import com.liferay.faces.util.portal.WebKeys;
-import com.liferay.portal.model.User;
 import com.liferay.portal.theme.ThemeDisplay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -12,17 +11,15 @@ import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.repository.DataPrivataRepository;
 import se.vgregion.portal.wwwprv.service.LiferayService;
 import se.vgregion.portal.wwwprv.service.LiferayServiceException;
+import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletRequest;
-import java.lang.management.ManagementFactory;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -107,12 +104,7 @@ public class AdminBackingBean {
 
     public List<Supplier> getAllSuppliers() {
         List<Supplier> allSuppliers = repository.getAllSuppliers();
-        Collections.sort(allSuppliers, new Comparator<Supplier>() {
-            @Override
-            public int compare(Supplier o1, Supplier o2) {
-                return o1.getEnhetsKod().toLowerCase().compareTo(o2.getEnhetsKod().toLowerCase());
-            }
-        });
+        Collections.sort(allSuppliers, new SupplierComparator());
         return allSuppliers;
     }
 

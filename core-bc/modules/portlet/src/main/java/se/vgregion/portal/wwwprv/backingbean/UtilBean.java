@@ -7,6 +7,7 @@ import se.vgregion.portal.wwwprv.model.UserContainer;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 
 import javax.faces.context.FacesContext;
+import javax.portlet.PortletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +42,11 @@ public class UtilBean {
     public static <T> T findBean(String beanName) {
         FacesContext context = FacesContext.getCurrentInstance();
         return (T) context.getApplication().evaluateExpressionGet(context, "#{" + beanName + "}", Object.class);
+    }
+
+    public static String getUserId() {
+        return ((PortletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest())
+                .getRemoteUser();
     }
 
 }

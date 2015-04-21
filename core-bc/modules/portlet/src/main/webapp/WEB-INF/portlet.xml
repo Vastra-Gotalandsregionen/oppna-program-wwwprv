@@ -67,4 +67,29 @@
 
     </portlet>
 
+    <portlet>
+
+        <description>Lista uppladdade filer</description>
+        <portlet-name>listfiles</portlet-name>
+        <display-name>Lista uppladdade filer</display-name>
+        <portlet-class>com.liferay.faces.bridge.GenericLiferayFacesPortlet</portlet-class>
+
+        <init-param>
+            <name>javax.portlet.faces.defaultViewId.view</name>
+            <value>/WEB-INF/xhtml/listfiles/view.xhtml</value>
+        </init-param>
+
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>VIEW</portlet-mode>
+        </supports>
+
+        <portlet-info>
+            <title>Lista uppladdade filer</title>
+            <short-title>listfiles</short-title>
+            <keywords>listfiles</keywords>
+        </portlet-info>
+
+    </portlet>
+
 </portlet-app>

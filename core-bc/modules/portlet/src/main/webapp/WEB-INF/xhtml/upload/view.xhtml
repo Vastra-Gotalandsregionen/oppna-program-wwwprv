@@ -6,17 +6,57 @@
 
     <h:head/>
 
-    <!--<link href="#{request.contextPath}/css/miscibility.css" rel="stylesheet" type="text/css"/>-->
+    <link href="#{request.contextPath}/css/wwwprv.css" rel="stylesheet" type="text/css"/>
 
     <h:form enctype="multipart/form-data">
         <h2>Ladda upp fil</h2>
 
         <h:messages />
 
-        <p:fileUpload  id="fileUploadInput" update="@form" label="Välj fil" uploadLabel="Ladda upp" cancelLabel="Avbryt"
-                      dragDropSupport="true" mode="advanced" fileUploadListener="#{uploadBackingBean.fileUploadListener}"/>
+        <p:confirmDialog closable="false" widgetVar="confirmOverwrite" message="Filen ”#{uploadBackingBean.tempFileUpload.baseName}#{uploadBackingBean.tempFileUpload.suffix}” har laddats upp tidigare. Vill du ladda upp igen?" visible="#{uploadBackingBean.currentlyDuplicateFileWorkflow}">
+            <h:commandButton value="Ladda upp" onclick="PF('confirmOverwrite').hide()">
+                <f:ajax listener="#{uploadBackingBean.moveTempFileToUploadDirectory()}" render="@form"/>
+            </h:commandButton>
+            <h:commandButton value="Avbryt" onclick="PF('confirmOverwrite').hide()">
+                <f:ajax listener="#{uploadBackingBean.abortMoveTempFileToUploadDirectory()}" render="@form"/>
+            </h:commandButton>
+        </p:confirmDialog>
 
-        <h:outputText value="#{viewBackingBean.uploadedFileName}"/>
+        <div class="label">Välj leverantör:</div>
+        <h:selectOneMenu id="chooseSupplier" value="#{uploadBackingBean.chosenSupplier}" converter="#{supplierConverter}">
+            <f:selectItem itemLabel="Välj leverantör..." itemValue=""/>
+            <f:selectItems value="#{uploadRequestScopeBackingBean.usersSuppliers}" var="supplier" itemValue="#{supplier}" itemLabel="#{supplier.enhetsNamn}"/>
+            <f:ajax  execute="chooseSupplier" render="@form"/>
+        </h:selectOneMenu>
+
+        <div class="file-upload-section">
+            <p:fileUpload id="fileUploadInput" update="@form" label="Välj fil" uploadLabel="Ladda upp" cancelLabel="Avbryt"
+                          dragDropSupport="true" mode="advanced" fileUploadListener="#{uploadBackingBean.fileUploadListener}"
+                          rendered="#{uploadBackingBean.showFileUpload}"/>
+        </div>
+
+        <h:panelGroup layout="block" class="uploaded-file-list" rendered="#{not empty uploadBackingBean.chosenSupplier}">
+            <div class="label">Redan uppladdade filer för <span style="font-size: 1.2em;">#{uploadBackingBean.chosenSupplier.enhetsNamn}</span></div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Namn</td>
+                        <td>Datum</td>
+                    </tr>
+                </thead>
+                <tbody>
+                <ui:repeat value="#{uploadBackingBean.uploadedFileList}" var="fileUpload">
+                    <tr>
+                        <td>#{fileUpload.fullFileName}</td>
+                        <td><h:outputText value="#{fileUpload.uploaded}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="Europe/Stockholm"/>
+                            </h:outputText>
+                        </td>
+                    </tr>
+                </ui:repeat>
+                </tbody>
+            </table>
+        </h:panelGroup>
     </h:form>
 
 </f:view>

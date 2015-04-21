@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:p="http://primefaces.org/ui" xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <h:head/>
+
+    <link href="#{request.contextPath}/css/wwwprv.css" rel="stylesheet" type="text/css"/>
+
+    <h:form enctype="multipart/form-data">
+        <h2>Lista uppladdade filer</h2>
+
+        <h:messages />
+
+        <p:dataTable value="#{listFilesBackingBean.allFileUploads}" var="fileUpload" emptyMessage="Inga träffar.">
+            <p:column headerText="Namn">
+                <h:outputText value="#{fileUpload.fullFileName}"/>
+            </p:column>
+            <p:column headerText="Leverantör">
+                <h:outputText value="#{fileUpload.supplierCode}"/>
+            </p:column>
+            <p:column headerText="Datum">
+                <h:outputText value="#{fileUpload.uploaded}">
+                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="Europe/Stockholm"/>
+                </h:outputText>
+            </p:column>
+        </p:dataTable>
+
+    </h:form>
+
+</f:view>

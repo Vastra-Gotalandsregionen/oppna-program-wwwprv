@@ -4,5 +4,6 @@
     <category name="VGR Data Privata">
         <portlet id="fileupload"/>
         <portlet id="adminportlet"/>
+        <portlet id="listfiles"/>
     </category>
 </display>
