@@ -55,12 +55,6 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <h:commandLink value="Spara" styleClass="save-link" style="display: none;">
-                                        <f:ajax listener="#{adminBackingBean.saveUser(userContainer)}"
-                                                execute=":theForm:userTable" render="@form"/>
-                                    </h:commandLink>
-                                </td>
                             </tr>
                         </ui:repeat>
                         </tbody>
@@ -110,13 +104,13 @@
                                 <td>
                                     <h:commandLink styleClass="save-link" style="display: none;" value="Spara">
                                         <f:ajax listener="#{adminBackingBean.saveSupplier(supplier)}"
-                                                execute=":theForm:supplierTable" render="@form"/>
+                                                execute=":theForm:supplierTable" render="@form" onevent="reinitAfterPageUpdate"/>
                                     </h:commandLink>
                                 </td>
                                 <td>
                                     <h:commandLink value="Ta bort">
                                         <f:ajax listener="#{adminBackingBean.removeSupplier(supplier)}"
-                                                execute=":theForm:supplierTable" render="@form"/>
+                                                execute=":theForm:supplierTable" render="@form" onevent="reinitAfterPageUpdate"/>
                                     </h:commandLink>
                                 </td>
                             </tr>
@@ -143,7 +137,7 @@
                             <td>
                                 <h:commandButton value="Lägg till">
                                     <f:ajax execute="supplierTable" listener="#{adminBackingBean.addSupplier}"
-                                            render="@form"/>
+                                            render="@form" onevent="reinitAfterPageUpdate"/>
                                 </h:commandButton>
                             </td>
                         </tr>
@@ -195,7 +189,7 @@
             }
 
             function showSaveButton(element) {
-                $(element).closest('tr').find('.save-link').fadeToggle(200);
+                $(element).closest('tr').find('.save-link').fadeIn(200);
             }
 
         </script>

@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Patrik Bergström
@@ -21,7 +22,6 @@ public class DataPrivataRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
-
 
     public DataPrivataUser getUserById(Long userId) {
         return entityManager.find(DataPrivataUser.class, userId);
@@ -35,6 +35,7 @@ public class DataPrivataRepository {
     public List<Supplier> getAllSuppliers() {
         return entityManager.createQuery("select s from Supplier s").getResultList();
     }
+
     @Transactional
     public void persistNewSupplier(Supplier supplierToAdd) {
         entityManager.persist(supplierToAdd);
@@ -51,7 +52,15 @@ public class DataPrivataRepository {
 
     @Transactional
     public void remove(Supplier supplier) {
-        entityManager.remove(entityManager.getReference(Supplier.class, supplier.getId()));
+        Supplier supplierReference = entityManager.getReference(Supplier.class, supplier.getId());
+
+        // Remove bidirectionally
+        Set<DataPrivataUser> dataPrivataUsers = supplierReference.getDataPrivataUsers();
+        for (DataPrivataUser dataPrivataUser : dataPrivataUsers) {
+            dataPrivataUser.getSuppliers().remove(supplierReference);
+        }
+
+        entityManager.remove(supplierReference);
     }
 
     @Transactional

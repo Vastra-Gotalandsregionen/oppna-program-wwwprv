@@ -1,7 +1,7 @@
 package se.vgregion.portal.wwwprv.model.jpa;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +27,7 @@ public class Supplier implements Serializable {
 
     private String enhetsKod;
 
-    @ManyToMany(mappedBy = "suppliers", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "suppliers", fetch = FetchType.EAGER)
     private Set<DataPrivataUser> dataPrivataUsers;
 
     public Supplier() {

@@ -1,6 +1,5 @@
 package se.vgregion.portal.wwwprv.model.jpa;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -22,7 +21,7 @@ public class DataPrivataUser {
     public DataPrivataUser() {
     }
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "vgr_dataprivata_user_supplier")
     private Set<Supplier> suppliers;
 
