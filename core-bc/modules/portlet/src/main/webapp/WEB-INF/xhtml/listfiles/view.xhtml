@@ -14,16 +14,19 @@
         <h:messages />
 
         <p:dataTable value="#{listFilesBackingBean.allFileUploads}" var="fileUpload" emptyMessage="Inga träffar.">
-            <p:column headerText="Namn">
+            <p:column headerText="Filnamn">
                 <h:outputText value="#{fileUpload.fullFileName}"/>
             </p:column>
             <p:column headerText="Leverantör">
                 <h:outputText value="#{fileUpload.supplierCode}"/>
             </p:column>
-            <p:column headerText="Datum">
+            <p:column headerText="Uppladdad">
                 <h:outputText value="#{fileUpload.uploaded}">
                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="Europe/Stockholm"/>
                 </h:outputText>
+            </p:column>
+            <p:column headerText="Uppladdad av">
+                <h:outputText value="#{fileUpload.uploader}"/>
             </p:column>
         </p:dataTable>
 

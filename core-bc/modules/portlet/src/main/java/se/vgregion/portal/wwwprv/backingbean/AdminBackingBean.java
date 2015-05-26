@@ -8,14 +8,16 @@ import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.UserContainer;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
-import se.vgregion.portal.wwwprv.repository.DataPrivataRepository;
+import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.service.LiferayService;
 import se.vgregion.portal.wwwprv.service.LiferayServiceException;
+import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletRequest;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +38,7 @@ public class AdminBackingBean {
     private LiferayService liferayService;
 
     @Autowired
-    private DataPrivataRepository repository;
-
-    @Autowired
-    private RequestScopedModelBean requestScopedModelBean;
+    private DataPrivataService dataPrivataService;
 
     private Supplier supplierToAdd;
     private String supplierMessage;
@@ -61,9 +60,25 @@ public class AdminBackingBean {
         }
     }
 
+    public List<Short> getAllSharedUploadFolders() {
+        SharedUploadFolder[] values = SharedUploadFolder.values();
+
+        List<Short> toReturn = new ArrayList<>();
+
+        for (SharedUploadFolder value : values) {
+            toReturn.add(value.getIndex());
+        }
+
+        return toReturn;
+    }
+
+    public String getLabel(Short index) {
+        return SharedUploadFolder.getSharedUploadFolder(index).getLabel();
+    }
+
     public void addSupplier() {
 
-        repository.persistNewSupplier(supplierToAdd);
+        dataPrivataService.persistNewSupplier(supplierToAdd);
 
         String message = "Lyckades lägga till " + supplierToAdd.getEnhetsKod() + ".";
 
@@ -74,7 +89,7 @@ public class AdminBackingBean {
 
     public void saveSupplier(Supplier supplier) {
 
-        repository.saveSupplier(supplier);
+        dataPrivataService.saveSupplier(supplier);
 
         String message = "Lyckades spara " + supplier.getEnhetsKod() + ".";
 
@@ -83,7 +98,7 @@ public class AdminBackingBean {
 
     public void removeSupplier(Supplier supplier) {
         try {
-            repository.remove(supplier);
+            dataPrivataService.remove(supplier);
 
             String message = "Lyckades ta bort " + supplier.getEnhetsKod() + ".";
 
@@ -95,7 +110,7 @@ public class AdminBackingBean {
     }
 
     public void saveUser(UserContainer userContainer) {
-        repository.saveUser(userContainer.getDataPrivataUser());
+        dataPrivataService.saveUser(userContainer.getDataPrivataUser());
 
         String message = "Lyckades spara till " + userContainer.getLiferayUser().getFullName() + ".";
 
@@ -103,7 +118,7 @@ public class AdminBackingBean {
     }
 
     public List<Supplier> getAllSuppliers() {
-        List<Supplier> allSuppliers = repository.getAllSuppliers();
+        List<Supplier> allSuppliers = dataPrivataService.getAllSuppliers();
         Collections.sort(allSuppliers, new SupplierComparator());
         return allSuppliers;
     }
@@ -155,7 +170,7 @@ public class AdminBackingBean {
             dataPrivataUser.getSuppliers().add(supplier);
         }
 
-        repository.saveUser(dataPrivataUser);
+        dataPrivataService.saveUser(dataPrivataUser);
 
         FacesContext context = FacesContext.getCurrentInstance();
 

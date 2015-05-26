@@ -28,6 +28,8 @@ public class FileUpload {
 
     private String suffix;
 
+    private String uploader;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date uploaded;
 
@@ -38,11 +40,12 @@ public class FileUpload {
     public FileUpload() {
     }
 
-    public FileUpload(String supplierCode, String baseName, String datePart, String suffix) {
+    public FileUpload(String supplierCode, String baseName, String datePart, String suffix, String uploader) {
         this.supplierCode = supplierCode;
         this.baseName = baseName;
         this.datePart = datePart;
         this.suffix = suffix;
+        this.uploader = uploader;
     }
 
     public void setSupplierCode(String supplierCode) {
@@ -83,5 +86,13 @@ public class FileUpload {
 
     public String getFullFileName() {
         return baseName + datePart + suffix;
+    }
+
+    public String getUploader() {
+        return uploader;
+    }
+
+    public void setUploader(String uploader) {
+        this.uploader = uploader;
     }
 }

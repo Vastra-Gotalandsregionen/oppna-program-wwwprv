@@ -74,6 +74,9 @@
                             <td>Enhetskod</td>
                             <td>Enhetsnamn</td>
                             <td>Ansvarigt kansli</td>
+                            <td>Delad uppladdningsmapp</td>
+                            <td></td>
+                            <td></td>
                         </tr>
                         </thead>
                         <tbody>
@@ -98,6 +101,14 @@
                                             <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
                                             <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
                                             <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
+                                        </h:selectOneMenu>
+                                    </p:inplace>
+                                </td>
+                                <td>
+                                    <p:inplace editor="true" emptyLabel="Ej angiven">
+                                        <h:selectOneMenu value="#{supplier.sharedUploadFolder}" converter="#{sharedUploadFolderConverter}" onchange="javascript:showSaveButton(this);">
+                                            <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
+                                            <f:selectItems value="#{adminBackingBean.allSharedUploadFolders}" var="folderIndex" itemValue="#{folderIndex}" itemLabel="#{adminBackingBean.getLabel(folderIndex)}"/>
                                         </h:selectOneMenu>
                                     </p:inplace>
                                 </td>
@@ -132,6 +143,12 @@
                                     <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
                                     <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
                                     <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
+                                </h:selectOneMenu>
+                            </td>
+                            <td>
+                                <h:selectOneMenu value="#{adminBackingBean.supplierToAdd.sharedUploadFolder}" converter="#{sharedUploadFolderConverter}" onchange="javascript:showSaveButton(this);">
+                                    <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{adminBackingBean.allSharedUploadFolders}" var="folderIndex" itemValue="#{folderIndex}" itemLabel="#{adminBackingBean.getLabel(folderIndex)}"/>
                                 </h:selectOneMenu>
                             </td>
                             <td>

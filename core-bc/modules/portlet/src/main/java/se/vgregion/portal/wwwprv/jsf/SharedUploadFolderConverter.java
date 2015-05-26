@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
+import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -13,24 +14,23 @@ import javax.faces.convert.Converter;
  * @author Patrik Bergström
  */
 @Component
-public class SupplierConverter implements Converter {
-
-    @Autowired
-    private DataPrivataService dataPrivataService;
+public class SharedUploadFolderConverter implements Converter {
 
     @Override
-    public Supplier getAsObject(FacesContext context, UIComponent component, String value) {
-        if (value == null || "".equals(value)) {
+    public Short getAsObject(FacesContext context, UIComponent component, String value) {
+        if (value == null || "".equals(value) || "Välj...".equals(value)) {
             return null;
         }
-        return dataPrivataService.findSupplierById(Integer.parseInt(value));
+
+        return SharedUploadFolder.getSharedUploadFolder(value).getIndex();
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
         if (value == null || "".equals(value)) {
-            return "";
+            return null;
         }
-        return ((Supplier) value).getId() + "";
+
+        return SharedUploadFolder.getSharedUploadFolder((Short) value).getLabel();
     }
 }

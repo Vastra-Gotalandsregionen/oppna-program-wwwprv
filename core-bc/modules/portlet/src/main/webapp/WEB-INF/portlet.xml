@@ -92,4 +92,9 @@
 
     </portlet>
 
+    <user-attribute>
+        <description>User Login ID</description>
+        <name>user.login.id</name>
+    </user-attribute>
+
 </portlet-app>

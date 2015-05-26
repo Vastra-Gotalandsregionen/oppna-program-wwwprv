@@ -3,18 +3,23 @@ package se.vgregion.portal.wwwprv.backingbean;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
-import se.vgregion.portal.wwwprv.repository.DataPrivataRepository;
+import se.vgregion.portal.wwwprv.service.DataPrivataService;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.portlet.PortletRequest;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Patrik Bergström
@@ -33,8 +39,10 @@ import java.util.List;
 @Scope("session")
 public class UploadBackingBean {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadBackingBean.class);
+
     @Autowired
-    private DataPrivataRepository repository;
+    private DataPrivataService dataPrivataService;
 
     private UploadedFile file;
 
@@ -88,8 +96,10 @@ public class UploadBackingBean {
 
         File newFile = new File(uploadDirectory, newFileName);
 
-        if (repository.isFileAlreadyUploaded(baseFileName, lastPartIncludingDot, chosenSupplier)) {
-            tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot);
+        String userName = getUserName();
+
+        if (dataPrivataService.isFileAlreadyUploaded(baseFileName, lastPartIncludingDot, chosenSupplier)) {
+            tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot, userName);
 
             tempFile = new File(System.getProperty("java.io.tmpdir"), newFileName);
             newFile = tempFile;
@@ -101,25 +111,54 @@ public class UploadBackingBean {
 
             IOUtils.copy(is, bos);
 
-            if (!currentlyDuplicateFileWorkflow) {
-                repository.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot);
-            }
         }
 
-        if (!currentlyDuplicateFileWorkflow) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Uppladdning lyckades. Filen fick namnet " + newFileName));
+        try (FileInputStream fis = new FileInputStream(newFile);
+             BufferedInputStream bis = new BufferedInputStream(fis)) {
+
+            if (!currentlyDuplicateFileWorkflow) {
+                dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot, userName, bis);
+            }
+
+            if (!currentlyDuplicateFileWorkflow) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Uppladdning lyckades. Filen fick namnet " + newFileName));
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
         }
 
         updateUploadedFileList();
     }
 
-    public void moveTempFileToUploadDirectory() throws IOException {
-        Files.move(tempFile.toPath(), new File(uploadDirectory, tempFile.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+    private String getUserName() {
+        PortletRequest request = (PortletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        Map<String, String> userInfo = (Map<String, String>) request.getAttribute(PortletRequest.USER_INFO);
+        String info;
+        if (userInfo != null) {
+            info = userInfo.get(PortletRequest.P3PUserInfos.USER_LOGIN_ID.toString());
+        } else {
+            return null;
+        }
+        return info;
+    }
 
-        repository.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
-                tempFileUpload.getDatePart(), tempFileUpload.getSuffix());
+    public void moveTempFileToUploadDirectory() throws IOException {
+        File target = new File(uploadDirectory, tempFile.getName());
+        Files.move(tempFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        try (FileInputStream fis = new FileInputStream(target);
+             BufferedInputStream bis = new BufferedInputStream(fis)) {
+            dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
+                    tempFileUpload.getDatePart(), tempFileUpload.getSuffix(), getUserName(), bis);
 
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + tempFile.getName() + " skapades."));
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
+        }
 
         tempFile = null;
         tempFileUpload = null;
@@ -182,7 +221,7 @@ public class UploadBackingBean {
     }
 
     private void updateUploadedFileList() {
-        List<FileUpload> allFileUploads = repository.getAllFileUploads();
+        List<FileUpload> allFileUploads = dataPrivataService.getAllFileUploads();
 
         Iterator<FileUpload> iterator = allFileUploads.iterator();
 

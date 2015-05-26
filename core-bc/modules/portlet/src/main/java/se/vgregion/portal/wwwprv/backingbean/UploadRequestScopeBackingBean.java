@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
-import se.vgregion.portal.wwwprv.repository.DataPrivataRepository;
+import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
 import javax.annotation.PostConstruct;
@@ -23,15 +23,17 @@ import java.util.Set;
 public class UploadRequestScopeBackingBean {
 
     @Autowired
-    private DataPrivataRepository repository;
+    private DataPrivataService dataPrivataService;
 
     private Set<Supplier> usersSuppliers;
 
     @PostConstruct
     public void init() {
-        DataPrivataUser dataPrivataUser = repository.getUserById(Long.valueOf(UtilBean.getUserId()));
+        DataPrivataUser dataPrivataUser = dataPrivataService.getUserById(Long.valueOf(UtilBean.getUserId()));
 
-        usersSuppliers = dataPrivataUser.getSuppliers();
+        if (dataPrivataUser != null) {
+            usersSuppliers = dataPrivataUser.getSuppliers();
+        }
     }
 
     public List<Supplier> getUsersSuppliers() {
@@ -39,7 +41,13 @@ public class UploadRequestScopeBackingBean {
             init();
         }
 
-        List<Supplier> suppliers = new ArrayList<>(usersSuppliers);
+        List<Supplier> suppliers;
+
+        if (usersSuppliers != null) {
+            suppliers = new ArrayList<>(usersSuppliers);
+        } else {
+            suppliers = new ArrayList<>();
+        }
 
         Collections.sort(suppliers, new SupplierComparator());
 

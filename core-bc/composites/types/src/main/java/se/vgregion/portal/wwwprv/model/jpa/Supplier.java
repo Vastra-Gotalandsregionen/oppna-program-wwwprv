@@ -27,6 +27,8 @@ public class Supplier implements Serializable {
 
     private String enhetsKod;
 
+    private Short sharedUploadFolder;
+
     @ManyToMany(mappedBy = "suppliers", fetch = FetchType.EAGER)
     private Set<DataPrivataUser> dataPrivataUsers;
 
@@ -67,6 +69,14 @@ public class Supplier implements Serializable {
 
     public void setDataPrivataUsers(Set<DataPrivataUser> dataPrivataUsers) {
         this.dataPrivataUsers = dataPrivataUsers;
+    }
+
+    public Short getSharedUploadFolder() {
+        return sharedUploadFolder;
+    }
+
+    public void setSharedUploadFolder(Short sharedUploadFolder) {
+        this.sharedUploadFolder = sharedUploadFolder;
     }
 
     @Override

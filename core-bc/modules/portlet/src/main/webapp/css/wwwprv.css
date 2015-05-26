@@ -50,6 +50,10 @@
     padding-right: 30px;
 }
 
+.aui .ui-datatable thead th, .ui-datatable tfoot td {
+    text-align: left;
+}
+
 /* File upload */
 .wwwprv-portlet-wrapper .file-upload-section {
     margin-top: 20px;

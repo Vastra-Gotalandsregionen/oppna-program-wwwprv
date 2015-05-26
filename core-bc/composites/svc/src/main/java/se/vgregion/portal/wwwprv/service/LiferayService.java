@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.portal.wwwprv.model.UserContainer;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
-import se.vgregion.portal.wwwprv.repository.DataPrivataRepository;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,7 +36,7 @@ public class LiferayService {
     private UserGroupRoleLocalService userGroupRoleLocalService;
 
     @Autowired
-    private DataPrivataRepository repository;
+    private DataPrivataService dataPrivataService;
 
     public LiferayService() {
         this.userLocalService = UserLocalServiceUtil.getService();
@@ -71,11 +70,11 @@ public class LiferayService {
 
             // So now we have all users which should be managed. Those which aren't already we "create".
             for (User user : users) {
-                DataPrivataUser dataPrivataUser = repository.getUserById(user.getUserId());
+                DataPrivataUser dataPrivataUser = dataPrivataService.getUserById(user.getUserId());
 
                 if (dataPrivataUser == null) {
                     dataPrivataUser = new DataPrivataUser(user.getUserId());
-                    repository.persistNewUser(dataPrivataUser);
+                    dataPrivataService.persistNewUser(dataPrivataUser);
                 }
 
                 userContainers.add(new UserContainer(user, dataPrivataUser));

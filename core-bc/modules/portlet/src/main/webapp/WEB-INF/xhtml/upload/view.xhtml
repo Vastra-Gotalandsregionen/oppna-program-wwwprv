@@ -37,11 +37,27 @@
 
         <h:panelGroup layout="block" class="uploaded-file-list" rendered="#{not empty uploadBackingBean.chosenSupplier}">
             <div class="label">Redan uppladdade filer för <span style="font-size: 1.2em;">#{uploadBackingBean.chosenSupplier.enhetsNamn}</span></div>
-            <table>
+
+            <p:dataTable value="#{uploadBackingBean.uploadedFileList}" var="fileUpload" emptyMessage="Ingen data">
+                <p:column headerText="Filnamn">
+                    <h:outputText value="#{fileUpload.fullFileName}"/>
+                </p:column>
+                <p:column headerText="Uppladdad">
+                    <h:outputText value="#{fileUpload.uploaded}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="Europe/Stockholm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Uppladdad av">
+                    <h:outputText value="#{fileUpload.uploader}"/>
+                </p:column>
+            </p:dataTable>
+
+ <!--           <table>
                 <thead>
                     <tr>
-                        <td>Namn</td>
-                        <td>Datum</td>
+                        <td>Filnamn</td>
+                        <td>Uppladdad</td>
+                        <td>Uppladdad av</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,10 +68,11 @@
                                 <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="Europe/Stockholm"/>
                             </h:outputText>
                         </td>
+                        <td>#{fileUpload.uploader}</td>
                     </tr>
                 </ui:repeat>
                 </tbody>
-            </table>
+            </table>-->
         </h:panelGroup>
     </h:form>
 
