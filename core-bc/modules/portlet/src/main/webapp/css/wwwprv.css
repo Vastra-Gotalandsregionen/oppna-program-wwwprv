@@ -88,6 +88,11 @@
     list-style: none;
 }
 
+.aui .wwwprv-portlet-wrapper .progress-bar-wrapper {
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
 .ui-confirm-dialog-severity {
     display: none !important;
 }

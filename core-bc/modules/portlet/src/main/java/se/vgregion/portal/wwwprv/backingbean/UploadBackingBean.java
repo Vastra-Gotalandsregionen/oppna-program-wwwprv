@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
+import se.vgregion.portal.wwwprv.util.Notifiable;
+import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -37,14 +39,12 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class UploadBackingBean {
+public class UploadBackingBean implements Notifiable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadBackingBean.class);
 
     @Autowired
     private DataPrivataService dataPrivataService;
-
-    private UploadedFile file;
 
     private String uploadedFileName;
     private Supplier chosenSupplier;
@@ -55,6 +55,9 @@ public class UploadBackingBean {
     private File uploadDirectory;
     private List<FileUpload> uploadedFileList;
     private FileUpload tempFileUpload;
+    private Integer progress;
+    private String latestFileName;
+    private boolean uploadInProgress;
 
     @PostConstruct
     public void init() {
@@ -66,7 +69,16 @@ public class UploadBackingBean {
     }
 
     public void fileUploadListener(FileUploadEvent event) throws IOException {
-        String originalFileName = event.getFile().getFileName();
+        if (this.uploadInProgress) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Du har redan en pågående uppladdning.", "Du har redan en pågående uppladdning."));
+        }
+        this.progress = null;
+
+        UploadedFile uploadedFile = event.getFile();
+
+        this.latestFileName = uploadedFile.getFileName();
+
+        String originalFileName = uploadedFile.getFileName();
 
         int lastDot = originalFileName.lastIndexOf(".");
 
@@ -99,7 +111,8 @@ public class UploadBackingBean {
         String userName = getUserName();
 
         if (dataPrivataService.isFileAlreadyUploaded(baseFileName, lastPartIncludingDot, chosenSupplier)) {
-            tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot, userName);
+            tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot,
+                    userName, uploadedFile.getSize());
 
             tempFile = new File(System.getProperty("java.io.tmpdir"), newFileName);
             newFile = tempFile;
@@ -107,7 +120,7 @@ public class UploadBackingBean {
         }
 
         try (FileOutputStream fos = new FileOutputStream(newFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
-            InputStream is = event.getFile().getInputstream();
+            InputStream is = uploadedFile.getInputstream();
 
             IOUtils.copy(is, bos);
 
@@ -117,7 +130,9 @@ public class UploadBackingBean {
              BufferedInputStream bis = new BufferedInputStream(fis)) {
 
             if (!currentlyDuplicateFileWorkflow) {
-                dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot, userName, bis);
+                this.uploadInProgress = true;
+                dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
+                        lastPartIncludingDot, userName, bis, uploadedFile.getSize(), this);
             }
 
             if (!currentlyDuplicateFileWorkflow) {
@@ -127,6 +142,8 @@ public class UploadBackingBean {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
+        } finally {
+            this.uploadInProgress = false;
         }
 
         updateUploadedFileList();
@@ -148,21 +165,28 @@ public class UploadBackingBean {
         File target = new File(uploadDirectory, tempFile.getName());
         Files.move(tempFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        try (FileInputStream fis = new FileInputStream(target);
-             BufferedInputStream bis = new BufferedInputStream(fis)) {
-            dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
-                    tempFileUpload.getDatePart(), tempFileUpload.getSuffix(), getUserName(), bis);
+        this.uploadInProgress = true;
 
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + tempFile.getName() + " skapades."));
+        // We consider it done here so we don't get a warning dialog on refreshing the page.
+        currentlyDuplicateFileWorkflow = false;
+
+        try (FileInputStream fis = new FileInputStream(target);
+            BufferedInputStream bis = new BufferedInputStream(fis)) {
+            dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
+                    tempFileUpload.getDatePart(), tempFileUpload.getSuffix(), getUserName(), bis,
+                    tempFileUpload.getFileSize(), this);
+
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + tempFile.getName() + " skapades."));
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
+        } finally {
+            this.uploadInProgress = false;
         }
 
         tempFile = null;
         tempFileUpload = null;
-        currentlyDuplicateFileWorkflow = false;
 
         updateUploadedFileList();
     }
@@ -184,14 +208,6 @@ public class UploadBackingBean {
 
     public FileUpload getTempFileUpload() {
         return tempFileUpload;
-    }
-
-    public UploadedFile getFile() {
-        return file;
-    }
-
-    public void setFile(UploadedFile file) {
-        this.file = file;
     }
 
     public String getUploadedFileName() {
@@ -220,7 +236,7 @@ public class UploadBackingBean {
         }
     }
 
-    private void updateUploadedFileList() {
+    public void updateUploadedFileList() {
         List<FileUpload> allFileUploads = dataPrivataService.getAllFileUploads();
 
         Iterator<FileUpload> iterator = allFileUploads.iterator();
@@ -244,5 +260,30 @@ public class UploadBackingBean {
 
     public Boolean getShowFileUpload() {
         return showFileUpload;
+    }
+
+    public String getLabel(Short index) {
+        return SharedUploadFolder.getSharedUploadFolder(index).getLabel();
+    }
+
+    @Override
+    public void notifyPercentage(int percentage) {
+        this.progress = percentage;
+    }
+
+    public Integer getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Integer progress) {
+        this.progress = progress;
+    }
+
+    public String getLatestFileName() {
+        return latestFileName;
+    }
+
+    public void setLatestFileName(String latestFileName) {
+        this.latestFileName = latestFileName;
     }
 }

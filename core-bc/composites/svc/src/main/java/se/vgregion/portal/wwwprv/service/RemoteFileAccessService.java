@@ -1,21 +1,19 @@
 package se.vgregion.portal.wwwprv.service;
 
 import jcifs.smb.NtlmPasswordAuthentication;
-import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
+import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 
 /**
  * @author Patrik Bergström
@@ -35,17 +33,23 @@ public class RemoteFileAccessService {
     @Value("${mars.folder2.password}")
     private String password2;
 
+    @Value("${mars.folder1.url}")
+    private String url1;
+
+    @Value("${mars.folder2.url}")
+    private String url2;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFileAccessService.class);
 
-    public void uploadFile(String fileName, Supplier supplier, InputStream inputStream) {
+    public void uploadFile(String fileName, Supplier supplier, final InputStream inputStream, long fileSize, Notifiable notifiable) {
 
         String url;
         NtlmPasswordAuthentication auth;
         if (SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).equals(SharedUploadFolder.MARS_SHARED_FOLDER)) {
-            url = "smb://mars.vgregion.se/inbox/DATA_PRIVATA/Försystem/Infiler/";
+            url = url1;
             auth = new NtlmPasswordAuthentication("MARS", user1, password1);
         } else if (SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).equals(SharedUploadFolder.AVESINA_SHARED_FOLDER)) {
-            url = "smb://mars.vgregion.se/inbox/DATA_PRIVATA/Försystem/InfilWeb/Avesina_old/";
+            url = url2;
             auth = new NtlmPasswordAuthentication("MARS", user2, password2);
         } else {
             throw new RuntimeException("Failed to decide which upload url to use.");
@@ -58,8 +62,25 @@ public class RemoteFileAccessService {
 
             newFile.createNewFile();
 
-            try (OutputStream outputStream = newFile.getOutputStream()) {
-                IOUtils.copy(inputStream, outputStream);
+            try (OutputStream outputStream = newFile.getOutputStream();
+                BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
+
+                byte[] buf = new byte[2048];
+
+                int n;
+                long accumulatedBytes = 0;
+                int numberRoundsSoFar = 0;
+
+                while ((n = inputStream.read(buf)) != -1) {
+                    accumulatedBytes += n;
+                    bos.write(buf, 0, n);
+
+                    if (++numberRoundsSoFar % 10 == 0) {
+                        notifiable.notifyPercentage((int) ((100f * (float) accumulatedBytes) / (float) fileSize));
+                    }
+                }
+
+                notifiable.notifyPercentage(100);
             }
 
         } catch (IOException e) {

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
+import se.vgregion.portal.wwwprv.util.Notifiable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -84,15 +85,17 @@ public class DataPrivataService {
     }
 
     @Transactional
-    public void saveFileUpload(String supplierCode, String baseName, String datePart, String suffix, String userName, InputStream inputStream) {
-        FileUpload fileUpload = new FileUpload(supplierCode, baseName, datePart, suffix, userName);
+    public void saveFileUpload(String supplierCode, String baseName, String datePart, String suffix, String userName,
+                               InputStream inputStream, long fileSize, Notifiable notifiable) {
+        FileUpload fileUpload = new FileUpload(supplierCode, baseName, datePart, suffix, userName, fileSize);
 
         fileUpload.setUploaded(new Date());
         fileUpload.setUploader(userName);
 
         entityManager.persist(fileUpload);
 
-        remoteFileAccessService.uploadFile(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream);
+        remoteFileAccessService.uploadFile(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream,
+                fileSize, notifiable);
     }
 
     public List<FileUpload> getAllFileUploads() {

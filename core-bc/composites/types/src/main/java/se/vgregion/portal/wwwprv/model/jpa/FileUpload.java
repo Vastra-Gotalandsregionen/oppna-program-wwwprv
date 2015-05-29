@@ -30,6 +30,8 @@ public class FileUpload {
 
     private String uploader;
 
+    private Long fileSize;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date uploaded;
 
@@ -40,12 +42,14 @@ public class FileUpload {
     public FileUpload() {
     }
 
-    public FileUpload(String supplierCode, String baseName, String datePart, String suffix, String uploader) {
+    public FileUpload(String supplierCode, String baseName, String datePart, String suffix, String uploader,
+                      Long fileSize) {
         this.supplierCode = supplierCode;
         this.baseName = baseName;
         this.datePart = datePart;
         this.suffix = suffix;
         this.uploader = uploader;
+        this.fileSize = fileSize;
     }
 
     public void setSupplierCode(String supplierCode) {
@@ -94,5 +98,13 @@ public class FileUpload {
 
     public void setUploader(String uploader) {
         this.uploader = uploader;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
     }
 }
