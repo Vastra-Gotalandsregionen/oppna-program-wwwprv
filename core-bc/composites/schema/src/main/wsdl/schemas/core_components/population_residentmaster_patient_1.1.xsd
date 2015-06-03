@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. Sveriges Kommuner och Landsting licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:riv:population:residentmaster:patient:1" 
+           xmlns:core="urn:riv:population:residentmaster:1" 
+           targetNamespace="urn:riv:population:residentmaster:patient:1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1">
+  
+  <xs:import schemaLocation='population_residentmaster_1.1.xsd' namespace='urn:riv:population:residentmaster:1' /> 
+
+  <xs:complexType name="PatientTYPE">
+    <xs:sequence>
+      <xs:element name="Sekretessmarkering" type="core:JaNejTYPE" />
+      <xs:element name="SenasteAndringFolkbokforing" type="core:DT"  minOccurs="0" />
+      <xs:element name="Personpost" type="core:PersonpostTYPE" minOccurs="0" />
+      <xs:element name="Tilltalsnamn" type="tns:Strang20TYPE" minOccurs="0" />
+      <xs:element name="Nationskod" type ="tns:Strang3TYPE" minOccurs="0" />
+      <xs:element name="Kontaktinformation" type="tns:KontaktTYPE" minOccurs="0"/>
+      <xs:element name="Tolk" type="tns:TolkTYPE" minOccurs="0"/>
+      <xs:element name="OvrigaAdresser" type="tns:OvrigAdressTYPE" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="RelationerKontaktinformation" type="tns:ExtendedRelationerTYPE" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="YtterligareID" type="tns:YtterligareIDTYPE" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="PersnrHistorik" type="tns:PersnrHistorikTYPE" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="SenasteAndringLokalt" type="core:DT"  minOccurs="0"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+    
+  <xs:complexType name="KontaktTYPE">
+    <xs:sequence>
+      <xs:element name="TelefonBostad" type="tns:Strang20TYPE" minOccurs="0"/>
+      <xs:element name="TelefonArbete" type="tns:Strang20TYPE" minOccurs="0"/>
+      <xs:element name="TelefonMobil" type="tns:Strang20TYPE" minOccurs="0"/>
+      <xs:element name="EPost" type="tns:Strang100TYPE" minOccurs="0"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="TolkTYPE">
+    <xs:sequence>
+      <xs:element name="Tolk" type="core:JaNejTYPE"/>
+      <xs:element name="Tolktyp" type="core:Strang36TYPE" minOccurs="0"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="ExtendedRelationerTYPE">
+    <xs:sequence>
+      <xs:element name="RelationId" type="core:RelationPersonIdTYPE"/>
+      <xs:element name="Relationstyp" type="core:RelationstypTYPE"/>
+      <xs:element name="RelationFromdatum" type="core:OfullstandigtDatumTYPE" minOccurs="0"/>
+      <xs:element name="RelationTomdatum" type="core:OfullstandigtDatumTYPE" minOccurs="0"/>
+      <xs:element name="Namn" type="core:NamnTYPE" minOccurs="0"/>
+      <xs:element name="Avregistrering" type="core:AvregistreringTYPE" minOccurs="0"/>
+      <xs:element name="Status" type="core:RelationStatusTYPE" minOccurs="0"/>
+      <xs:element name="RelationstypText" type="tns:Strang20TYPE" minOccurs="0" />
+      <xs:element name="Kontaktinformation" type="tns:KontaktTYPE" minOccurs="0"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="YtterligareIDTYPE">
+    <xs:annotation>
+      <xs:documentation>Uppgifter om identiteter utover personnummer</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="YtterligareIDTypKod" type="tns:YtterligareIDTypTYPE"/>
+      <xs:element name="YtterligareIDTypText" type="tns:Strang50TYPE" minOccurs="0"/>
+      <xs:element name="Identitet" type="tns:Strang50TYPE"/>
+      <xs:element name="GiltigFrom" type="core:DT" minOccurs="0"/>
+      <xs:element name="GiltigTom" type="core:DT" minOccurs="0" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OvrigAdressTYPE">    
+    <xs:sequence>
+      <xs:element name="AdressTyp" type="tns:AdressTypTYPE" minOccurs="0" maxOccurs ="unbounded"/>
+      <xs:element name="CareOf" type="core:Strang35TYPE" minOccurs="0"/>
+      <xs:element name="Gatuadress" type="core:Strang35TYPE" minOccurs="0"/>
+      <xs:element name="Postnr" type="tns:Strang5TYPE" minOccurs="0"/>            
+      <xs:element name="Postort" type="core:Strang27TYPE" minOccurs="0"/>
+      <xs:element name="Land" type="core:Strang35TYPE" minOccurs="0"/>
+      <xs:element name="LanKod" type="core:Strang2TYPE" minOccurs="0"/>
+      <xs:element name="KommunKod" type="core:Strang2TYPE" minOccurs="0"/>
+      <xs:element name="SCB_Nyckelkod" type="core:Strang6TYPE" minOccurs="0"/>
+      <xs:element name="Kontaktuppgifter" type="tns:KontaktTYPE" minOccurs="0"/>
+      <xs:element name="GiltigFrom" type="core:DT" minOccurs="0" />
+      <xs:element name="GiltigTom" type="core:DT" minOccurs="0" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:complexType name="PersnrHistorikTYPE">
+    <xs:sequence>
+      <xs:element name="GammaltPersonnummer" type="core:PersonIdTYPE"/>
+      <xs:element name="NyttPersonnummer" type="core:PersonIdTYPE"/>
+      <xs:element name="ByttDatum" type="core:DT" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="Strang20TYPE">
+    <xs:annotation>
+      <xs:documentation>Strangar med 20 tecken</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Strang5TYPE">
+    <xs:annotation>
+      <xs:documentation>Strangar med 5 tecken</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="5"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Strang3TYPE">
+    <xs:annotation>
+      <xs:documentation>Strangar med 3 tecken</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="Strang50TYPE">
+    <xs:annotation>
+      <xs:documentation>Strangar med 50 tecken</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Strang100TYPE">
+    <xs:annotation>
+      <xs:documentation>Strangar med 100 tecken</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="YtterligareIDTypTYPE">
+    <xs:annotation>
+      <xs:documentation>Identitetstyper utover personnummer</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LMA"/>
+      <xs:enumeration value="PASS"/>
+      <xs:enumeration value="EU_EES"/>
+      <xs:enumeration value="BARN_NR"/>
+      <xs:enumeration value="SKAS_BNR"/>
+      <xs:enumeration value="SAS_BNR"/>
+      <xs:enumeration value="NU-BNR"/>
+      <xs:enumeration value="KORKORT"/>
+      <xs:enumeration value="ANNAT"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  
+  <xs:simpleType name="AdressTypTYPE">
+    <xs:annotation>
+      <xs:documentation></xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="F"/>
+      <xs:enumeration value="K"/>
+      <xs:enumeration value="T"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

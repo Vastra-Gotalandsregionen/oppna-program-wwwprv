@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. Västra Götalandsregionen licenses 
+	this file to you under the Apache License, Version 2.0 (the "License"); you 
+	may not use this file except in compliance with the License. You may obtain 
+	a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless 
+	required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'
+	xmlns:tns='urn:riv:population:residentmaster:LookupResidentHistoryResponder:1'
+	xmlns:core='urn:riv:population:residentmaster:1'
+	targetNamespace='urn:riv:population:residentmaster:LookupResidentHistoryResponder:1'
+	elementFormDefault='qualified' attributeFormDefault='unqualified'
+	version='1.0'>
+	<xs:import schemaLocation='../../core_components/vgr_population_residentmaster_1.0.xsd'
+		namespace='urn:riv:population:residentmaster:1' />
+	<xs:element name='LookupResidentHistory' type='tns:LookupResidentHistoryType' />
+	<xs:element name='LookupResidentHistoryResponse' type='tns:LookupResidentHistoryResponseType' />
+	<xs:complexType name='LookupResidentHistoryType'>
+		<xs:sequence>
+			<xs:element name='PersonId' type='core:PersonIdTYPE' />
+			<xs:element name='Tidpunkt' type='xs:dateTime' />
+			<xs:any namespace='##other' processContents='lax' minOccurs='0'
+				maxOccurs='unbounded' />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name='LookupResidentHistoryResponseType'>
+    	<xs:sequence>
+            <xs:element name='FromDatum' type='xs:dateTime' />
+            <xs:element name='TomDatum' type='xs:dateTime' minOccurs='0' />
+            <xs:element name='resident' type='core:ResidentType' minOccurs='0'/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:simpleType name="Strang1TYPE">
+		<xs:annotation>
+			<xs:documentation>Strängar med 1 tecken</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name='ResultCodeEnum'>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='OK' />
+			<xs:enumeration value='ERROR' />
+			<xs:enumeration value='INFO' />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

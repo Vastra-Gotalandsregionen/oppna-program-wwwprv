@@ -22,7 +22,6 @@ Generation time : 2015-03-12 14:47:57 CET
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 
-<!-- UNCOMMENT AND CHANGE THIS TO USE JAX-WS WSDL CODE GENERATION
   <build>
     <plugins>
       <plugin>
@@ -37,7 +36,10 @@ Generation time : 2015-03-12 14:47:57 CET
               <sourceRoot>${basedir}/target/generated/wsdl</sourceRoot>
               <wsdlOptions>
                 <wsdlOption>
-                  <wsdl>${basedir}/src/main/wsdl/AddressServices_1.0.wsdl</wsdl>
+                  <wsdl>${basedir}/src/main/wsdl/schemas/interactions/LookupDistrictInformationInteraction/LookupDistrictInformationInteraction_1.0_RIVTABP21.wsdl</wsdl>
+                </wsdlOption>
+                <wsdlOption>
+                  <wsdl>${basedir}/src/main/wsdl/schemas/interactions/LookupResidentForFullProfileInteraction/LookupResidentForFullProfileInteraction_1.1_RIVTABP21.wsdl</wsdl>
                 </wsdlOption>
               </wsdlOptions>
             </configuration>
@@ -49,7 +51,7 @@ Generation time : 2015-03-12 14:47:57 CET
       </plugin>
     </plugins>
   </build>
--->
+
 
   <dependencies>
     <dependency>

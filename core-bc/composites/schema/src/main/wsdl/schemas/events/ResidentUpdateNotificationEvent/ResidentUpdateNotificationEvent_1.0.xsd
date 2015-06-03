@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    targetNamespace="urn:riv:population:residentmaster:ResidentUpdateNotificationEvent:v1"
+    xmlns:tns="urn:riv:population:residentmaster:ResidentUpdateNotificationEvent:v1" 
+    xmlns:core='urn:riv:population:residentmaster:1'
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified" 
+    version="1.0">
+
+    <xsd:import schemaLocation='../../core_components/population_residentmaster_1.1.xsd' namespace='urn:riv:population:residentmaster:1' />
+        
+    <xsd:element name='ResidentUpdateNotificationEvent' type='tns:ResidentUpdateNotificationEventType' />
+
+    <xsd:complexType name='ResidentUpdateNotificationEventType'>
+      <xsd:sequence>
+        <xsd:element name='NotificationId' type='xsd:string' minOccurs='1' />
+        <xsd:element name='ResidentUpdate' type='tns:ResidentUpdateType' minOccurs='0' maxOccurs='unbounded' />
+        <xsd:any namespace='##other' processContents='lax' minOccurs='0' maxOccurs='unbounded' />
+      </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name='ResidentUpdateType'>
+      <xsd:sequence>
+         <xsd:element name='PersonId' type="core:PersonIdTYPE" />
+         <xsd:element name='Uppdateringsdatum' type='core:DT'/>
+         <xsd:element name='SenasteAndringFolkbokforing' type='core:DT'/>
+         <xsd:element name='Avregistrering' type='core:AvregistreringTYPE' minOccurs='0'/>
+              
+         <xsd:any namespace='##other' processContents='lax' minOccurs='0' maxOccurs='unbounded' />
+      </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

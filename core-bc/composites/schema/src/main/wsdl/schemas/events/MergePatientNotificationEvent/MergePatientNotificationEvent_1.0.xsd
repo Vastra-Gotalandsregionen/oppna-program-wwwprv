@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    targetNamespace="urn:riv:population:residentmaster:MergePatientNotificationEvent:v1"
+    xmlns:tns="urn:riv:population:residentmaster:MergePatientNotificationEvent:v1" 
+    xmlns:core='urn:riv:population:residentmaster:1'
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified" 
+    version="1.0">
+
+    <xsd:import schemaLocation='../../core_components/population_residentmaster_1.1.xsd' namespace='urn:riv:population:residentmaster:1' />
+        
+    <xsd:element name='MergePatientNotificationEvent' type='tns:MergePatientNotificationEventTYPE' />
+
+    <xsd:complexType name='MergePatientNotificationEventTYPE'>
+      <xsd:sequence>
+        <xsd:element name='NotificationId' type='xsd:string' />
+        <xsd:element name='FranPersonId' type="core:PersonIdTYPE" />
+        <xsd:element name='TillPersonId' type="core:PersonIdTYPE" />
+        <xsd:element name='Andringstidpunkt' type='core:TS'/>
+        <xsd:element name='Ansvarig' type='tns:HsaIdentityType' minOccurs='0'/>
+        <xsd:element name='UtforandeVardenhet' type='tns:HsaIdentityType' minOccurs='0'/>
+        <xsd:any namespace='##other' processContents='lax' minOccurs='0' maxOccurs='unbounded' />
+      </xsd:sequence>
+    </xsd:complexType>
+	
+    <xsd:simpleType name="HsaIdentityType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+</xsd:schema>

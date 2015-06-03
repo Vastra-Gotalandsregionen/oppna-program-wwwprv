@@ -1,0 +1,23 @@
+<jaxb:bindings
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    jaxb:version="2.1">
+
+    <jaxb:bindings schemaLocation="../../core_components/population_residentmaster_1.1_ext.xsd" node="/xsd:schema">
+        <jaxb:schemaBindings>
+            <jaxb:package name="se.riv.population.residentmaster.v11"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="../../core_components/population_residentmaster_1.1.xsd" node="/xsd:schema">
+        <jaxb:schemaBindings>
+            <jaxb:package name="se.riv.population.residentmaster.v1"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="ResidentUpdateEvent_1.0.xsd" node="/xsd:schema">
+        <jaxb:schemaBindings>
+            <jaxb:package name="se.riv.population.residentmaster.residentupdateevent.v1"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+</jaxb:bindings>

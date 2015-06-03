@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. Västra Götalandsregionen licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ -->		
+<wsdl:definitions name='LookupDistrictInformationInteraction' xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:tjsr='urn:riv:population:residentmaster:LookupDistrictInformationResponder:1' xmlns:tjsi='urn:riv:population:residentmaster:LookupDistrictInformationInitiator:1' xmlns:tns='urn:riv:population:residentmaster:LookupDistrictInformation:1:rivtabp21' targetNamespace='urn:riv:population:residentmaster:LookupDistrictInformation:1:rivtabp21' xmlns:itr='urn:riv:itintegration:registry:1'>
+  <xs:annotation>
+    <xs:documentation>
+			 Tjänsteinteraktionens namn: LookupDistrictInformationInteraction
+			 Beskrivning: 
+			   
+			 Revisioner: 
+			 Tjänstedomän: population:residentmaster
+			 Tjänsteinteraktionstyp: Fråga-Svar
+			 WS-profil: RIVTABP21
+			 Förvaltas av: Västra Götalandsregionen
+			 </xs:documentation>
+  </xs:annotation>
+  <wsdl:types>
+    <xs:schema targetNamespace='urn:riv:population:residentmaster:LookupDistrictInformation:1:rivtabp21'>
+      <xs:import schemaLocation='LookupDistrictInformationResponder_1.0.xsd' namespace='urn:riv:population:residentmaster:LookupDistrictInformationResponder:1' />
+      <xs:import schemaLocation='../../core_components/itintegration_registry_1.0.xsd' namespace='urn:riv:itintegration:registry:1' />
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name='LookupDistrictInformationRequest'>
+    <wsdl:part name='LogicalAddress' element='itr:LogicalAddress'>
+      <wsdl:documentation></wsdl:documentation>
+    </wsdl:part>
+    <wsdl:part name='parameters' element='tjsr:LookupDistrictInformation' />
+  </wsdl:message>
+  <wsdl:message name='LookupDistrictInformationResponse'>
+    <wsdl:part name='parameters' element='tjsr:LookupDistrictInformationResponse' />
+  </wsdl:message>
+  <wsdl:portType name='LookupDistrictInformationResponderInterface'>
+    <wsdl:operation name='LookupDistrictInformation'>
+      <wsdl:input message='tns:LookupDistrictInformationRequest' />
+      <wsdl:output message='tns:LookupDistrictInformationResponse' />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name='LookupDistrictInformationResponderBinding' type='tns:LookupDistrictInformationResponderInterface'>
+    <soap:binding style='document' transport='http://schemas.xmlsoap.org/soap/http' />
+    <wsdl:operation name='LookupDistrictInformation'>
+      <soap:operation soapAction='urn:riv:population:residentmaster:LookupDistrictInformationResponder:1:LookupDistrictInformation' style='document' />
+      <wsdl:input>
+        <soap:header use='literal' message='tns:LookupDistrictInformationRequest' part='LogicalAddress' />
+        <soap:body use='literal' parts='parameters' />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use='literal' />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name='LookupDistrictInformationResponderService'>
+    <wsdl:port name='LookupDistrictInformationResponderPort' binding='tns:LookupDistrictInformationResponderBinding'>
+      <soap:address location='http://tempuri.org' />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
