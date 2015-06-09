@@ -27,6 +27,9 @@ public class DataPrivataService {
     private EntityManager entityManager;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private RemoteFileAccessService remoteFileAccessService;
 
     public DataPrivataUser getUserById(Long userId) {
@@ -96,6 +99,8 @@ public class DataPrivataService {
 
         remoteFileAccessService.uploadFile(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream,
                 fileSize, notifiable);
+
+        emailService.notifyNewUpload(fileUpload.getFullFileName(), getSupplier(supplierCode));
     }
 
     public List<FileUpload> getAllFileUploads() {
