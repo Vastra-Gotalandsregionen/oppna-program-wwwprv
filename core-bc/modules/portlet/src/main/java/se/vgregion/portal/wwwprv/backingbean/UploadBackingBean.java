@@ -69,16 +69,33 @@ public class UploadBackingBean implements Notifiable {
     }
 
     public void fileUploadListener(FileUploadEvent event) throws IOException {
+        UploadedFile uploadedFile = event.getFile();
+
+        String originalFileName = uploadedFile.getFileName();
+
+        String newCaseFileName;
+        if (chosenSupplier.getSharedUploadFolder().equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
+            newCaseFileName = originalFileName.toUpperCase();
+        } else if (chosenSupplier.getSharedUploadFolder().equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
+            newCaseFileName = originalFileName.toLowerCase();
+        } else {
+            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
+        }
+
+        this.latestFileName = newCaseFileName;
+
+        try {
+            dataPrivataService.verifyFileName(newCaseFileName, chosenSupplier);
+        } catch (IllegalArgumentException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
+            return;
+        }
+
         if (this.uploadInProgress) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Du har redan en pågående uppladdning.", "Du har redan en pågående uppladdning."));
         }
+
         this.progress = null;
-
-        UploadedFile uploadedFile = event.getFile();
-
-        this.latestFileName = uploadedFile.getFileName();
-
-        String originalFileName = uploadedFile.getFileName();
 
         int lastDot = originalFileName.lastIndexOf(".");
 
@@ -123,7 +140,6 @@ public class UploadBackingBean implements Notifiable {
             InputStream is = uploadedFile.getInputstream();
 
             IOUtils.copy(is, bos);
-
         }
 
         try (FileInputStream fis = new FileInputStream(newFile);

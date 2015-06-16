@@ -7,6 +7,7 @@ import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
+import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -118,5 +119,21 @@ public class DataPrivataService {
         List resultList = query.getResultList();
 
         return resultList != null && resultList.size() > 0;
+    }
+
+    public static void verifyFileName(String fileName, Supplier chosenSupplier) throws IllegalArgumentException {
+        Short sharedUploadFolder = chosenSupplier.getSharedUploadFolder();
+        String enhetsKod = chosenSupplier.getEnhetsKod();
+        if (sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
+            if (!fileName.toLowerCase().startsWith(enhetsKod.toLowerCase())) {
+                throw new IllegalArgumentException("Filen börjar inte med " + enhetsKod + ".");
+            }
+        } else if (sharedUploadFolder.equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
+            if (!fileName.toLowerCase().matches(enhetsKod.toLowerCase() + "_[0-9]{2}[0-1][0-9][0-3][0-9]\\.in")) {
+                throw new IllegalArgumentException("Filen måste vara på formen " + enhetsKod + "_yymmdd.in");
+            }
+        } else {
+            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
+        }
     }
 }
