@@ -100,14 +100,16 @@ public class UploadBackingBean implements Notifiable {
         int lastDot = originalFileName.lastIndexOf(".");
 
         String baseFileName = null;
-        String lastPartIncludingDot = null;
+        String suffixIncludingDot = null;
         if (lastDot > -1) {
             baseFileName = originalFileName.substring(0, lastDot);
-            lastPartIncludingDot = originalFileName.substring(lastDot, originalFileName.length());
+            suffixIncludingDot = originalFileName.substring(lastDot, originalFileName.length());
         } else {
             baseFileName = originalFileName;
-            lastPartIncludingDot = "";
+            suffixIncludingDot = "";
         }
+
+        suffixIncludingDot = dataPrivataService.possiblyChangeSuffix(suffixIncludingDot, chosenSupplier);
 
         if (!uploadDirectory.exists()) {
             boolean success = uploadDirectory.mkdirs();
@@ -121,14 +123,14 @@ public class UploadBackingBean implements Notifiable {
 
         String datePart = sdf.format(new Date());
 
-        String newFileName = baseFileName + datePart + lastPartIncludingDot;
+        String newFileName = baseFileName + datePart + suffixIncludingDot;
 
         File newFile = new File(uploadDirectory, newFileName);
 
         String userName = getUserName();
 
-        if (dataPrivataService.isFileAlreadyUploaded(baseFileName, lastPartIncludingDot, chosenSupplier)) {
-            tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, lastPartIncludingDot,
+        if (dataPrivataService.isFileAlreadyUploaded(baseFileName, suffixIncludingDot, chosenSupplier)) {
+            tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, suffixIncludingDot,
                     userName, uploadedFile.getSize());
 
             tempFile = new File(System.getProperty("java.io.tmpdir"), newFileName);
@@ -148,7 +150,7 @@ public class UploadBackingBean implements Notifiable {
             if (!currentlyDuplicateFileWorkflow) {
                 this.uploadInProgress = true;
                 dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
-                        lastPartIncludingDot, userName, bis, uploadedFile.getSize(), this);
+                        suffixIncludingDot, userName, bis, uploadedFile.getSize(), this);
             }
 
             if (!currentlyDuplicateFileWorkflow) {
