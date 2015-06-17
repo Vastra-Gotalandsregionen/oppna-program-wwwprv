@@ -35,7 +35,7 @@ public class EmailService {
     public void notifyNewUpload(String fullFileName, Supplier supplier) {
 
         // Sender's email ID needs to be mentioned
-        String from = "no-reply@vgregion.se";
+        String from = "dataprivata@vgregion.se";
 
         // Assuming you are sending email from localhost
         String host = "mail.vgregion.se";

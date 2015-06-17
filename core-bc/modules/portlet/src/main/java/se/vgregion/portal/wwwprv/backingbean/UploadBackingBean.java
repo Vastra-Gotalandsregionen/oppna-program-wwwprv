@@ -110,6 +110,7 @@ public class UploadBackingBean implements Notifiable {
         }
 
         suffixIncludingDot = dataPrivataService.possiblyChangeSuffix(suffixIncludingDot, chosenSupplier);
+        baseFileName = dataPrivataService.modifyBaseFileName(baseFileName, chosenSupplier);
 
         if (!uploadDirectory.exists()) {
             boolean success = uploadDirectory.mkdirs();

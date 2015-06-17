@@ -158,4 +158,20 @@ public class DataPrivataService {
         // Unchanged.
         return suffixIncludingDot;
     }
+
+    public String modifyBaseFileName(String baseFileName, Supplier chosenSupplier) {
+        Short sharedUploadFolder = chosenSupplier.getSharedUploadFolder();
+
+        if (sharedUploadFolder == null) {
+            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
+        }
+
+        if (sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
+            return baseFileName.toUpperCase();
+        } else if (sharedUploadFolder.equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
+            return baseFileName.toLowerCase();
+        } else {
+            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
+        }
+    }
 }
