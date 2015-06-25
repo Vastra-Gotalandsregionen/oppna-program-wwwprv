@@ -58,6 +58,12 @@ public class RemoteFileAccessService {
         try {
             SmbFile dir = new SmbFile(url, auth);
 
+            try {
+                LOGGER.info("Uploading to samba share: dir=" + dir.getCanonicalPath() + ", fileName=" + fileName);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+
             SmbFile newFile = new SmbFile(dir, fileName);
 
             newFile.createNewFile();
