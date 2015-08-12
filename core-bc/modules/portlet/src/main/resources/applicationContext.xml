@@ -20,7 +20,11 @@
 
     <context:component-scan base-package="se.vgregion.portal.wwwprv.jsf"/>
     <context:component-scan base-package="se.vgregion.portal.wwwprv.backingbean"/>
-    <context:component-scan base-package="se.vgregion.portal.wwwprv.service"/>
+
+    <bean class="se.vgregion.portal.wwwprv.service.DataPrivataService"/>
+    <bean class="se.vgregion.portal.wwwprv.service.EmailService"/>
+    <bean class="se.vgregion.portal.wwwprv.service.LiferayService"/>
+    <bean class="${fileServiceClass}"/>
 
     <context:annotation-config/>
 

@@ -69,48 +69,49 @@ public class UploadBackingBean implements Notifiable {
     }
 
     public void fileUploadListener(FileUploadEvent event) throws IOException {
+        if (this.uploadInProgress) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Du har redan en pågående uppladdning.", "Du har redan en pågående uppladdning."));
+            return;
+        }
+
         UploadedFile uploadedFile = event.getFile();
 
         String originalFileName = uploadedFile.getFileName();
 
-        String newCaseFileName;
-        if (chosenSupplier.getSharedUploadFolder().equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
-            newCaseFileName = originalFileName.toUpperCase();
-        } else if (chosenSupplier.getSharedUploadFolder().equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
-            newCaseFileName = originalFileName.toLowerCase();
-        } else {
-            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
-        }
+        String fileNameToUse = preProcessFileName(originalFileName, chosenSupplier);
 
-        this.latestFileName = newCaseFileName;
+        this.latestFileName = fileNameToUse;
 
         try {
-            dataPrivataService.verifyFileName(newCaseFileName, chosenSupplier);
+            dataPrivataService.verifyFileName(fileNameToUse, chosenSupplier);
         } catch (IllegalArgumentException e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(), e.getMessage()));
             return;
-        }
-
-        if (this.uploadInProgress) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Du har redan en pågående uppladdning.", "Du har redan en pågående uppladdning."));
         }
 
         this.progress = null;
 
-        int lastDot = originalFileName.lastIndexOf(".");
+        int lastDot = fileNameToUse.lastIndexOf(".");
 
         String baseFileName = null;
         String suffixIncludingDot = null;
         if (lastDot > -1) {
-            baseFileName = originalFileName.substring(0, lastDot);
-            suffixIncludingDot = originalFileName.substring(lastDot, originalFileName.length());
+            baseFileName = fileNameToUse.substring(0, lastDot);
         } else {
-            baseFileName = originalFileName;
-            suffixIncludingDot = "";
+            baseFileName = fileNameToUse;
         }
 
-        suffixIncludingDot = dataPrivataService.possiblyChangeSuffix(suffixIncludingDot, chosenSupplier);
-        baseFileName = dataPrivataService.modifyBaseFileName(baseFileName, chosenSupplier);
+        // Always set the same suffix
+        suffixIncludingDot = chosenSupplier.getSharedUploadFolder() == SharedUploadFolder.MARS_SHARED_FOLDER.getIndex() ? ".IN" : ".in";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("_yyyyMMdd_HHmm");
+
+        String datePart = sdf.format(new Date());
+
+        String newFileName = baseFileName + datePart + suffixIncludingDot;
 
         if (!uploadDirectory.exists()) {
             boolean success = uploadDirectory.mkdirs();
@@ -120,17 +121,12 @@ public class UploadBackingBean implements Notifiable {
             }
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("_yyyyMMdd_HHmm");
-
-        String datePart = sdf.format(new Date());
-
-        String newFileName = baseFileName + datePart + suffixIncludingDot;
-
         File newFile = new File(uploadDirectory, newFileName);
 
         String userName = getUserName();
 
         if (dataPrivataService.isFileAlreadyUploaded(baseFileName, suffixIncludingDot, chosenSupplier)) {
+            // Make a temporary file upload and ask the user whether he/she wants to continue.
             tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, suffixIncludingDot,
                     userName, uploadedFile.getSize());
 
@@ -150,11 +146,10 @@ public class UploadBackingBean implements Notifiable {
 
             if (!currentlyDuplicateFileWorkflow) {
                 this.uploadInProgress = true;
+
                 dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
                         suffixIncludingDot, userName, bis, uploadedFile.getSize(), this);
-            }
 
-            if (!currentlyDuplicateFileWorkflow) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Uppladdning lyckades. Filen fick namnet " + newFileName));
             }
 
@@ -166,6 +161,29 @@ public class UploadBackingBean implements Notifiable {
         }
 
         updateUploadedFileList();
+    }
+
+    static String preProcessFileName(String fileName, Supplier supplier) {
+        // First trim the .txt part if fileName ends with .in.txt
+        if (fileName.endsWith(".in.txt")) {
+            fileName = fileName.replaceAll("\\.in\\.txt", ".in");
+        }
+
+        if (fileName.contains("\\")) {
+            String[] split = fileName.split("\\\\");
+            fileName = split[split.length - 1];
+        }
+
+        // Modify case depending on supplier.
+        if (supplier.getSharedUploadFolder().equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
+            fileName = fileName.toUpperCase();
+        } else if (supplier.getSharedUploadFolder().equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
+            fileName = fileName.toLowerCase();
+        } else {
+            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
+        }
+
+        return fileName;
     }
 
     private String getUserName() {

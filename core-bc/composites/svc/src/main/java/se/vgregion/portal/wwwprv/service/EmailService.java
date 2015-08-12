@@ -32,7 +32,7 @@ public class EmailService {
     @Value("${email.notification.environment}")
     private String environment;
 
-    public void notifyNewUpload(String fullFileName, Supplier supplier) {
+    public void notifyNewUpload(String fullFileName, Supplier supplier, String userName) {
 
         // Sender's email ID needs to be mentioned
         String from = "dataprivata@vgregion.se";
@@ -68,7 +68,7 @@ public class EmailService {
             message.setSubject("Uppladdad fil: " + fullFileName + (environment != null && !"".equals(environment) ? " - " + environment : ""));
 
             // Now set the actual message
-            message.setText(fullFileName + " har laddats upp till " + SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).getLabel());
+            message.setText(fullFileName + " har laddats upp till " + SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).getLabel() + " av " + userName);
 
             // Send message
             Transport.send(message);

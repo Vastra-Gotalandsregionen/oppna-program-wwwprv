@@ -19,7 +19,7 @@ import java.io.OutputStream;
  * @author Patrik Bergström
  */
 @Service
-public class RemoteFileAccessService {
+public class RemoteFileAccessService implements FileAccessService {
 
     @Value("${mars.folder1.user}")
     private String user1;
@@ -41,6 +41,7 @@ public class RemoteFileAccessService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFileAccessService.class);
 
+    @Override
     public void uploadFile(String fileName, Supplier supplier, final InputStream inputStream, long fileSize, Notifiable notifiable) {
 
         String url;
@@ -69,7 +70,7 @@ public class RemoteFileAccessService {
             newFile.createNewFile();
 
             try (OutputStream outputStream = newFile.getOutputStream();
-                BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
+                 BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
 
                 byte[] buf = new byte[2048];
 

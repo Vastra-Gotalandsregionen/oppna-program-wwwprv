@@ -24,6 +24,11 @@ public class DataPrivataServiceTest {
 
         DataPrivataService.verifyFileName("asdf_151027.in", s1);
 
+        // Next
+        s1.setEnhetsKod("STMGBG15SVK");
+        s1.setSharedUploadFolder(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex());
+
+        DataPrivataService.verifyFileName("STMGBG15SVK20150804.in", s1);
     }
 
     @Test

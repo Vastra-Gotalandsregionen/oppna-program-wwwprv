@@ -8,8 +8,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Patrik Bergström
  */
@@ -26,6 +24,6 @@ public class EmailServiceIT {
 
         Supplier supplier = new Supplier();
         supplier.setSharedUploadFolder((short) 1);
-        service.notifyNewUpload("TestFil.txt", supplier);
+        service.notifyNewUpload("TestFil.txt", supplier, "Test Testsson");
     }
 }

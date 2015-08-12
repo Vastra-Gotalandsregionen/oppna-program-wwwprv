@@ -1,5 +1,7 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class DataPrivataService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataPrivataService.class);
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -31,7 +35,7 @@ public class DataPrivataService {
     private EmailService emailService;
 
     @Autowired
-    private RemoteFileAccessService remoteFileAccessService;
+    private FileAccessService fileAccessService;
 
     public DataPrivataUser getUserById(Long userId) {
         return entityManager.find(DataPrivataUser.class, userId);
@@ -98,10 +102,10 @@ public class DataPrivataService {
 
         entityManager.persist(fileUpload);
 
-        remoteFileAccessService.uploadFile(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream,
+        fileAccessService.uploadFile(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream,
                 fileSize, notifiable);
 
-        emailService.notifyNewUpload(fileUpload.getFullFileName(), getSupplier(supplierCode));
+        emailService.notifyNewUpload(fileUpload.getFullFileName(), getSupplier(supplierCode), userName);
     }
 
     public List<FileUpload> getAllFileUploads() {
@@ -129,7 +133,10 @@ public class DataPrivataService {
         if (sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
 
             if (!fileName.toLowerCase().startsWith(enhetsKod.toLowerCase())) {
-                throw new IllegalArgumentException("Filen börjar inte med " + enhetsKod + ".");
+                LOGGER.error("Filename \"" + fileName.toLowerCase() + "\" doesn't start with \""
+                        + enhetsKod.toLowerCase() + "\".");
+
+                throw new IllegalArgumentException("Filen " + fileName + " börjar inte med " + enhetsKod + ".");
             }
 
         } else if (sharedUploadFolder.equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
@@ -159,19 +166,4 @@ public class DataPrivataService {
         return suffixIncludingDot;
     }
 
-    public String modifyBaseFileName(String baseFileName, Supplier chosenSupplier) {
-        Short sharedUploadFolder = chosenSupplier.getSharedUploadFolder();
-
-        if (sharedUploadFolder == null) {
-            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
-        }
-
-        if (sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
-            return baseFileName.toUpperCase();
-        } else if (sharedUploadFolder.equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
-            return baseFileName.toLowerCase();
-        } else {
-            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
-        }
-    }
 }
