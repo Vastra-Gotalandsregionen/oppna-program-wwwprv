@@ -24,7 +24,7 @@ Generation time : 2015-03-12 14:47:57 CET
 
   <build>
     <plugins>
-      <plugin>
+      <!--<plugin>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-codegen-plugin</artifactId>
         <version>${apache.cxf.version}</version>
@@ -48,7 +48,7 @@ Generation time : 2015-03-12 14:47:57 CET
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
     </plugins>
   </build>
 
@@ -68,6 +68,12 @@ Generation time : 2015-03-12 14:47:57 CET
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-transports-http</artifactId>
       <version>${apache.cxf.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>se.vgregion.icc.sd.population</groupId>
+      <artifactId>population-schemas</artifactId>
+      <version>1.0.8</version>
     </dependency>
   </dependencies>
   

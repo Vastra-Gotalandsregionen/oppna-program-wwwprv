@@ -1,16 +1,12 @@
-import riv.population.residentmaster._1.JaNejTYPE;
-import riv.population.residentmaster._1.ResidentType;
-import riv.population.residentmaster._1.SvenskAdressTYPE;
-import riv.population.residentmaster.lookupdistrictinformation._1.rivtabp21.LookupDistrictInformationResponderInterface;
-import riv.population.residentmaster.lookupdistrictinformation._1.rivtabp21.LookupDistrictInformationResponderService;
-import riv.population.residentmaster.lookupdistrictinformationresponder._1.LookupDistrictInformationResponseType;
-import riv.population.residentmaster.lookupdistrictinformationresponder._1.LookupDistrictInformationType;
-import riv.population.residentmaster.lookupdistrictinformationresponder._1.ObjectFactory;
-import riv.population.residentmaster.lookupresidentforfullprofile._1.rivtabp21.LookupResidentForFullProfileResponderInterface;
-import riv.population.residentmaster.lookupresidentforfullprofile._1.rivtabp21.LookupResidentForFullProfileResponderService;
-import riv.population.residentmaster.lookupresidentforfullprofileresponder._1.LookUpSpecificationType;
-import riv.population.residentmaster.lookupresidentforfullprofileresponder._1.LookupResidentForFullProfileResponseType;
-import riv.population.residentmaster.lookupresidentforfullprofileresponder._1.LookupResidentForFullProfileType;
+
+import se.riv.population.residentmaster.lookupresidentforfullprofile.v1.rivtabp21.LookupResidentForFullProfileResponderInterface;
+import se.riv.population.residentmaster.lookupresidentforfullprofile.v1.rivtabp21.LookupResidentForFullProfileResponderService;
+import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookUpSpecificationType;
+import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileResponseType;
+import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileType;
+import se.riv.population.residentmaster.v1.JaNejTYPE;
+import se.riv.population.residentmaster.v1.ResidentType;
+import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
 
 import javax.xml.ws.Service;
 import java.net.MalformedURLException;
@@ -22,7 +18,7 @@ import java.util.List;
  */
 public class Test {
 
-    public static void main(String[] args) throws MalformedURLException {
+    /*public static void main(String[] args) throws MalformedURLException {
 
         String logicalAddress = "logicalAddress";
 
@@ -111,5 +107,5 @@ public class Test {
                 lookUpSpecificationForFullProfile);
 
         return response;
-    }
+    }*/
 }
