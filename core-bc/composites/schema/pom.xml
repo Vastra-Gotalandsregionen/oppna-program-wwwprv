@@ -22,6 +22,10 @@ Generation time : 2015-03-12 14:47:57 CET
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 
+  <properties>
+    <apache.cxf.version>2.4.1</apache.cxf.version>
+  </properties>
+
 <!-- UNCOMMENT AND CHANGE THIS TO USE JAX-WS WSDL CODE GENERATION
   <build>
     <plugins>
@@ -56,16 +60,30 @@ Generation time : 2015-03-12 14:47:57 CET
       <groupId>${project.groupId}</groupId>
       <artifactId>wwwprv-core-bc-composite-types</artifactId>
       <version>${project.version}</version>
-    </dependency>    
+    </dependency>
+
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxws</artifactId>
       <version>${apache.cxf.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-transports-http</artifactId>
       <version>${apache.cxf.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>se.vgregion.icc.sd.population</groupId>
+      <artifactId>population-schemas</artifactId>
+      <version>1.0.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>3.0.5.RELEASE</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   

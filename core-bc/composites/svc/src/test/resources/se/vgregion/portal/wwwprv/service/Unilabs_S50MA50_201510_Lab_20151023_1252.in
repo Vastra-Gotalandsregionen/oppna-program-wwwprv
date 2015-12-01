@@ -1,0 +1,39 @@
+Datum    Pnr            Namn                      Betalare     Beställare   Analys.kod Analysnamn                     Pris
+20150923 191202119150   TESTSSON, TEST            S50MA55      5024         SN         Snabbsvar                         173.04
+20150925 193901059059   TESTSSON, TEST            S50MA55      5024                    BMA 1-3 klossar                   510.04
+20150923 189004119807   TESTSSON, TEST            S50MA55      5024         H 02       BMA 4-6 klossar                   134.91
+20151007 195102262267   TESTSSON, TEST            S50MA55      5024         SN         Snabbsvar                         255.77
+20151009 199506262386   TESTSSON, TEST            S50MA55      5024         SN         Snabbsvar                         255.77
+20151002 199504152381   TESTSSON, TEST            S50MA55      5024                    BMA 1-3 klossar                        0
+20151008 189007209803   TESTSSON, TEST            S50MA55      5024                    BMA 1-3 klossar                     73.7
+20151008 189004149812   TESTSSON, TEST            S50MA55      5024         SN         Snabbsvar                         216.99
+20151009 195205131575   TESTSSON, TEST            S50MA55      5024         SN         Snabbsvar                          92.16
+20151009 195102031753   TESTSSON, TEST            S50MA55      5024         H 02       BMA 4-6 klossar                    17.34
+20151009 195401072284   TESTSSON, TEST            S50MA55      5024                    P-Pankreasamylas                    8.74
+20151014 199711192394   TESTSSON, TEST            S50MA55      5024                    fP-Triglycerider                    73.7
+20151007 200110302387   TESTSSON, TEST            S50MA55      5024                    P-HDL-kolesterol                   112.5
+20151007 199711302381   TESTSSON, TEST            S50MA55      5024                    P-Kolesterol                      147.46
+20151007 200008072399   TESTSSON, TEST            S50MA55      5024                    P-ALAT                            173.04
+20151009 199812262393   TESTSSON, TEST            S50MA55      5024                    P-ALP                             302.77
+20151008 200110172392   TESTSSON, TEST            S50MA55      5024                    P-Urat                             92.16
+20150929 200112152384   TESTSSON, TEST            S50MA55      5024                    P-Calcium                          112.5
+20150929 199801222390   TESTSSON, TEST            S50MA55      5024                    P-Urea                            147.46
+20150929 200112152384   TESTSSON, TEST            S50MA55      5024                    P-ASAT                            216.99
+20150930 196801029288   TESTSSON, TEST            S50MA55      5024                    P-Kalium                            8.74
+20151016 194803022328   TESTSSON, TEST            S50MA55      5024                    P-Kobalamin                        112.5
+20151007 193302129220   TESTSSON, TEST            S50MA55      5024                    P-Natrium                         173.04
+20150924 199604222399   TESTSSON, TEST            S50MA55      5024                    P-Folat                           610.97
+20150922 199508232387   TESTSSON, TEST            S50MA55      5024                    P-LDL-kol, direkt                 255.77
+20151009 199711232398   TESTSSON, TEST            S50MA55      5024                    P-GT                              134.91
+20151009 199801152381   TESTSSON, TEST            S50MA55      5024                    P-Kreatinin                       134.91
+20151001 199801042392   TESTSSON, TEST            S50MA55      5024                    B-HbA1c(IFCC)                     409.38
+20151001 196508122857   TESTSSON, TEST            S50MA55      5024                    BMA 7-9 klossar                   409.38
+20150922 194512267743   TESTSSON, TEST            S50MA55      PL5025       SN         Snabbsvar                           73.7
+20150922 199711172396   TESTSSON, TEST            S50MA55      PL5025       H 02       BMA 4-6 klossar                   128.74
+20150923 198504199897   TESTSSON, TEST            S50MA55      PL5025       SN         Snabbsvar                         323.69
+20151012 197006121144   TESTSSON, TEST            S50MA55      PL5025                  P-ALAT                             17.34
+20151013 198508199885   TESTSSON, TEST            S50MA55      PL5025                  P-HDL-kolesterol                  415.64
+20151016 196804159264   TESTSSON, TEST            S50MA55      PL5025                  P-Kreatinin                        17.34
+20151014 199508232387   TESTSSON, TEST            S50MA55      PL5025                  P-ALP                             119.88
+20151016 199711232398   TESTSSON, TEST            S50MA55      PL5025                  P-Kalium                          323.69
+20151005 196708282584   TESTSSON, TEST            S50MA55      PL5025                  P-ASAT                              8.74

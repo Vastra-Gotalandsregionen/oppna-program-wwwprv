@@ -21,9 +21,12 @@
     <context:component-scan base-package="se.vgregion.portal.wwwprv.jsf"/>
     <context:component-scan base-package="se.vgregion.portal.wwwprv.backingbean"/>
 
+    <import resource="classpath:population.xml" />
+
     <bean class="se.vgregion.portal.wwwprv.service.DataPrivataService"/>
     <bean class="se.vgregion.portal.wwwprv.service.EmailService"/>
     <bean class="se.vgregion.portal.wwwprv.service.LiferayService"/>
+    <bean class="se.vgregion.portal.wwwprv.service.BoardDistributionService"/>
     <bean class="${fileServiceClass}"/>
 
     <context:annotation-config/>
