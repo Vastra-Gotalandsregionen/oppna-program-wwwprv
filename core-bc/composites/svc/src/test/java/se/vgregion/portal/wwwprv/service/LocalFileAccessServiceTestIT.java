@@ -27,7 +27,7 @@ public class LocalFileAccessServiceTestIT {
     @Autowired
     LocalFileAccessService service;
 
-    @Ignore
+    //@Ignore
     @Test
     public void uploadFile() throws InterruptedException, IOException {
         assertNotNull(service);

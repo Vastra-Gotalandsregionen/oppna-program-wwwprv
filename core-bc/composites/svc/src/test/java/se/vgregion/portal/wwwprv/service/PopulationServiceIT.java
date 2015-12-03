@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import com.google.gson.Gson;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +9,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import se.riv.population.residentmaster.lookupresidentforextendedprofileresponder.v1.LookupResidentForExtendedProfileResponseType;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,8 +40,8 @@ public class PopulationServiceIT {
     @Autowired
     private PopulationService populationService;
 
-    @Test
     @Ignore
+    @Test
     public void oneCallLookup() throws Exception {
         long now = System.currentTimeMillis();
         try {
@@ -46,15 +53,17 @@ public class PopulationServiceIT {
         System.out.println(" " + (System.currentTimeMillis() - now));
     }
 
-
+    //@Ignore
     @Test
-    @Ignore
     public void eachItemLookup() throws Exception {
+        final List<String> correctNumbers = new ArrayList<>();
+
         for (String id : ids) {
             long now = System.currentTimeMillis();
             try {
                 System.out.print(id);
                 LookupResidentForExtendedProfileResponseType r = populationService.lookup(id);
+                correctNumbers.add(id);
                 if (!r.getResident().isEmpty()) {
                     System.out.print(" Y");
                 } else {
@@ -65,6 +74,41 @@ public class PopulationServiceIT {
             }
             System.out.println(" Tidsåtgång " + (System.currentTimeMillis() - now) + " ms.");
         }
+
+        System.out.println("\nCorrect-Numbers\n \"" + String.join("\", \"", correctNumbers) + "\"");
+    }
+
+    @Ignore
+    @Test
+    public void serializeResult() throws IOException {
+        List<String> input = Arrays.asList("191202119150", "193901059059", "189004119807", "195102262267",
+                "199506262386", "199504152381", "189007209803", "189004149812", "195205131575", "195102031753",
+                "195401072284", "199711192394", "200110302387", "199711302381", "200008072399", "199812262393",
+                "200110172392", "199701032394", "200112152384", "199801222390", "200112152384", "196801029288",
+                "194803022328", "193302129220", "199604222399", "199508232387", "199711232398", "199801152381",
+                "199801042392", "196508122857", "194512267743", "199711172396", "198504199897", "197006121144",
+                "198508199885", "196804159264", "199508232387", "199711232398", "196708282584");
+
+        LookupResidentForExtendedProfileResponseType result = populationService.lookup(input);
+
+        /*Path path = Paths.get(new File("src\\test\\resources\\se\\vgregion\\portal\\wwwprv".replace("\\", File.separator))
+                .getAbsolutePath() + File.separator + "lookup.dump");*/
+
+        Path path = getLookupDump();
+
+        Gson gson = new Gson();
+        String json = gson.toJson(result);
+        Files.write(path, json.getBytes());
+
+        System.out.println("Before " + result.getResident().size());
+        result = gson.fromJson(json, LookupResidentForExtendedProfileResponseType.class);
+        System.out.println("After  " + result.getResident().size());
+    }
+
+    public static Path getLookupDump() {
+        Path path = Paths.get(new File("src\\test\\resources\\se\\vgregion\\portal\\wwwprv".replace("\\", File.separator))
+                .getAbsolutePath() + File.separator + "lookup.dump");
+        return path;
     }
 
 }
