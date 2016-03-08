@@ -3,14 +3,13 @@ package se.vgregion.portal.wwwprv.service;
 import org.apache.commons.io.output.NullOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.vgregion.portal.wwwprv.model.Tree;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * @author Patrik Björk
@@ -47,6 +46,30 @@ public class MockFileAccessService implements FileAccessService {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Tree<String> retrieveRemoteFileTree() {
+
+        Tree<String> tree = new Tree<>("Rotmapp");
+
+        List<Tree.Node<String>> level1 = tree.getRoot().getChildren();
+
+        Tree.Node<String> dir1 = new Tree.Node<>("Mapp1");
+        level1.add(dir1);
+        level1.add(new Tree.Node<>("Mapp2"));
+        level1.add(new Tree.Node<>("Mapp3"));
+
+        Tree.Node<String> dir12 = new Tree.Node<>("mapp1-2");
+        List<Tree.Node<String>> level2 = dir1.getChildren();
+        level2.add(dir12);
+        level2.add(new Tree.Node<>("mapp1-3"));
+
+        List<Tree.Node<String>> level3 = dir12.getChildren();
+        level3.add(new Tree.Node<>("mapp1-3-1"));
+        level3.add(new Tree.Node<>("mapp1-3-2"));
+
+        return tree;
     }
 
 }

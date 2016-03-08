@@ -2,9 +2,12 @@ package se.vgregion.portal.wwwprv.backingbean;
 
 import com.liferay.faces.util.portal.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import se.vgregion.portal.wwwprv.model.Tree;
 import se.vgregion.portal.wwwprv.model.UserContainer;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
@@ -14,10 +17,12 @@ import se.vgregion.portal.wwwprv.service.LiferayServiceException;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,10 +46,50 @@ public class AdminBackingBean {
     private DataPrivataService dataPrivataService;
 
     private Supplier supplierToAdd;
+    private Supplier currentSupplier;
     private String supplierMessage;
     private String userMessage;
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private Map<Long, Boolean> usersSupplierChooserExpanded = new HashMap<>();
+    private Tree<String> tree;
+
+    public AdminBackingBean() {
+    }
+
+    public AdminBackingBean(LiferayService liferayService, DataPrivataService dataPrivataService) {
+        this.liferayService = liferayService;
+        this.dataPrivataService = dataPrivataService;
+    }
+
+    @PostConstruct
+    public void init() {
+        tree = dataPrivataService.retrieveRemoteFileTree();
+    }
+
+    public TreeNode getFileTree() {
+        TreeNode target = new DefaultTreeNode(tree.getRoot().getData());
+
+        Tree.Node<String> source = tree.getRoot();
+
+        target.getChildren().addAll(getFileTree(source.getChildren()));
+
+        return target;
+    }
+
+    private Collection<? extends TreeNode> getFileTree(List<Tree.Node<String>> nodes) {
+        if (nodes == null || nodes.size() == 0) {
+            return new ArrayList<>();
+        } else {
+            Collection<TreeNode> nodesToAdd = new ArrayList<>();
+            for (Tree.Node node : nodes) {
+                TreeNode treeNode = new DefaultTreeNode(node.getData());
+                treeNode.getChildren().addAll(getFileTree(node.getChildren()));
+                nodesToAdd.add(treeNode);
+            }
+
+            return nodesToAdd;
+        }
+    }
 
     public List<UserContainer> getAllUsers() {
         ThemeDisplay themeDisplay = (ThemeDisplay) ((PortletRequest) FacesContext.getCurrentInstance()
@@ -220,5 +265,13 @@ public class AdminBackingBean {
         }, 2, TimeUnit.SECONDS);
 
         return userMessage;
+    }
+
+    public Supplier getCurrentSupplier() {
+        return currentSupplier;
+    }
+
+    public void setCurrentSupplier(Supplier currentSupplier) {
+        this.currentSupplier = currentSupplier;
     }
 }

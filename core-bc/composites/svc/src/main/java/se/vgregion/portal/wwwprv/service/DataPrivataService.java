@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import se.vgregion.portal.wwwprv.model.Tree;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
@@ -36,6 +37,14 @@ public class DataPrivataService {
 
     @Autowired
     private FileAccessService fileAccessService;
+
+    public DataPrivataService() {
+    }
+
+    public DataPrivataService(EmailService emailService, FileAccessService fileAccessService) {
+        this.emailService = emailService;
+        this.fileAccessService = fileAccessService;
+    }
 
     public DataPrivataUser getUserById(Long userId) {
         return entityManager.find(DataPrivataUser.class, userId);
@@ -166,4 +175,7 @@ public class DataPrivataService {
         return suffixIncludingDot;
     }
 
+    public Tree<String> retrieveRemoteFileTree() {
+        return fileAccessService.retrieveRemoteFileTree();
+    }
 }

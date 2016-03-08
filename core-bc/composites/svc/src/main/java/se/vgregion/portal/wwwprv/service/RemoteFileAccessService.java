@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import se.vgregion.portal.wwwprv.model.Tree;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
@@ -95,4 +96,8 @@ public class RemoteFileAccessService implements FileAccessService {
         }
     }
 
+    @Override
+    public Tree<String> retrieveRemoteFileTree() {
+        throw new UnsupportedOperationException("todo");
+    }
 }

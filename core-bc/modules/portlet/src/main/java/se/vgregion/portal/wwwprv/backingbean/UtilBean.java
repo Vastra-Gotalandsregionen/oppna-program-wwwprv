@@ -49,4 +49,8 @@ public class UtilBean {
                 .getRemoteUser();
     }
 
+    public static String buildUploadFolderString(Supplier supplier) {
+        return "N/A";
+    }
+
 }

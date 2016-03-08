@@ -114,3 +114,18 @@
     background: none;
     border: none;
 }
+
+/* To theme? */
+
+.aui .ui-dialog.ui-widget-content .ui-dialog-titlebar-close:hover {
+    padding: 0;
+}
+
+.aui .ui-dialog .ui-dialog-titlebar-close .ui-icon-closethick {
+    background: transparent;
+}
+
+.aui .wwwprv-portlet-wrapper .ui-dialog .ui-dialog-content {
+    /*background-color: #FFF;*/
+     text-align: left;
+}

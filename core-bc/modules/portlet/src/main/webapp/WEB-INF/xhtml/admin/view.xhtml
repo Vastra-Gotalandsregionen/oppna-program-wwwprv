@@ -105,12 +105,10 @@
                                     </p:inplace>
                                 </td>
                                 <td>
-                                    <p:inplace editor="true" emptyLabel="Ej angiven">
-                                        <h:selectOneMenu value="#{supplier.sharedUploadFolder}" converter="#{sharedUploadFolderConverter}" onchange="javascript:showSaveButton(this);">
-                                            <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
-                                            <f:selectItems value="#{adminBackingBean.allSharedUploadFolders}" var="folderIndex" itemValue="#{folderIndex}" itemLabel="#{adminBackingBean.getLabel(folderIndex)}"/>
-                                        </h:selectOneMenu>
-                                    </p:inplace>
+                                    <h:commandLink value="#{utilBean.buildUploadFolderString(supplier)}">
+                                        <!--<f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}" render="@form" onevent="showUploadFolderDialogOnComplete" />-->
+                                        <f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}" render=":theForm:uploadFolderWrapper" onevent="showUploadFolderDialogOnComplete" />
+                                    </h:commandLink>
                                 </td>
                                 <td>
                                     <h:commandLink styleClass="save-link" style="display: none;" value="Spara">
@@ -126,6 +124,7 @@
                                 </td>
                             </tr>
                         </ui:repeat>
+
                         <tr class="label">
                             <td>Lägg till leverantör:</td>
                         </tr>
@@ -163,14 +162,36 @@
                 </h:panelGroup>
             </section>
 
+            <h:panelGroup id="uploadFolderWrapper">
+                <p:dialog widgetVar="uploadFolderDialog">
+                    asdfasdf
+
+                    <!--selectionMode="single" selection="#{treeSelectionView.selectedNode}"-->
+                    <p:tree value="#{adminBackingBean.fileTree}" var="node"
+
+                            >
+                        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+
+                    </p:tree>
+                </p:dialog>
+            </h:panelGroup>
+
         </h:form>
 
         <script type="application/javascript">
 
             initPage();
 
+            function showUploadFolderDialogOnComplete(data) {
+                if (data.status === "success") {
+                    PF('uploadFolderDialog').show();
+                }
+            }
+
             function reinitAfterPageUpdate(data) {
-                if (data.status='complete') {
+                if (data.status === 'complete') {
                     initPage();
                 }
             }
