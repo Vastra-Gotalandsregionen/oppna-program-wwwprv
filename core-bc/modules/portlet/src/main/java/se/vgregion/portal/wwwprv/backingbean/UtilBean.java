@@ -9,6 +9,7 @@ import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -49,8 +50,12 @@ public class UtilBean {
                 .getRemoteUser();
     }
 
-    public static String buildUploadFolderString(Supplier supplier) {
-        return "N/A";
+    public static List<?> toList(Collection<?> collection) {
+        if (collection != null) {
+            return new ArrayList<>(collection);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
 }

@@ -20,9 +20,9 @@
             <section>
                 <h2>Användare med rollen "Filuppladdare"</h2>
 
-                 <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.userMessage}">#{adminBackingBean.userMessage}</h:panelGroup>
+                <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.userMessage}">#{adminBackingBean.userMessage}</h:panelGroup>
 
-                 <h:panelGroup id="userTable">
+                <h:panelGroup id="userTable">
                     <table>
                         <thead>
                         <tr>
@@ -105,9 +105,17 @@
                                     </p:inplace>
                                 </td>
                                 <td>
-                                    <h:commandLink value="#{utilBean.buildUploadFolderString(supplier)}">
-                                        <!--<f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}" render="@form" onevent="showUploadFolderDialogOnComplete" />-->
-                                        <f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}" render=":theForm:uploadFolderWrapper" onevent="showUploadFolderDialogOnComplete" />
+                                    <h:commandLink>
+                                        <f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}"
+                                                render=":theForm:uploadFolderWrapper"
+                                                onevent="showUploadFolderDialogOnComplete"/>
+                                        <ui:repeat value="#{utilBean.toList(supplier.uploadFolders)}" var="folder">
+                                            <div>#{folder}</div>
+                                        </ui:repeat>
+
+                                        <h:panelGroup rendered="#{empty supplier.uploadFolders}">
+                                            Ingen vald
+                                        </h:panelGroup>
                                     </h:commandLink>
                                 </td>
                                 <td>
@@ -164,17 +172,24 @@
 
             <h:panelGroup id="uploadFolderWrapper">
                 <p:dialog widgetVar="uploadFolderDialog">
-                    asdfasdf
+                    <p>Markera den eller de uppladdningsmappar som är aktuella för #{adminBackingBean.currentSupplier.enhetsNamn}.</p>
+                    <p>Vid flera val, håll nere Ctrl-knappen medan du klickar på mapparna.</p>
 
-                    <!--selectionMode="single" selection="#{treeSelectionView.selectedNode}"-->
-                    <p:tree value="#{adminBackingBean.fileTree}" var="node"
-
+                    <p:tree value="#{adminBackingBean.remoteDirectoryTree}" var="node"
+                            selectionMode="multiple"
+                            selection="#{adminBackingBean.selectedDirectoryNode}"
                             >
                         <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
                             <h:outputText value="#{node}"/>
                         </p:treeNode>
 
                     </p:tree>
+
+                    <div>
+                        <h:commandButton value="Spara">
+                            <f:ajax listener="#{adminBackingBean.saveUploadFolders}" execute=":theForm:uploadFolderWrapper" render="@form"/>
+                        </h:commandButton>
+                    </div>
                 </p:dialog>
             </h:panelGroup>
 

@@ -33,7 +33,7 @@ public class AdminBackingBeanTest {
         adminBackingBean.init();
         
         // Verify
-        TreeNode fileTree = adminBackingBean.getFileTree(); // Primefaces TreeNode
+        TreeNode fileTree = adminBackingBean.getRemoteDirectoryTree(); // Primefaces TreeNode
 
         Tree<String> correctTree = mockFileAccessService.retrieveRemoteFileTree();
 

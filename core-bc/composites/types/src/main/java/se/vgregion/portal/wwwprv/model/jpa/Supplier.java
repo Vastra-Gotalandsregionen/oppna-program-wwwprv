@@ -1,5 +1,7 @@
 package se.vgregion.portal.wwwprv.model.jpa;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -8,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -31,6 +34,10 @@ public class Supplier implements Serializable {
 
     @ManyToMany(mappedBy = "suppliers", fetch = FetchType.EAGER)
     private Set<DataPrivataUser> dataPrivataUsers;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "vgr_dataprivata_supplier_uploadfolders")
+    private Set<String> uploadFolders = new HashSet<>();
 
     public Supplier() {
     }
@@ -77,6 +84,14 @@ public class Supplier implements Serializable {
 
     public void setSharedUploadFolder(Short sharedUploadFolder) {
         this.sharedUploadFolder = sharedUploadFolder;
+    }
+
+    public Set<String> getUploadFolders() {
+        return uploadFolders;
+    }
+
+    public void setUploadFolders(Set<String> uploadFolders) {
+        this.uploadFolders = uploadFolders;
     }
 
     @Override

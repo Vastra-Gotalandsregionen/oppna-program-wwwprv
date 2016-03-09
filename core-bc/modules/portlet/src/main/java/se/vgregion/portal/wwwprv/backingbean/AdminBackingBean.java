@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +53,8 @@ public class AdminBackingBean {
     private String userMessage;
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private Map<Long, Boolean> usersSupplierChooserExpanded = new HashMap<>();
-    private Tree<String> tree;
+    private TreeNode remoteDirectoryTree;
+    private TreeNode[] selectedDirectoryNode;
 
     public AdminBackingBean() {
     }
@@ -63,27 +66,32 @@ public class AdminBackingBean {
 
     @PostConstruct
     public void init() {
-        tree = dataPrivataService.retrieveRemoteFileTree();
+        remoteDirectoryTree = transformTree(dataPrivataService.retrieveRemoteFileTree());
     }
 
-    public TreeNode getFileTree() {
+    /**
+     * Transforms from {@link Tree} to {@link TreeNode}.
+     * @return
+     */
+    public TreeNode transformTree(Tree<String> tree) {
         TreeNode target = new DefaultTreeNode(tree.getRoot().getData());
 
         Tree.Node<String> source = tree.getRoot();
 
-        target.getChildren().addAll(getFileTree(source.getChildren()));
+        target.getChildren().addAll(transformTree(source.getChildren()));
 
         return target;
     }
 
-    private Collection<? extends TreeNode> getFileTree(List<Tree.Node<String>> nodes) {
+    private Collection<? extends TreeNode> transformTree(List<Tree.Node<String>> nodes) {
         if (nodes == null || nodes.size() == 0) {
             return new ArrayList<>();
         } else {
             Collection<TreeNode> nodesToAdd = new ArrayList<>();
             for (Tree.Node node : nodes) {
                 TreeNode treeNode = new DefaultTreeNode(node.getData());
-                treeNode.getChildren().addAll(getFileTree(node.getChildren()));
+                treeNode.getChildren().addAll(transformTree(node.getChildren()));
+
                 nodesToAdd.add(treeNode);
             }
 
@@ -139,6 +147,20 @@ public class AdminBackingBean {
         String message = "Lyckades spara " + supplier.getEnhetsKod() + ".";
 
         setSupplierMessage(message);
+    }
+
+    public void saveUploadFolders() {
+        System.out.println("asdf");
+
+        Set<String> selectedUploadFolders = new HashSet<>();
+
+        for (TreeNode treeNode : selectedDirectoryNode) {
+            selectedUploadFolders.add(getFullPath(treeNode));
+        }
+
+        currentSupplier.setUploadFolders(selectedUploadFolders);
+
+        dataPrivataService.saveSupplier(currentSupplier);
     }
 
     public void removeSupplier(Supplier supplier) {
@@ -273,5 +295,72 @@ public class AdminBackingBean {
 
     public void setCurrentSupplier(Supplier currentSupplier) {
         this.currentSupplier = currentSupplier;
+
+        traverseAndSetSelected(currentSupplier, remoteDirectoryTree);
+        traverseAndSetExpanded(currentSupplier, remoteDirectoryTree);
+    }
+
+    private static void traverseAndSetExpanded(Supplier supplier, TreeNode treeNode) {
+        Set<String> persistedUploadFolders = supplier.getUploadFolders();
+
+        boolean match = anyPersistedUploadFolderStartsWith(persistedUploadFolders, getFullPath(treeNode));
+
+        treeNode.setExpanded(match && treeNode.getChildren().size() > 0);
+
+        if (treeNode.getChildren().size() > 0) {
+            for (TreeNode node : treeNode.getChildren()) {
+                traverseAndSetExpanded(supplier, node);
+            }
+        }
+    }
+
+    private static boolean anyPersistedUploadFolderStartsWith(Set<String> strings, String string) {
+        for (String s : strings) {
+            // Just starts with. We don't want to expand when equal.
+            if (s.startsWith(string) && !s.equals(string)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void traverseAndSetSelected(Supplier supplier, TreeNode treeNode) {
+        Set<String> persistedUploadFolders = supplier.getUploadFolders();
+
+        boolean contains = persistedUploadFolders.contains(getFullPath(treeNode));
+        treeNode.setSelected(contains);
+
+        if (treeNode.getChildren().size() > 0) {
+            for (TreeNode node : treeNode.getChildren()) {
+                traverseAndSetSelected(supplier, node);
+            }
+        }
+    }
+
+    public TreeNode[] getSelectedDirectoryNode() {
+        return selectedDirectoryNode;
+    }
+
+    public void setSelectedDirectoryNode(TreeNode[] selectedDirectoryNode) {
+        this.selectedDirectoryNode = selectedDirectoryNode;
+    }
+
+    public TreeNode getRemoteDirectoryTree() {
+        return remoteDirectoryTree;
+    }
+
+    public static String getFullPath(TreeNode treeNode) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("\\" + treeNode.getData());
+
+        while (treeNode.getParent() != null) {
+            sb.insert(0, "\\" + treeNode.getParent().getData());
+
+            treeNode = treeNode.getParent();
+        }
+
+        return sb.toString();
     }
 }
