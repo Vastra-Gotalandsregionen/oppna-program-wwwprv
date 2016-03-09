@@ -1,16 +1,20 @@
 package se.vgregion.portal.wwwprv.backingbean;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.vgregion.portal.wwwprv.model.Tree;
+import se.vgregion.portal.wwwprv.model.jpa.GlobalSetting;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.service.MockFileAccessService;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Patrik Björk
@@ -26,6 +30,12 @@ public class AdminBackingBeanTest {
         MockFileAccessService mockFileAccessService = new MockFileAccessService();
 
         DataPrivataService dataPrivataService = new DataPrivataService(null, mockFileAccessService);
+
+        EntityManager entityManager = Mockito.mock(EntityManager.class);
+        when(entityManager.find(GlobalSetting.class, "namnd-fordelnings-directory"))
+                .thenReturn(new GlobalSetting("namnd-fordelnings-directory", "mumbojumbo"));
+
+        dataPrivataService.setEntityManager(entityManager);
         
         AdminBackingBean adminBackingBean = new AdminBackingBean(null, dataPrivataService);
 

@@ -19,6 +19,7 @@ import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletRequest;
 import java.util.ArrayList;
@@ -55,6 +56,11 @@ public class AdminBackingBean {
     private Map<Long, Boolean> usersSupplierChooserExpanded = new HashMap<>();
     private TreeNode remoteDirectoryTree;
     private TreeNode[] selectedDirectoryNode;
+    private TreeNode selectedNamndFordelningDirectory;
+    private TreeNode namndFordelningRemoteDirectoryTree;
+
+    @Autowired
+    private RequestScopedModelBean requestScopedModelBean;
 
     public AdminBackingBean() {
     }
@@ -67,6 +73,39 @@ public class AdminBackingBean {
     @PostConstruct
     public void init() {
         remoteDirectoryTree = transformTree(dataPrivataService.retrieveRemoteFileTree());
+
+        // namndFordelningRemoteDirectoryTree
+        namndFordelningRemoteDirectoryTree = transformTree(dataPrivataService.retrieveRemoteFileTree());
+
+        refreshNamndFordelningDirectory();
+    }
+
+    private void refreshNamndFordelningDirectory() {
+        String namndFordelningDirectory = dataPrivataService.getNamndFordelningDirectory();
+
+        traverseAndSetSelectedAndExpanded(namndFordelningRemoteDirectoryTree, namndFordelningDirectory);
+    }
+
+    private void traverseAndSetSelectedAndExpanded(TreeNode treeNode, String directory) {
+
+        // Defaults.
+        treeNode.setSelected(false);
+        treeNode.setExpanded(false);
+
+        if (getFullPath(treeNode).equals(directory)) {
+            treeNode.setSelected(true);
+
+            while (treeNode.getParent() != null) {
+                treeNode.getParent().setExpanded(true);
+                treeNode = treeNode.getParent();
+            }
+        } else {
+            if (treeNode.getChildren().size() > 0) {
+                for (TreeNode node : treeNode.getChildren()) {
+                    traverseAndSetSelectedAndExpanded(node, directory);
+                }
+            }
+        }
     }
 
     /**
@@ -150,8 +189,6 @@ public class AdminBackingBean {
     }
 
     public void saveUploadFolders() {
-        System.out.println("asdf");
-
         Set<String> selectedUploadFolders = new HashSet<>();
 
         for (TreeNode treeNode : selectedDirectoryNode) {
@@ -161,6 +198,19 @@ public class AdminBackingBean {
         currentSupplier.setUploadFolders(selectedUploadFolders);
 
         dataPrivataService.saveSupplier(currentSupplier);
+    }
+
+    public void saveNamndFordelningDirectory() {
+        String fullPath = getFullPath(selectedNamndFordelningDirectory);
+
+        dataPrivataService.saveNamndFordelningDirectory(fullPath);
+
+        refreshNamndFordelningDirectory();
+
+        FacesContext.getCurrentInstance()
+                .addMessage(
+                        getJustToAssociateMessageWithSomething().getClientId(),
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sparat!", "Sparat!"));
     }
 
     public void removeSupplier(Supplier supplier) {
@@ -350,17 +400,41 @@ public class AdminBackingBean {
         return remoteDirectoryTree;
     }
 
+    public TreeNode getNamndFordelningRemoteDirectoryTree() {
+        return namndFordelningRemoteDirectoryTree;
+    }
+
+    public void setNamndFordelningRemoteDirectoryTree(TreeNode namndFordelningRemoteDirectoryTree) {
+        this.namndFordelningRemoteDirectoryTree = namndFordelningRemoteDirectoryTree;
+    }
+
+    public TreeNode getSelectedNamndFordelningDirectory() {
+        return selectedNamndFordelningDirectory;
+    }
+
+    public void setSelectedNamndFordelningDirectory(TreeNode selectedNamndFordelningDirectory) {
+        this.selectedNamndFordelningDirectory = selectedNamndFordelningDirectory;
+    }
+
     public static String getFullPath(TreeNode treeNode) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("\\" + treeNode.getData());
+        sb.append(treeNode.getData());
 
         while (treeNode.getParent() != null) {
-            sb.insert(0, "\\" + treeNode.getParent().getData());
+            sb.insert(0, treeNode.getParent().getData());
 
             treeNode = treeNode.getParent();
         }
 
         return sb.toString();
+    }
+
+    public HtmlCommandButton getJustToAssociateMessageWithSomething() {
+        return requestScopedModelBean.getJustToAssociateMessageWithSomething();
+    }
+
+    public void setJustToAssociateMessageWithSomething(HtmlCommandButton testar) {
+        requestScopedModelBean.setJustToAssociateMessageWithSomething(testar);
     }
 }

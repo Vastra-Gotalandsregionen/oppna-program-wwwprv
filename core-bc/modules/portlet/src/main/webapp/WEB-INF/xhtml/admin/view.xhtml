@@ -114,7 +114,7 @@
                                         </ui:repeat>
 
                                         <h:panelGroup rendered="#{empty supplier.uploadFolders}">
-                                            Ingen vald
+                                            <span style="color: red">Ingen vald</span>
                                         </h:panelGroup>
                                     </h:commandLink>
                                 </td>
@@ -153,12 +153,6 @@
                                 </h:selectOneMenu>
                             </td>
                             <td>
-                                <h:selectOneMenu value="#{adminBackingBean.supplierToAdd.sharedUploadFolder}" converter="#{sharedUploadFolderConverter}" onchange="javascript:showSaveButton(this);">
-                                    <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
-                                    <f:selectItems value="#{adminBackingBean.allSharedUploadFolders}" var="folderIndex" itemValue="#{folderIndex}" itemLabel="#{adminBackingBean.getLabel(folderIndex)}"/>
-                                </h:selectOneMenu>
-                            </td>
-                            <td>
                                 <h:commandButton value="Lägg till">
                                     <f:ajax execute="supplierTable" listener="#{adminBackingBean.addSupplier}"
                                             render="@form" onevent="reinitAfterPageUpdate"/>
@@ -167,6 +161,27 @@
                         </tr>
                         </tbody>
                     </table>
+                </h:panelGroup>
+            </section>
+
+            <section>
+                <h:panelGroup id="namndFordelningDirectory">
+                    <h2>Nämndfördelningsmapp</h2>
+                    <p>Någon mapp behöver märkas som "nämndfördelningsmapp" för att systemet ska veta vart den nämndfördelade filen ska skickas.</p>
+
+                    <p:tree value="#{adminBackingBean.namndFordelningRemoteDirectoryTree}" var="node" selectionMode="single" selection="#{adminBackingBean.selectedNamndFordelningDirectory}">
+                        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+
+                    <div>
+                        <h:commandButton value="Spara nämndfördelningsmapp" id="saveNamndFordelningButton" binding="#{adminBackingBean.justToAssociateMessageWithSomething}">
+                            <f:ajax listener="#{adminBackingBean.saveNamndFordelningDirectory}" execute=":theForm:namndFordelningDirectory" render="@form" onevent="reinitAfterPageUpdate"/>
+                        </h:commandButton>
+
+                        <h:message for="saveNamndFordelningButton" style="display: inline; margin-left: 20px"/>
+                    </div>
                 </h:panelGroup>
             </section>
 
@@ -187,7 +202,7 @@
 
                     <div>
                         <h:commandButton value="Spara">
-                            <f:ajax listener="#{adminBackingBean.saveUploadFolders}" execute=":theForm:uploadFolderWrapper" render="@form"/>
+                            <f:ajax listener="#{adminBackingBean.saveUploadFolders}" execute=":theForm:uploadFolderWrapper" render="@form" onevent="reinitAfterPageUpdate"/>
                         </h:commandButton>
                     </div>
                 </p:dialog>
@@ -207,7 +222,7 @@
 
             function reinitAfterPageUpdate(data) {
                 if (data.status === 'complete') {
-                    initPage();
+                    setTimeout(function() {initPage();}, 100);
                 }
             }
 

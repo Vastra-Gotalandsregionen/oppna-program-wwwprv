@@ -1,7 +1,9 @@
 package se.vgregion.portal.wwwprv.service;
 
 import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +43,18 @@ public class RemoteFileAccessService implements FileAccessService {
     private String url2;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFileAccessService.class);
+
+    public RemoteFileAccessService() {
+    }
+
+    public RemoteFileAccessService(String user1, String user2, String password1, String password2, String url1, String url2) {
+        this.user1 = user1;
+        this.user2 = user2;
+        this.password1 = password1;
+        this.password2 = password2;
+        this.url1 = url1;
+        this.url2 = url2;
+    }
 
     @Override
     public void uploadFile(String fileName, Supplier supplier, final InputStream inputStream, long fileSize, Notifiable notifiable) {
@@ -98,6 +112,50 @@ public class RemoteFileAccessService implements FileAccessService {
 
     @Override
     public Tree<String> retrieveRemoteFileTree() {
-        throw new UnsupportedOperationException("todo");
+        try {
+
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("MARS", user1, password1);
+
+            SmbFile smbRoot = new SmbFile(url1, auth);
+
+            if (!smbRoot.isDirectory()) {
+                throw new RuntimeException("Root is expected to be a directory.");
+            }
+
+            String[] split = url1.split("/");
+            Tree<String> tree = new Tree<>(split[split.length - 1] + "/");
+
+            Tree.Node<String> root = tree.getRoot();
+
+            buildDirectoryTree(root, smbRoot);
+
+            return tree;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void buildDirectoryTree(Tree.Node<String> node, SmbFile smbRoot) {
+        SmbFile[] directories;
+        try {
+            directories = smbRoot.listFiles(new SmbFileFilter() {
+                @Override
+                public boolean accept(SmbFile file) throws SmbException {
+                    return file.isDirectory();
+                }
+            });
+        } catch (SmbException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (directories == null || directories.length == 0) {
+            return;
+        } else {
+            for (SmbFile directory : directories) {
+                Tree.Node<String> newNode = new Tree.Node<>(directory.getName());
+                buildDirectoryTree(newNode, directory);
+                node.getChildren().add(newNode);
+            }
+        }
     }
 }

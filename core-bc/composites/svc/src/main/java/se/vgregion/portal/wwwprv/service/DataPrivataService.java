@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.portal.wwwprv.model.Tree;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
+import se.vgregion.portal.wwwprv.model.jpa.GlobalSetting;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
@@ -177,5 +178,27 @@ public class DataPrivataService {
 
     public Tree<String> retrieveRemoteFileTree() {
         return fileAccessService.retrieveRemoteFileTree();
+    }
+
+    public String getNamndFordelningDirectory() {
+        GlobalSetting globalSetting = entityManager.find(GlobalSetting.class, "namnd-fordelnings-directory");
+
+        if (globalSetting == null) {
+            globalSetting = new GlobalSetting("namnd-fordelnings-directory", "");
+            entityManager.persist(globalSetting);
+        }
+
+        return globalSetting.getValue();
+    }
+
+    @Transactional
+    public void saveNamndFordelningDirectory(String value) {
+        GlobalSetting globalSetting = new GlobalSetting("namnd-fordelnings-directory", value);
+
+        entityManager.merge(globalSetting);
+    }
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 }
