@@ -14,6 +14,7 @@
 	<persistence-unit name="dataprivata">
 		<class>se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser</class>
 		<class>se.vgregion.portal.wwwprv.model.jpa.FileUpload</class>
+		<class>se.vgregion.portal.wwwprv.model.jpa.GlobalSetting</class>
 		<class>se.vgregion.portal.wwwprv.model.jpa.Supplier</class>
 	</persistence-unit>
 
