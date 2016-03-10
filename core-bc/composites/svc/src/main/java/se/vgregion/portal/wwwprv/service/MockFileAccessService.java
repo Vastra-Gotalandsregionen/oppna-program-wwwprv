@@ -51,23 +51,23 @@ public class MockFileAccessService implements FileAccessService {
     @Override
     public Tree<String> retrieveRemoteFileTree() {
 
-        Tree<String> tree = new Tree<>("Rotmapp");
+        Tree<String> tree = new Tree<>("Rotmapp/");
 
         List<Tree.Node<String>> level1 = tree.getRoot().getChildren();
 
-        Tree.Node<String> dir1 = new Tree.Node<>("Mapp1");
+        Tree.Node<String> dir1 = new Tree.Node<>("Mapp1/");
         level1.add(dir1);
-        level1.add(new Tree.Node<>("Mapp2"));
-        level1.add(new Tree.Node<>("Mapp3"));
+        level1.add(new Tree.Node<>("Mapp2/"));
+        level1.add(new Tree.Node<>("Mapp3/"));
 
-        Tree.Node<String> dir12 = new Tree.Node<>("mapp1-2");
+        Tree.Node<String> dir12 = new Tree.Node<>("mapp1-2/");
         List<Tree.Node<String>> level2 = dir1.getChildren();
         level2.add(dir12);
-        level2.add(new Tree.Node<>("mapp1-3"));
+        level2.add(new Tree.Node<>("mapp1-3/"));
 
         List<Tree.Node<String>> level3 = dir12.getChildren();
-        level3.add(new Tree.Node<>("mapp1-3-1"));
-        level3.add(new Tree.Node<>("mapp1-3-2"));
+        level3.add(new Tree.Node<>("mapp1-3-1/"));
+        level3.add(new Tree.Node<>("mapp1-3-2/"));
 
         return tree;
     }
