@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import se.vgregion.portal.wwwprv.model.Tree;
+import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
@@ -115,7 +115,7 @@ public class RemoteFileAccessService implements FileAccessService {
     }
 
     @Override
-    public Tree<String> retrieveRemoteFileTree(String host) {
+    public Node<String> retrieveRemoteFileTree(String host) {
 
         String url = "smb://" + host;
         try {
@@ -129,9 +129,9 @@ public class RemoteFileAccessService implements FileAccessService {
             }
 
             String[] split = url.split("/");
-            Tree<String> tree = new Tree<>(split[split.length - 1] + "/");
+            Node<String> tree = new Node<>(split[split.length - 1] + "/");
 
-            Tree.Node<String> root = tree.getRoot();
+            Node<String> root = tree;
 
             buildDirectoryTree(root, smbRoot);
 
@@ -141,7 +141,7 @@ public class RemoteFileAccessService implements FileAccessService {
         }
     }
 
-    private void buildDirectoryTree(Tree.Node<String> node, SmbFile smbRoot) {
+    private void buildDirectoryTree(Node<String> node, SmbFile smbRoot) {
         SmbFile[] directories = null;
         try {
             directories = smbRoot.listFiles(new SmbFileFilter() {
@@ -163,7 +163,7 @@ public class RemoteFileAccessService implements FileAccessService {
             directories = list.toArray(new SmbFile[0]);
         } catch (SmbException e) {
             String message = e.getMessage();
-            if (!"Access is denied".equals(message)) {
+            if (!"Access is denied.".equals(message)) {
                 LOGGER.error(message, e);
             }
         }
@@ -172,7 +172,7 @@ public class RemoteFileAccessService implements FileAccessService {
             return;
         } else {
             for (SmbFile directory : directories) {
-                Tree.Node<String> newNode = new Tree.Node<>(directory.getName());
+                Node<String> newNode = new Node<>(directory.getName());
                 buildDirectoryTree(newNode, directory);
                 newNode.setParent(node);
                 node.getChildren().add(newNode);

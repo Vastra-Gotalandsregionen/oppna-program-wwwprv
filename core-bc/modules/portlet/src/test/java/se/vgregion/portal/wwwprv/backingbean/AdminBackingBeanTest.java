@@ -5,7 +5,7 @@ import org.mockito.Mockito;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.vgregion.portal.wwwprv.model.Tree;
+import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.GlobalSetting;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.service.MockFileAccessService;
@@ -35,6 +35,8 @@ public class AdminBackingBeanTest {
         when(entityManager.find(GlobalSetting.class, "namnd-fordelnings-directory"))
                 .thenReturn(new GlobalSetting("namnd-fordelnings-directory", "mumbojumbo"));
 
+        Mockito.when(entityManager.find(Mockito.eq(GlobalSetting.class), Mockito.eq("server-list"))).thenReturn(new GlobalSetting("server-list", "dummy"));
+
         dataPrivataService.setEntityManager(entityManager);
         
         AdminBackingBean adminBackingBean = new AdminBackingBean(null, dataPrivataService);
@@ -45,9 +47,10 @@ public class AdminBackingBeanTest {
         // Verify
         TreeNode fileTree = adminBackingBean.getRemoteDirectoryTree(); // Primefaces TreeNode
 
-        Tree<String> correctTree = mockFileAccessService.retrieveRemoteFileTree("dummy");
+        Node<String> correctTree = mockFileAccessService.retrieveRemoteFileTree("dummy");
 
-        Tree.Node<String> correctTreeRoot = correctTree.getRoot();
+        Node<String> correctTreeRoot = new Node<>();
+        correctTreeRoot.add(correctTree);
 
         // Root level
         LOGGER.info("Root level: " + correctTreeRoot.getData() + " - " + fileTree.getData());
@@ -56,7 +59,7 @@ public class AdminBackingBeanTest {
         // We make it iteratively as opposed to recursive here since the recursive method in runtime is what we test.
         // First level
         List<TreeNode> toVerify = fileTree.getChildren();
-        List<Tree.Node<String>> verifyAgainst = correctTreeRoot.getChildren();
+        List<Node<String>> verifyAgainst = correctTreeRoot.getChildren();
 
         for (int i = 0; i < verifyAgainst.size(); i++) {
 
@@ -66,7 +69,7 @@ public class AdminBackingBeanTest {
             // Second level
             for (int j = 0; j < verifyAgainst.size(); j++) {
                 List<TreeNode> toVerify1 = toVerify.get(j).getChildren();
-                List<Tree.Node<String>> verifyAgainst1 = verifyAgainst.get(j).getChildren();
+                List<Node<String>> verifyAgainst1 = verifyAgainst.get(j).getChildren();
 
                 for (int k = 0; k < verifyAgainst1.size(); k++) {
                     LOGGER.info("Second level: " + verifyAgainst1.get(k).getData() + " - " + toVerify1.get(k).getData());

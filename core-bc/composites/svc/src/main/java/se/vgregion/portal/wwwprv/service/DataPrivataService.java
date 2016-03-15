@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import se.vgregion.portal.wwwprv.model.Tree;
+import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.GlobalSetting;
@@ -177,19 +177,19 @@ public class DataPrivataService {
         return suffixIncludingDot;
     }
 
-    public Tree<String> retrieveRemoteFileTree() {
+    public Node<String> retrieveRemoteFileTree() {
 
-        Tree<String> aggregatedTree = new Tree<>("rot");
+        Node<String> aggregatedTree = new Node<>();
         List<String> serverList = getServerList();
 
         for (String serverUrl : serverList) {
-            Tree<String> stringTree = fileAccessService.retrieveRemoteFileTree(serverUrl);
+            Node<String> stringTree = fileAccessService.retrieveRemoteFileTree(serverUrl);
 
-            Tree.Node<String> newNode = new Tree.Node<>(serverUrl);
+            Node<String> newNode = new Node<>(serverUrl);
 
-            aggregatedTree.getRoot().getChildren().add(newNode);
+            aggregatedTree.getChildren().add(newNode);
 
-            newNode.getChildren().addAll(stringTree.getRoot().getChildren());
+            newNode.getChildren().addAll(stringTree.getChildren());
         }
 
         return aggregatedTree;

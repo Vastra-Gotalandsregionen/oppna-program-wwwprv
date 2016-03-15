@@ -2,12 +2,13 @@ package se.vgregion.portal.wwwprv.backingbean;
 
 import com.liferay.faces.util.portal.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import se.vgregion.portal.wwwprv.model.Tree;
+import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.UserContainer;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
@@ -78,6 +79,12 @@ public class AdminBackingBean {
         // namndFordelningRemoteDirectoryTree
         namndFordelningRemoteDirectoryTree = transformTree(dataPrivataService.retrieveRemoteFileTree());
 
+        List<String> serverList = dataPrivataService.getServerList();
+
+        if (serverList != null && serverList.size() > 0) {
+            this.serverList = StringUtils.join(serverList, ", ");
+        }
+
         refreshNamndFordelningDirectory();
     }
 
@@ -110,25 +117,25 @@ public class AdminBackingBean {
     }
 
     /**
-     * Transforms from {@link Tree} to {@link TreeNode}.
+     * Transforms from {@link Node} to {@link TreeNode}.
      * @return
      */
-    public TreeNode transformTree(Tree<String> tree) {
-        TreeNode target = new DefaultTreeNode(tree.getRoot().getData());
+    public TreeNode transformTree(Node<String> tree) {
+        TreeNode target = new DefaultTreeNode(tree.getData());
 
-        Tree.Node<String> source = tree.getRoot();
+        Node<String> source = tree;
 
         target.getChildren().addAll(transformTree(source.getChildren()));
 
         return target;
     }
 
-    private Collection<? extends TreeNode> transformTree(List<Tree.Node<String>> nodes) {
+    private Collection<? extends TreeNode> transformTree(List<Node<String>> nodes) {
         if (nodes == null || nodes.size() == 0) {
             return new ArrayList<>();
         } else {
             Collection<TreeNode> nodesToAdd = new ArrayList<>();
-            for (Tree.Node node : nodes) {
+            for (Node node : nodes) {
                 TreeNode treeNode = new DefaultTreeNode(node.getData());
                 treeNode.getChildren().addAll(transformTree(node.getChildren()));
 
@@ -238,6 +245,11 @@ public class AdminBackingBean {
     public void saveServerList() {
         dataPrivataService.saveServerList(serverList);
         init();
+
+        FacesContext.getCurrentInstance()
+                .addMessage(
+                        null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sparat!", "Sparat!"));
     }
 
     public List<Supplier> getAllSuppliers() {
@@ -427,7 +439,7 @@ public class AdminBackingBean {
 
         sb.append(treeNode.getData());
 
-        while (treeNode.getParent() != null) {
+        while (treeNode.getParent() != null && StringUtils.isNotEmpty((String) treeNode.getParent().getData())) {
             sb.insert(0, treeNode.getParent().getData() + "/");
 
             treeNode = treeNode.getParent();
@@ -442,6 +454,14 @@ public class AdminBackingBean {
 
     public void setJustToAssociateMessageWithSomething(HtmlCommandButton testar) {
         requestScopedModelBean.setJustToAssociateMessageWithSomething(testar);
+    }
+
+    public HtmlCommandButton getSaveServerListButton() {
+        return requestScopedModelBean.getSaveServerListButton();
+    }
+
+    public void setSaveServerListButton(HtmlCommandButton button) {
+        requestScopedModelBean.setSaveServerListButton(button);
     }
 
     public String getServerList() {

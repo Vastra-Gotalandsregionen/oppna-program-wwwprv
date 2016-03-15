@@ -112,17 +112,14 @@
                                         <ui:repeat value="#{utilBean.toList(supplier.uploadFolders)}" var="folder">
                                             <div>#{folder}</div>
                                         </ui:repeat>
-                                        <span class="btn btn-primary" style="margin-left: 5px;">
-                                            <i class="icon-edit"></i>
-                                        </span>
                                         <h:panelGroup rendered="#{empty supplier.uploadFolders}">
                                             <span style="color: red">
                                                 Ingen vald
                                             </span>
-                                            <span class="btn btn-primary" style="margin-left: 5px;">
-                                                <i class="icon-edit"></i>
-                                            </span>
                                         </h:panelGroup>
+                                        <span class="btn btn-primary" style="margin-left: 5px;">
+                                            <i class="icon-edit"></i>
+                                        </span>
                                     </h:commandLink>
                                 </td>
                                 <td>
@@ -175,10 +172,29 @@
                 <h:panelGroup id="serverList">
                     <h2>Uppladdningsservrar</h2>
                     <p>Skriv en kommaseparerad lista för vilka servrar som ska laddas upp till. T.ex. "VGFS0249,VGFS0233".</p>
-                    <h:inputText value="#{adminBackingBean.serverList}"/>
-                    <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
-                        <f:ajax execute="serverList" render="@form" listener="#{adminBackingBean.saveServerList}"/>
-                    </h:commandButton>
+
+                    <p:ajaxStatus>
+                        <f:facet name="default">
+                            <h:inputText id="defaultInput" value="#{adminBackingBean.serverList}"/>
+                            <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                <f:ajax execute="defaultInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                            </h:commandButton>
+                        </f:facet>
+
+                        <f:facet name="start">
+                            <h:inputText value="Sparar..." disabled="true"/>
+                            <h:commandButton id="saveServerListButtonDisabled" disabled="true" styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                            </h:commandButton>
+                        </f:facet>
+
+                        <f:facet name="complete">
+                            <h:inputText id="completeInput" value="#{adminBackingBean.serverList}"/>
+                            <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                <f:ajax execute="completeInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                            </h:commandButton>
+                        </f:facet>
+                    </p:ajaxStatus>
+
                 </h:panelGroup>
 
             </section>

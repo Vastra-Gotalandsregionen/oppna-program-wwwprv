@@ -18,6 +18,7 @@ public class RequestScopedModelBean {
 
     private HtmlCommandButton justToAssociateMessageWithSomething;
     private Map<UserContainer, Map<Supplier, Boolean>> userWithSuppliersHelper;
+    private HtmlCommandButton saveServerListButton;
 
     public HtmlCommandButton getJustToAssociateMessageWithSomething() {
         return justToAssociateMessageWithSomething;
@@ -33,5 +34,13 @@ public class RequestScopedModelBean {
 
     public void setUserWithSuppliersHelper(Map<UserContainer, Map<Supplier, Boolean>> userWithSuppliersHelper) {
         this.userWithSuppliersHelper = userWithSuppliersHelper;
+    }
+
+    public void setSaveServerListButton(HtmlCommandButton saveServerListButton) {
+        this.saveServerListButton = saveServerListButton;
+    }
+
+    public HtmlCommandButton getSaveServerListButton() {
+        return saveServerListButton;
     }
 }
