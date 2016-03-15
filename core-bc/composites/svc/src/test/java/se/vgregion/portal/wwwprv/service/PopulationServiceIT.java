@@ -78,7 +78,7 @@ public class PopulationServiceIT {
         System.out.println("\nCorrect-Numbers\n \"" + String.join("\", \"", correctNumbers) + "\"");
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void serializeResult() throws IOException {
         List<String> input = Arrays.asList("191202119150", "193901059059", "189004119807", "195102262267",

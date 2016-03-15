@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
-import se.vgregion.portal.wwwprv.util.Text;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -19,9 +18,6 @@ import java.nio.file.Paths;
 public class LocalFileAccessService implements FileAccessService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileAccessService.class);
-
-    @Autowired
-    BoardDistributionService distributionService;
 
     @Value("${localStoragePath}")
     private String localStoragePath;
@@ -67,25 +63,15 @@ public class LocalFileAccessService implements FileAccessService {
             }
             FileInputStream fis = new FileInputStream(save2path.toString());
             FileOutputStream fos = new FileOutputStream(save2path + ".board-distributed");
-            distributionService.runMakeDistributionFileContent(fis, fileName, supplier.getEnhetsKod(), fos);
+
+            // Do some distributions here....
+
+            //distributionService.runMakeDistributionFileContent(fis, fileName, supplier.getEnhetsKod(), fos);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
-        /*Thread thread = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Text source = new Text(Files.readAllLines(Paths.get(localStoragePath, fileName)));
-                    Text result = distributionService.makeDistributionFileContent(source, fileName, supplier.getEnhetsKod());
-                    Files.write(Paths.get(localStoragePath, fileName + ".board-distributed"), result.toRawLines());
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        thread.run();*/
     }
 
     public String getLocalStoragePath() {

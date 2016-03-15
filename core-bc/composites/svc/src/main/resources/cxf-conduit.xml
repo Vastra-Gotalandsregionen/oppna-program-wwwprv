@@ -23,8 +23,8 @@
         <sec:keyStore type="JKS" password="population" file="${user.home}/.hotell/wwwprv/population.service.jks"/>
       </sec:trustManagers>
       <!-- It is possible to add a keyManager for mutual authentication. -->
-      <sec:keyManagers keyPassword="simple">
-        <sec:keyStore type="PKCS12" password="simple" file="${user.home}/.hotell/wwwprv/portalen.vgregion.se.simple.p12" />
+      <sec:keyManagers keyPassword="${population.service.password}">
+        <sec:keyStore type="PKCS12" password="${population.service.password}" file="${population.service.cert}" />
       </sec:keyManagers>
     </http:tlsClientParameters>
   </http:conduit>

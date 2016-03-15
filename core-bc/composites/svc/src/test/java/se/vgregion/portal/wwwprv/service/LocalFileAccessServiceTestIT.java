@@ -48,7 +48,7 @@ public class LocalFileAccessServiceTestIT {
 
         service.uploadFile(fileName, unilabs, testContent, IOUtils.toByteArray(getClass().getResourceAsStream(fileName)).length, notfyer);
 
-        BoardDistributionService.getCurrentDistributionFileContentWorker().get().join();
+        //BoardDistributionService.getCurrentDistributionFileContentWorker().get().join();
 
         File unprocessed = new File(service.getLocalStoragePath() + File.separator + fileName);
         assertTrue(unprocessed.exists());
