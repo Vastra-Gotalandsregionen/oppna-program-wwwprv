@@ -173,27 +173,29 @@
                     <h2>Uppladdningsservrar</h2>
                     <p>Skriv en kommaseparerad lista för vilka servrar som ska laddas upp till. T.ex. "VGFS0249,VGFS0233".</p>
 
-                    <p:ajaxStatus>
-                        <f:facet name="default">
-                            <h:inputText id="defaultInput" value="#{adminBackingBean.serverList}"/>
-                            <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
-                                <f:ajax execute="defaultInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
-                            </h:commandButton>
-                        </f:facet>
+                    <div class="input-row">
+                        <p:ajaxStatus>
+                            <f:facet name="default">
+                                <h:inputText id="defaultInput" value="#{adminBackingBean.serverList}"/>
+                                <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                    <f:ajax execute="defaultInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                                </h:commandButton>
+                            </f:facet>
 
-                        <f:facet name="start">
-                            <h:inputText value="Sparar..." disabled="true"/>
-                            <h:commandButton id="saveServerListButtonDisabled" disabled="true" styleClass="btn btn-primary" value="Spara uppladdningsservrar">
-                            </h:commandButton>
-                        </f:facet>
+                            <f:facet name="start">
+                                <h:inputText value="Sparar..." disabled="true"/>
+                                <h:commandButton id="saveServerListButtonDisabled" disabled="true" styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                </h:commandButton>
+                            </f:facet>
 
-                        <f:facet name="complete">
-                            <h:inputText id="completeInput" value="#{adminBackingBean.serverList}"/>
-                            <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
-                                <f:ajax execute="completeInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
-                            </h:commandButton>
-                        </f:facet>
-                    </p:ajaxStatus>
+                            <f:facet name="complete">
+                                <h:inputText id="completeInput" value="#{adminBackingBean.serverList}"/>
+                                <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                    <f:ajax execute="completeInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                                </h:commandButton>
+                            </f:facet>
+                        </p:ajaxStatus>
+                    </div>
 
                 </h:panelGroup>
 
