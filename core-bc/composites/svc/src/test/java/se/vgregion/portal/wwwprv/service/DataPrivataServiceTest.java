@@ -1,8 +1,14 @@
 package se.vgregion.portal.wwwprv.service;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+import se.vgregion.portal.wwwprv.model.jpa.GlobalSetting;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
+
+import javax.persistence.EntityManager;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -75,6 +81,21 @@ public class DataPrivataServiceTest {
 
         }
 
+    }
+
+    @Test
+    public void testGetServerList() {
+        DataPrivataService service = new DataPrivataService();
+
+        EntityManager mock = Mockito.mock(EntityManager.class);
+
+        Mockito.when(mock.find(Mockito.eq(GlobalSetting.class), Mockito.eq("server-list"))).thenReturn(null);
+
+        service.setEntityManager(mock);
+
+        List<String> serverList = service.getServerList();
+
+        assertTrue(serverList.size() == 0);
     }
 
 }

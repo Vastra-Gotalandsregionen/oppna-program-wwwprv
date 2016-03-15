@@ -52,6 +52,7 @@ public class AdminBackingBean {
     private Supplier currentSupplier;
     private String supplierMessage;
     private String userMessage;
+    private String serverList;
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private Map<Long, Boolean> usersSupplierChooserExpanded = new HashMap<>();
     private TreeNode remoteDirectoryTree;
@@ -232,6 +233,11 @@ public class AdminBackingBean {
         String message = "Lyckades spara till " + userContainer.getLiferayUser().getFullName() + ".";
 
         setUserMessage(message);
+    }
+
+    public void saveServerList() {
+        dataPrivataService.saveServerList(serverList);
+        init();
     }
 
     public List<Supplier> getAllSuppliers() {
@@ -422,7 +428,7 @@ public class AdminBackingBean {
         sb.append(treeNode.getData());
 
         while (treeNode.getParent() != null) {
-            sb.insert(0, treeNode.getParent().getData());
+            sb.insert(0, treeNode.getParent().getData() + "/");
 
             treeNode = treeNode.getParent();
         }
@@ -436,5 +442,13 @@ public class AdminBackingBean {
 
     public void setJustToAssociateMessageWithSomething(HtmlCommandButton testar) {
         requestScopedModelBean.setJustToAssociateMessageWithSomething(testar);
+    }
+
+    public String getServerList() {
+        return serverList;
+    }
+
+    public void setServerList(String serverList) {
+        this.serverList = serverList;
     }
 }

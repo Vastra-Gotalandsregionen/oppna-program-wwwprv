@@ -13,5 +13,5 @@ public interface FileAccessService {
 
     void uploadFile(String fileName, Supplier supplier, InputStream inputStream, long fileSize, Notifiable notifiable);
 
-    Tree<String> retrieveRemoteFileTree();
+    Tree<String> retrieveRemoteFileTree(String url);
 }

@@ -48,6 +48,10 @@ public class Tree<T> {
             this.children = children;
         }
 
+        public void setParent(Node<T> parent) {
+            this.parent = parent;
+        }
+
         public Node<T> getParent() {
             return parent;
         }

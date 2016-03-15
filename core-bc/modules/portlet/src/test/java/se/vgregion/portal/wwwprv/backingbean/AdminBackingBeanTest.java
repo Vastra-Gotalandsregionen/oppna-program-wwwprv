@@ -45,7 +45,7 @@ public class AdminBackingBeanTest {
         // Verify
         TreeNode fileTree = adminBackingBean.getRemoteDirectoryTree(); // Primefaces TreeNode
 
-        Tree<String> correctTree = mockFileAccessService.retrieveRemoteFileTree();
+        Tree<String> correctTree = mockFileAccessService.retrieveRemoteFileTree("dummy");
 
         Tree.Node<String> correctTreeRoot = correctTree.getRoot();
 

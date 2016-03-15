@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -177,7 +178,21 @@ public class DataPrivataService {
     }
 
     public Tree<String> retrieveRemoteFileTree() {
-        return fileAccessService.retrieveRemoteFileTree();
+
+        Tree<String> aggregatedTree = new Tree<>("rot");
+        List<String> serverList = getServerList();
+
+        for (String serverUrl : serverList) {
+            Tree<String> stringTree = fileAccessService.retrieveRemoteFileTree(serverUrl);
+
+            Tree.Node<String> newNode = new Tree.Node<>(serverUrl);
+
+            aggregatedTree.getRoot().getChildren().add(newNode);
+
+            newNode.getChildren().addAll(stringTree.getRoot().getChildren());
+        }
+
+        return aggregatedTree;
     }
 
     public String getNamndFordelningDirectory() {
@@ -200,5 +215,39 @@ public class DataPrivataService {
 
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
+    }
+
+    @Transactional
+    public void saveServerList(String commaSeparatedServerList) {
+        GlobalSetting globalSetting = new GlobalSetting("server-list", commaSeparatedServerList);
+
+        entityManager.merge(globalSetting);
+    }
+
+    public List<String> getServerList() {
+        GlobalSetting globalSetting = entityManager.find(GlobalSetting.class, "server-list");
+
+        if (globalSetting == null) {
+            globalSetting = new GlobalSetting("server-list", "");
+            entityManager.persist(globalSetting);
+        }
+
+        String[] servers;
+
+        String value = globalSetting.getValue();
+
+        if (value != null && value.length() > 0) {
+            servers = value.split(",");
+        } else {
+            servers = new String[0];
+        }
+
+        List<String> serverList = new ArrayList<>();
+
+        for (String server : servers) {
+            serverList.add(server.trim());
+        }
+
+        return serverList;
     }
 }

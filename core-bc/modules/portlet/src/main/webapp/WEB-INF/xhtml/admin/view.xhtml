@@ -110,13 +110,11 @@
                                                 render=":theForm:uploadFolderWrapper"
                                                 onevent="showUploadFolderDialogOnComplete"/>
                                         <ui:repeat value="#{utilBean.toList(supplier.uploadFolders)}" var="folder">
-                                            <div>#{folder}
-                                            <span class="btn btn-primary" style="margin-left: 5px;">
-                                                <i class="icon-edit"></i>
-                                            </span>
-                                            </div>
+                                            <div>#{folder}</div>
                                         </ui:repeat>
-
+                                        <span class="btn btn-primary" style="margin-left: 5px;">
+                                            <i class="icon-edit"></i>
+                                        </span>
                                         <h:panelGroup rendered="#{empty supplier.uploadFolders}">
                                             <span style="color: red">
                                                 Ingen vald
@@ -174,6 +172,18 @@
             </section>
 
             <section>
+                <h:panelGroup id="serverList">
+                    <h2>Uppladdningsservrar</h2>
+                    <p>Skriv en kommaseparerad lista för vilka servrar som ska laddas upp till. T.ex. "VGFS0249,VGFS0233".</p>
+                    <h:inputText value="#{adminBackingBean.serverList}"/>
+                    <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                        <f:ajax execute="serverList" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                    </h:commandButton>
+                </h:panelGroup>
+
+            </section>
+
+            <section>
                 <h:panelGroup id="namndFordelningDirectory">
                     <h2>Nämndfördelningsmapp</h2>
                     <p>Någon mapp behöver märkas som "nämndfördelningsmapp" för att systemet ska veta vart den nämndfördelade filen ska skickas.</p>
@@ -202,6 +212,7 @@
                     <p:tree value="#{adminBackingBean.remoteDirectoryTree}" var="node"
                             selectionMode="multiple"
                             selection="#{adminBackingBean.selectedDirectoryNode}"
+                            style="max-height: 500px;min-height: 500px;overflow: scroll;"
                             >
                         <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
                             <h:outputText value="#{node}"/>

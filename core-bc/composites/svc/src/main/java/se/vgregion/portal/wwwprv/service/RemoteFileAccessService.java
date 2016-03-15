@@ -17,6 +17,10 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author Patrik Bergström
@@ -36,11 +40,11 @@ public class RemoteFileAccessService implements FileAccessService {
     @Value("${mars.folder2.password}")
     private String password2;
 
-    @Value("${mars.folder1.url}")
+    /*@Value("${mars.folder1.url}")
     private String url1;
 
     @Value("${mars.folder2.url}")
-    private String url2;
+    private String url2;*/
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFileAccessService.class);
 
@@ -52,14 +56,14 @@ public class RemoteFileAccessService implements FileAccessService {
         this.user2 = user2;
         this.password1 = password1;
         this.password2 = password2;
-        this.url1 = url1;
-        this.url2 = url2;
+//        this.url1 = url1;
+//        this.url2 = url2;
     }
 
     @Override
     public void uploadFile(String fileName, Supplier supplier, final InputStream inputStream, long fileSize, Notifiable notifiable) {
 
-        String url;
+        /*String url;
         NtlmPasswordAuthentication auth;
         if (SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).equals(SharedUploadFolder.MARS_SHARED_FOLDER)) {
             url = url1;
@@ -107,22 +111,24 @@ public class RemoteFileAccessService implements FileAccessService {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     @Override
-    public Tree<String> retrieveRemoteFileTree() {
+    public Tree<String> retrieveRemoteFileTree(String host) {
+
+        String url = "smb://" + host;
         try {
 
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("MARS", user1, password1);
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("VGREGION", user1, password1);
 
-            SmbFile smbRoot = new SmbFile(url1, auth);
+            SmbFile smbRoot = new SmbFile(url, auth);
 
             if (!smbRoot.isDirectory()) {
                 throw new RuntimeException("Root is expected to be a directory.");
             }
 
-            String[] split = url1.split("/");
+            String[] split = url.split("/");
             Tree<String> tree = new Tree<>(split[split.length - 1] + "/");
 
             Tree.Node<String> root = tree.getRoot();
@@ -136,7 +142,7 @@ public class RemoteFileAccessService implements FileAccessService {
     }
 
     private void buildDirectoryTree(Tree.Node<String> node, SmbFile smbRoot) {
-        SmbFile[] directories;
+        SmbFile[] directories = null;
         try {
             directories = smbRoot.listFiles(new SmbFileFilter() {
                 @Override
@@ -144,8 +150,22 @@ public class RemoteFileAccessService implements FileAccessService {
                     return file.isDirectory();
                 }
             });
+
+            List<SmbFile> list = Arrays.asList(directories);
+
+            Collections.sort(list, new Comparator<SmbFile>() {
+                @Override
+                public int compare(SmbFile o1, SmbFile o2) {
+                    return o1.getName().compareTo(o2.getName());
+                }
+            });
+
+            directories = list.toArray(new SmbFile[0]);
         } catch (SmbException e) {
-            throw new RuntimeException(e);
+            String message = e.getMessage();
+            if (!"Access is denied".equals(message)) {
+                LOGGER.error(message, e);
+            }
         }
 
         if (directories == null || directories.length == 0) {
@@ -154,6 +174,7 @@ public class RemoteFileAccessService implements FileAccessService {
             for (SmbFile directory : directories) {
                 Tree.Node<String> newNode = new Tree.Node<>(directory.getName());
                 buildDirectoryTree(newNode, directory);
+                newNode.setParent(node);
                 node.getChildren().add(newNode);
             }
         }
