@@ -46,7 +46,7 @@ public class UnilabsLab implements DistrictDistribution {
         String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
-        table.insert(new Column("Ursprungligt_filnamn", 0, 50));
+        table.insert(new Column("Ursprungligt_filnamn", 0, originalFileName.length()));
         table.insert(new Column("Körningsdatum", 1, 10));
         table.insert(new Column("Klockslag_körningsdatum", 2, 9)); //
         // The original columns are here...

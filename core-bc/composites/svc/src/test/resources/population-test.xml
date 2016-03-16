@@ -18,7 +18,6 @@
 
     <context:annotation-config/>
 
-  <bean class="se.vgregion.portal.wwwprv.service.BoardDistributionService"/>
   <bean class="se.vgregion.portal.wwwprv.service.LocalFileAccessService"/>
 
 </beans>

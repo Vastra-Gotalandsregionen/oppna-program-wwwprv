@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import se.vgregion.portal.wwwprv.DummyPersonalNumbers;
 import se.vgregion.portal.wwwprv.table.Column;
 import se.vgregion.portal.wwwprv.table.Table;
 import se.vgregion.portal.wwwprv.table.Tupel;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by clalu4 on 2016-03-14.
@@ -29,8 +33,25 @@ public class UnilabsLabTest {
         UnilabsLab unilabsLab = new UnilabsLab(populationService, originalFileName);
 
         String output = unilabsLab.process(inputFileContent().toString());
+        Table outputTable = new Table(output);
         System.out.println(output);
+
+        String expectedHeading = "korn_datum              filnamn                                            avtalskod BesoksDatum personnr      Namn                           Betalare Bestallare Analyskod  AnalysNamn                     Cap_pris               PatLan     PatKommun  SDN        NyckelKod  Namnd\n";
+        Table havingExpectedHeading = new Table(expectedHeading);
+
+        Set<String> columnNames = new HashSet<>();
+        for (Column c : outputTable.getColumns()) {
+            columnNames.add(c.getName());
+        }
+
+        for (Column column : havingExpectedHeading.getColumns()) {
+            Assert.assertTrue("Column " + column.getName() + " should have been inside.",
+                    columnNames.contains(column.getName())
+            );
+        }
+
     }
+
 
     public Table inputFileContent() {
         String def = "" +
