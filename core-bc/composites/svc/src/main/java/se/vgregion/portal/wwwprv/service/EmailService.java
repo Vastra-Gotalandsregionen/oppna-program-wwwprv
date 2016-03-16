@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +39,8 @@ public class EmailService {
     public void notifyNewUpload(String fullFileName, Supplier supplier, String userName) {
 
         String subject = "Uppladdad fil: " + fullFileName + getEnvironmentString();
-        String text = fullFileName + " har laddats upp till " + SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).getLabel() + " av " + userName;
+        String text = fullFileName + " har laddats upp till "
+                + StringUtils.join(supplier.getUploadFolders(), ", ") + " av " + userName;
 
         sendMessage(subject, text);
     }

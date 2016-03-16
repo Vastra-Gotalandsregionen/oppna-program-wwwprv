@@ -1,7 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ public class LocalFileAccessServiceTestIT {
         Supplier unilabs = new Supplier();
         unilabs.setEnhetsKod("Unilabs_S50MA50");
 
-        service.uploadFile(fileName, unilabs, testContent, IOUtils.toByteArray(getClass().getResourceAsStream(fileName)).length, notfyer);
+        service.uploadFile(fileName, unilabs, testContent, IOUtils.toByteArray(getClass().getResourceAsStream(fileName)).length, "namndfordelningsdir", notfyer);
 
         //BoardDistributionService.getCurrentDistributionFileContentWorker().get().join();
 

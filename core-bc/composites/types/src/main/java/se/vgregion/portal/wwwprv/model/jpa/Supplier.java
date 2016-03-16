@@ -39,6 +39,8 @@ public class Supplier implements Serializable {
     @CollectionTable(name = "vgr_dataprivata_supplier_uploadfolders")
     private Set<String> uploadFolders = new HashSet<>();
 
+    private String districtDistributionClassName;
+
     public Supplier() {
     }
 
@@ -92,6 +94,14 @@ public class Supplier implements Serializable {
 
     public void setUploadFolders(Set<String> uploadFolders) {
         this.uploadFolders = uploadFolders;
+    }
+
+    public String getDistrictDistributionClassName() {
+        return districtDistributionClassName;
+    }
+
+    public void setDistrictDistributionClassName(String districtDistributionClassName) {
+        this.districtDistributionClassName = districtDistributionClassName;
     }
 
     @Override

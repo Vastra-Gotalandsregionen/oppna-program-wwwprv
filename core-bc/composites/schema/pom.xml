@@ -67,7 +67,14 @@ Generation time : 2015-03-12 14:47:57 CET
       <artifactId>cxf-rt-frontend-jaxws</artifactId>
       <version>${apache.cxf.version}</version>
       <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-javamail_1.4_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-transports-http</artifactId>

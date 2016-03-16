@@ -19,7 +19,8 @@ public class MockFileAccessService implements FileAccessService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MockFileAccessService.class);
 
     @Override
-    public void uploadFile(String fileName, Supplier supplier, InputStream inputStream, long fileSize, Notifiable notifiable) {
+    public void uploadFile(String fileName, Supplier supplier, InputStream inputStream, long fileSize,
+                           String namndFordelningDirectory, Notifiable notifiable) {
 
         LOGGER.info("Uploading using " + MockFileAccessService.class.getName());
 

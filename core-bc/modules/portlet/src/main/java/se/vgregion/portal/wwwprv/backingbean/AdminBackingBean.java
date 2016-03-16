@@ -15,6 +15,7 @@ import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.service.LiferayService;
 import se.vgregion.portal.wwwprv.service.LiferayServiceException;
+import se.vgregion.portal.wwwprv.service.model.DistrictDistributionClassName;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
@@ -446,6 +447,10 @@ public class AdminBackingBean {
         }
 
         return sb.toString();
+    }
+
+    public DistrictDistributionClassName[] getDistrictDistributionClassNameValues() {
+        return DistrictDistributionClassName.values();
     }
 
     public HtmlCommandButton getJustToAssociateMessageWithSomething() {

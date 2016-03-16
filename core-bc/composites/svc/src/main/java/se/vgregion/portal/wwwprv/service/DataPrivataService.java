@@ -114,7 +114,7 @@ public class DataPrivataService {
         entityManager.persist(fileUpload);
 
         fileAccessService.uploadFile(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream,
-                fileSize, notifiable);
+                fileSize, getNamndFordelningDirectory(), notifiable);
 
         emailService.notifyNewUpload(fileUpload.getFullFileName(), getSupplier(supplierCode), userName);
     }

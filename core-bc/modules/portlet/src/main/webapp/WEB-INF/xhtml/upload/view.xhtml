@@ -39,7 +39,7 @@
 
         <h:panelGroup id="progressBarWrapperWrapper" layout="block">
             <h:panelGroup id="progressBarWrapper" styleClass="progress-bar-wrapper" layout="block" rendered="#{not empty uploadBackingBean.progress}">
-                Uppladdning av #{uploadBackingBean.latestFileName} till #{uploadBackingBean.getLabel(uploadBackingBean.chosenSupplier.sharedUploadFolder)}
+                Bearbetning av #{uploadBackingBean.latestFileName}
                 <p:progressBar widgetVar="pbAjax" ajax="true" value="#{uploadBackingBean.progress}" labelTemplate="{value}%" styleClass="animated" global="false">
                     <p:ajax event="complete" listener="#{uploadBackingBean.updateUploadedFileList()}" update="@form" />
                 </p:progressBar>

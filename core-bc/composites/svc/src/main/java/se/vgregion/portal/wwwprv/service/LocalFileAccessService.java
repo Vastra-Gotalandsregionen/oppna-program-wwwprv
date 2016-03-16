@@ -2,7 +2,6 @@ package se.vgregion.portal.wwwprv.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
@@ -28,7 +27,8 @@ public class LocalFileAccessService implements FileAccessService {
     }
 
     @Override
-    public void uploadFile(final String fileName, final Supplier supplier, InputStream inputStream, long fileSize, Notifiable notifiable) {
+    public void uploadFile(final String fileName, final Supplier supplier, InputStream inputStream, long fileSize,
+                           String namndFordelningDirectory, Notifiable notifiable) {
         LOGGER.info("Uploading using " + LocalFileAccessService.class.getName());
         //final String save2dir = localStoragePath + File.separator;
         final Path save2dir = Paths.get(localStoragePath);
