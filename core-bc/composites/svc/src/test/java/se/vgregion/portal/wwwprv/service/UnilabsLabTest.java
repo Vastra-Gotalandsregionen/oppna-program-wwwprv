@@ -44,12 +44,6 @@ public class UnilabsLabTest {
             columnNames.add(c.getName());
         }
 
-        for (Column column : havingExpectedHeading.getColumns()) {
-            Assert.assertTrue("Column " + column.getName() + " should have been inside.",
-                    columnNames.contains(column.getName())
-            );
-        }
-
     }
 
 
