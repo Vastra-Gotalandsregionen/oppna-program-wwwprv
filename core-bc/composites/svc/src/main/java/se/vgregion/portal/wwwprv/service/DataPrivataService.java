@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
+import se.vgregion.portal.wwwprv.model.jpa.GlobalSetting;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
@@ -15,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +39,14 @@ public class DataPrivataService {
 
     @Autowired
     private FileAccessService fileAccessService;
+
+    public DataPrivataService() {
+    }
+
+    public DataPrivataService(EmailService emailService, FileAccessService fileAccessService) {
+        this.emailService = emailService;
+        this.fileAccessService = fileAccessService;
+    }
 
     public DataPrivataUser getUserById(Long userId) {
         return entityManager.find(DataPrivataUser.class, userId);
@@ -166,4 +177,77 @@ public class DataPrivataService {
         return suffixIncludingDot;
     }
 
+    public Node<String> retrieveRemoteFileTree() {
+
+        Node<String> aggregatedTree = new Node<>();
+        List<String> serverList = getServerList();
+
+        for (String serverUrl : serverList) {
+            Node<String> stringTree = fileAccessService.retrieveRemoteFileTree(serverUrl);
+
+            Node<String> newNode = new Node<>(serverUrl);
+
+            aggregatedTree.getChildren().add(newNode);
+
+            newNode.getChildren().addAll(stringTree.getChildren());
+        }
+
+        return aggregatedTree;
+    }
+
+    public String getNamndFordelningDirectory() {
+        GlobalSetting globalSetting = entityManager.find(GlobalSetting.class, "namnd-fordelnings-directory");
+
+        if (globalSetting == null) {
+            globalSetting = new GlobalSetting("namnd-fordelnings-directory", "");
+            entityManager.persist(globalSetting);
+        }
+
+        return globalSetting.getValue();
+    }
+
+    @Transactional
+    public void saveNamndFordelningDirectory(String value) {
+        GlobalSetting globalSetting = new GlobalSetting("namnd-fordelnings-directory", value);
+
+        entityManager.merge(globalSetting);
+    }
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @Transactional
+    public void saveServerList(String commaSeparatedServerList) {
+        GlobalSetting globalSetting = new GlobalSetting("server-list", commaSeparatedServerList);
+
+        entityManager.merge(globalSetting);
+    }
+
+    public List<String> getServerList() {
+        GlobalSetting globalSetting = entityManager.find(GlobalSetting.class, "server-list");
+
+        if (globalSetting == null) {
+            globalSetting = new GlobalSetting("server-list", "");
+            entityManager.persist(globalSetting);
+        }
+
+        String[] servers;
+
+        String value = globalSetting.getValue();
+
+        if (value != null && value.length() > 0) {
+            servers = value.split(",");
+        } else {
+            servers = new String[0];
+        }
+
+        List<String> serverList = new ArrayList<>();
+
+        for (String server : servers) {
+            serverList.add(server.trim());
+        }
+
+        return serverList;
+    }
 }

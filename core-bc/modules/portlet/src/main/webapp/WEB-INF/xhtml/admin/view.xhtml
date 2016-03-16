@@ -20,9 +20,9 @@
             <section>
                 <h2>Användare med rollen "Filuppladdare"</h2>
 
-                 <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.userMessage}">#{adminBackingBean.userMessage}</h:panelGroup>
+                <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.userMessage}">#{adminBackingBean.userMessage}</h:panelGroup>
 
-                 <h:panelGroup id="userTable">
+                <h:panelGroup id="userTable">
                     <table>
                         <thead>
                         <tr>
@@ -105,12 +105,22 @@
                                     </p:inplace>
                                 </td>
                                 <td>
-                                    <p:inplace editor="true" emptyLabel="Ej angiven">
-                                        <h:selectOneMenu value="#{supplier.sharedUploadFolder}" converter="#{sharedUploadFolderConverter}" onchange="javascript:showSaveButton(this);">
-                                            <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
-                                            <f:selectItems value="#{adminBackingBean.allSharedUploadFolders}" var="folderIndex" itemValue="#{folderIndex}" itemLabel="#{adminBackingBean.getLabel(folderIndex)}"/>
-                                        </h:selectOneMenu>
-                                    </p:inplace>
+                                    <h:commandLink>
+                                        <f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}"
+                                                render=":theForm:uploadFolderWrapper"
+                                                onevent="showUploadFolderDialogOnComplete"/>
+                                        <ui:repeat value="#{utilBean.toList(supplier.uploadFolders)}" var="folder">
+                                            <div>#{folder}</div>
+                                        </ui:repeat>
+                                        <h:panelGroup rendered="#{empty supplier.uploadFolders}">
+                                            <span style="color: red">
+                                                Ingen vald
+                                            </span>
+                                        </h:panelGroup>
+                                        <span class="btn btn-primary" style="margin-left: 5px;">
+                                            <i class="icon-edit"></i>
+                                        </span>
+                                    </h:commandLink>
                                 </td>
                                 <td>
                                     <h:commandLink styleClass="save-link" style="display: none;" value="Spara">
@@ -119,13 +129,14 @@
                                     </h:commandLink>
                                 </td>
                                 <td>
-                                    <h:commandLink value="Ta bort">
+                                    <h:commandButton value="Ta bort" styleClass="btn btn-danger" style="margin: 0 0 0 25px">
                                         <f:ajax listener="#{adminBackingBean.removeSupplier(supplier)}"
                                                 execute=":theForm:supplierTable" render="@form" onevent="reinitAfterPageUpdate"/>
-                                    </h:commandLink>
+                                    </h:commandButton>
                                 </td>
                             </tr>
                         </ui:repeat>
+
                         <tr class="label">
                             <td>Lägg till leverantör:</td>
                         </tr>
@@ -146,13 +157,7 @@
                                 </h:selectOneMenu>
                             </td>
                             <td>
-                                <h:selectOneMenu value="#{adminBackingBean.supplierToAdd.sharedUploadFolder}" converter="#{sharedUploadFolderConverter}" onchange="javascript:showSaveButton(this);">
-                                    <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
-                                    <f:selectItems value="#{adminBackingBean.allSharedUploadFolders}" var="folderIndex" itemValue="#{folderIndex}" itemLabel="#{adminBackingBean.getLabel(folderIndex)}"/>
-                                </h:selectOneMenu>
-                            </td>
-                            <td>
-                                <h:commandButton value="Lägg till">
+                                <h:commandButton value="Lägg till" styleClass="btn btn-primary">
                                     <f:ajax execute="supplierTable" listener="#{adminBackingBean.addSupplier}"
                                             render="@form" onevent="reinitAfterPageUpdate"/>
                                 </h:commandButton>
@@ -163,15 +168,99 @@
                 </h:panelGroup>
             </section>
 
+            <section>
+                <h:panelGroup id="serverList">
+                    <h2>Uppladdningsservrar</h2>
+                    <p>Skriv en kommaseparerad lista för vilka servrar som ska laddas upp till. T.ex. "VGFS0249,VGFS0233".</p>
+
+                    <div class="input-row">
+                        <p:ajaxStatus>
+                            <f:facet name="default">
+                                <h:inputText id="defaultInput" value="#{adminBackingBean.serverList}"/>
+                                <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                    <f:ajax execute="defaultInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                                </h:commandButton>
+                            </f:facet>
+
+                            <f:facet name="start">
+                                <h:inputText value="Sparar..." disabled="true"/>
+                                <h:commandButton id="saveServerListButtonDisabled" disabled="true" styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                </h:commandButton>
+                            </f:facet>
+
+                            <f:facet name="complete">
+                                <h:inputText id="completeInput" value="#{adminBackingBean.serverList}"/>
+                                <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                    <f:ajax execute="completeInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                                </h:commandButton>
+                            </f:facet>
+                        </p:ajaxStatus>
+                    </div>
+
+                </h:panelGroup>
+
+            </section>
+
+            <section>
+                <h:panelGroup id="namndFordelningDirectory">
+                    <h2>Nämndfördelningsmapp</h2>
+                    <p>Någon mapp behöver märkas som "nämndfördelningsmapp" för att systemet ska veta vart den nämndfördelade filen ska skickas.</p>
+
+                    <p:tree value="#{adminBackingBean.namndFordelningRemoteDirectoryTree}" var="node" selectionMode="single" selection="#{adminBackingBean.selectedNamndFordelningDirectory}">
+                        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+
+                    <div>
+                        <h:commandButton value="Spara nämndfördelningsmapp" id="saveNamndFordelningButton" binding="#{adminBackingBean.justToAssociateMessageWithSomething}" styleClass="btn btn-primary">
+                            <f:ajax listener="#{adminBackingBean.saveNamndFordelningDirectory}" execute=":theForm:namndFordelningDirectory" render="@form" onevent="reinitAfterPageUpdate"/>
+                        </h:commandButton>
+
+                        <h:message for="saveNamndFordelningButton" style="display: inline; margin-left: 20px"/>
+                    </div>
+                </h:panelGroup>
+            </section>
+
+            <h:panelGroup id="uploadFolderWrapper">
+                <p:dialog widgetVar="uploadFolderDialog">
+                    <p>Markera den eller de uppladdningsmappar som är aktuella för #{adminBackingBean.currentSupplier.enhetsNamn}.</p>
+                    <p>Vid flera val, håll nere Ctrl-knappen medan du klickar på mapparna.</p>
+
+                    <p:tree value="#{adminBackingBean.remoteDirectoryTree}" var="node"
+                            selectionMode="multiple"
+                            selection="#{adminBackingBean.selectedDirectoryNode}"
+                            style="max-height: 500px;min-height: 500px;overflow: scroll;"
+                            >
+                        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+
+                    </p:tree>
+
+                    <div>
+                        <h:commandButton value="Spara" styleClass="btn btn-primary">
+                            <f:ajax listener="#{adminBackingBean.saveUploadFolders}" execute=":theForm:uploadFolderWrapper" render="@form" onevent="reinitAfterPageUpdate"/>
+                        </h:commandButton>
+                    </div>
+                </p:dialog>
+            </h:panelGroup>
+
         </h:form>
 
         <script type="application/javascript">
 
             initPage();
 
+            function showUploadFolderDialogOnComplete(data) {
+                if (data.status === "success") {
+                    PF('uploadFolderDialog').show();
+                }
+            }
+
             function reinitAfterPageUpdate(data) {
-                if (data.status='complete') {
-                    initPage();
+                if (data.status === 'complete') {
+                    setTimeout(function() {initPage();}, 100);
                 }
             }
 

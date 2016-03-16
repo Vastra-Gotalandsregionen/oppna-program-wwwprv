@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 
@@ -74,11 +75,21 @@ public class LocalFileAccessService implements FileAccessService {
 
     }
 
+    @Override
+    public Node<String> retrieveRemoteFileTree(String url) {
+        return new MockFileAccessService().retrieveRemoteFileTree(url);
+    }
+
     public String getLocalStoragePath() {
         return localStoragePath;
     }
 
     public void setLocalStoragePath(String localStoragePath) {
         this.localStoragePath = localStoragePath;
+        File file = new File(localStoragePath);
+
+        if (!file.exists()) {
+            file.mkdirs();
+        }
     }
 }
