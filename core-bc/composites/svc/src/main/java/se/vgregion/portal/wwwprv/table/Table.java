@@ -1,10 +1,18 @@
 package se.vgregion.portal.wwwprv.table;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
 /**
  * Created by clalu4 on 2016-03-14.
+ * A representation of a textual table. It holds both the data, as rows or Tupels, ant the meta-data connected to those
+ * as Columns.
+ * It can be constructed with a text where the first row defines the columns, their name och width. A column starts
+ * at the char where the name of the column starts and ends one char before the beginning of the next column (or the
+ * end of the row).
+ *
  */
 public class Table {
 
@@ -12,6 +20,24 @@ public class Table {
 
     private final List<Tupel> tupels = new ArrayList<>();
 
+    /**
+     * Constructs an empty table. No columns and no data.
+     */
+    public Table() {
+        super();
+        columns = new ArrayList<>();
+    }
+
+    /**
+     * Constructs a new table.
+     * @param text  This text will result in a table with three columns with the width of 8 for the two first and 7 for the last one.
+     * <pre>
+     *     Column1  Column2  Column3
+     *     Value1   Value2   Value3
+     *     Value4   Value5   Value6
+     * </pre>
+     * Three tupel will be created.
+     */
     public Table(String text) {
         super();
         List<String> lines = Arrays.asList(text.split(("\\n")));
@@ -21,7 +47,7 @@ public class Table {
             return;
         }
 
-        List<String> sub = lines.subList(1, lines.size() - 1);
+        List<String> sub = lines.subList(1, lines.size());
 
         for (String line : sub) {
             Tupel tupel = new Tupel(columns, line);
@@ -29,6 +55,11 @@ public class Table {
         }
     }
 
+    /**
+     * Gets the data in this table. If the content of this list is modified then the content of the table also will. Its
+     * one and the same - no defencive copying. Use the result of this to access and modify the data.
+     * @return a list of tupels.
+     */
     public List<Tupel> getTupels() {
         return tupels;
     }
@@ -41,6 +72,11 @@ public class Table {
         return index;
     }
 
+    /**
+     * Inserts a column in the table. This is the preferred way of adding a column after the table have been
+     * instantiated.
+     * @param column the column to insert into the collective of columns.
+     */
     public void insert(final Column column) {
         columns.add(column.getIndex(), column);
         int counter = 0;
@@ -50,6 +86,35 @@ public class Table {
         Collections.sort(columns);
     }
 
+    /**
+     * Creates a text-mass that reflects all the column-names and values separated by a provided text.
+     * @param withThisDelimiter what to put between each value/column-name as field separator.
+     * @return the text 'showing' the table as... well text.
+     */
+    public String toString(String withThisDelimiter) {
+        StringBuilder sb = new StringBuilder();
+        List<String> list = new ArrayList<>();
+        for (Column column : columns) {
+            list.add(column.getName());
+        }
+        sb.append(StringUtils.join(list, withThisDelimiter));
+        sb.append("\n");
+
+        for (Tupel tupel : tupels) {
+            list = new ArrayList<>();
+            for (Column column : columns) {
+                list.add(tupel.get(column).value().trim());
+            }
+            sb.append(StringUtils.join(list, withThisDelimiter));
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Prints the table with fixed sized column width.
+     * @return Text display of the table.
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -87,6 +152,13 @@ public class Table {
         return String.format("%1$" + n + "s", s);
     }
 
+    /**
+     * Getter for the columns. Adding columns to this list can have some side-effects. It could cause the printout
+     * (toString()) of the object to show the columns in an unforseen order. Use the insert(Column)-method for this
+     * instead.
+     * Removing one of the columns would be more appropriate usage.
+     * @return the columns of this table.
+     */
     public List<Column> getColumns() {
         return columns;
     }

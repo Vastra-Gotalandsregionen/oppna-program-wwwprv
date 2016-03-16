@@ -38,7 +38,7 @@ public class UnilabsLab implements DistrictDistribution {
         List<String> personalNumbers = new ArrayList<>();
 
         for (Tupel tupel : table.getTupels()) {
-            personalNumbers.add(tupel.get("Personnr").value());
+            personalNumbers.add(tupel.get("personnr").value());
         }
 
         data = service.lookup(personalNumbers);
@@ -46,32 +46,33 @@ public class UnilabsLab implements DistrictDistribution {
         String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
-        table.insert(new Column("Ursprungligt_filnamn", 0, originalFileName.length()));
-        table.insert(new Column("Körningsdatum", 1, 10));
-        table.insert(new Column("Klockslag_körningsdatum", 2, 9)); //
+        table.insert(new Column("korn_datum", 0, 10));
+        table.insert(new Column("klockslag", 1, 9)); //
+        table.insert(new Column("filnamn", 2, originalFileName.length()));
         // The original columns are here...
-        table.insert(new Column("Just_Nämnd", 11, 2));
-        table.insert(new Column("Just_länkommm", 12, 4));
-        table.insert(new Column("Just_sdn", 13, 2));
-        table.insert(new Column("Just_nyckelkod", 14, 6));
+        table.insert(new Column("Pat_Nämnd", table.getColumns().size(), 2));
+        table.insert(new Column("PatLan_+_kommun", table.getColumns().size(), 4));
+        table.insert(new Column("Pat_SDN", table.getColumns().size(), 2));
+        table.insert(new Column("Pat_nyckelkod", table.getColumns().size(), 6));
 
         for (Tupel tupel : table.getTupels()) {
-            String personalNumber = tupel.get("Personnr").value();
-            String date = tupel.get("Provdatum").value();
+            String personalNumber = tupel.get("personnr").value();
+            String date = tupel.get("BesoksDatum").value();
             ExtendedResidentType info = getLatestResidentInfo(personalNumber, date);
-            tupel.get("Ursprungligt_filnamn").set(originalFileName);
-            tupel.get("Körningsdatum").set(nowDate);
-            tupel.get("Klockslag_körningsdatum").set(nowTime);
+            tupel.get("korn_datum").set(nowDate);
+            tupel.get("filnamn").set(originalFileName);
+            tupel.get("klockslag").set(nowTime);
             if (info != null) {
                 AdministrativIndelningType folkbok = info.getFolkbokforingsaddressIndelning();
                 if (folkbok != null) {
-                    tupel.get("Just_Nämnd").set(folkbok.getHalsoSjukvardsNamndKod());
-                    tupel.get("Just_länkommm").set(folkbok.getPrimaromradeKod());
+                    tupel.get("Pat_Nämnd").set(folkbok.getHalsoSjukvardsNamndKod());
+                    tupel.get("PatLan_+_kommun").set(folkbok.getPrimaromradeKod());
+                    // Split this into län - kom
                     // Ask Pia about above...
-                    tupel.get("Just_sdn").set(folkbok.getStadsdelsnamndKod());
+                    tupel.get("Pat_SDN").set(folkbok.getStadsdelsnamndKod());
                     SvenskAdressTYPE adress = info.getPersonpost().getFolkbokforingsadress();
                     if (adress != null) {
-                        tupel.get("Just_nyckelkod").set(adress.getSCBNyckelkod());
+                        tupel.get("Pat_nyckelkod").set(adress.getSCBNyckelkod());
                     }
                 }
                 // Ask Pia about above...
