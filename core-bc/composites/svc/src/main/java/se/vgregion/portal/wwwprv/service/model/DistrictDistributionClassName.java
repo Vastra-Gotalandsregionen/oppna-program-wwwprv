@@ -1,14 +1,13 @@
 package se.vgregion.portal.wwwprv.service.model;
 
 import se.vgregion.portal.wwwprv.service.UnilabsLab;
-import se.vgregion.portal.wwwprv.service.UnilabsRontgen;
 
 /**
  * @author Patrik Björk
  */
 public enum DistrictDistributionClassName {
-    UNILABS_LAB(UnilabsLab.class.getCanonicalName()),
-    UNILABS_RONTGEN(UnilabsRontgen.class.getCanonicalName());
+    UNILABS_LAB(UnilabsLab.class.getCanonicalName());
+//    UNILABS_RONTGEN(UnilabsRontgen.class.getCanonicalName());
 
     private final String canonicalName;
 
