@@ -5,11 +5,18 @@ import java.util.List;
 
 /**
  * Created by clalu4 on 2016-03-14.
+ * Represents a row in the Table object.
  */
 public class Tupel extends HashMap<String, Cell> {
 
     private final List<Column> columns;
 
+    /**
+     * The get method returns a new instance, inserted into the Tupel, if no item already is present for the key.
+     * @param key a string or Column that represents a cell value inside this map.
+     * @return a Cell. Never a null. a unmapped value results in a put of a new Cell object and then this new value
+     * is returned.
+     */
     @Override
     public Cell get(Object key) {
         if (key instanceof Column) {
@@ -33,6 +40,11 @@ public class Tupel extends HashMap<String, Cell> {
         return null;
     }
 
+    /**
+     * Makes a new instance.
+     * @param columns Columns that might be used inside this object.
+     * @param line the values represented by this text.
+     */
     public Tupel(List<Column> columns, String line) {
         this.columns = columns;
         int offset = 0;
@@ -47,6 +59,10 @@ public class Tupel extends HashMap<String, Cell> {
         }
     }
 
+    /**
+     * Getter for columns.
+     * @return columns.
+     */
     public List<Column> getColumns() {
         return columns;
     }
