@@ -26,49 +26,46 @@ public class UnilabsLabTest {
 
     @Test
     public void main() {
-        // System.out.println(resultFileContent());
-        // System.out.println(inputFileContent());
-
         String originalFileName = "original_file_name.text";
         UnilabsLab unilabsLab = new UnilabsLab(populationService, originalFileName);
 
         String output = unilabsLab.process(inputFileContent().toString());
-        Table outputTable = new Table(output);
         System.out.println(output);
+        Table outputTable = new Table(output);
 
-        String expectedHeading = "korn_datum              filnamn                                            avtalskod BesoksDatum personnr      Namn                           Betalare Bestallare Analyskod  AnalysNamn                     Cap_pris               PatLan     PatKommun  SDN        NyckelKod  Namnd\n";
-        Table havingExpectedHeading = new Table(expectedHeading);
+        Table headings = new Table(getResultFileColumns());
 
         Set<String> columnNames = new HashSet<>();
-        for (Column c : outputTable.getColumns()) {
-            columnNames.add(c.getName());
+        for (Tupel column : headings.getTupels()) {
+            columnNames.add(column.get("key").value().trim());
         }
 
-        for (Column column : havingExpectedHeading.getColumns()) {
+        for (Column column : outputTable.getColumns()) {
             Assert.assertTrue("Column " + column.getName() + " should have been inside.",
                     columnNames.contains(column.getName())
             );
         }
 
+        System.out.println(new Table(output).toString(";"));
     }
 
+    public String getInputFileColumns() {
+        return "" +
+                "key                    format\n" +
+                "BesoksDatum             A(8)\n" +
+                "personnr               A(12)\n" +
+                "Namn                   A(30)\n" +
+                "Betalare                A(2)\n" +
+                "Bestallare             A(10)\n" +
+                "Analyskod              A(10)\n" +
+                "AnalysNamn             A(20)\n" +
+                "pris                    A(7)\n";
+    }
 
     public Table inputFileContent() {
-        String def = "" +
-                "key                      format\n" +
-                "Provdatum                A(8)  \n" +
-                "Personnr                 A(12) \n" + // changed A(10) -> A(12)
-                "Namn                     A(30) \n" +
-                "Betalare                 A(2)  \n" +
-                "Beställare               A(10) \n" +
-                "Analyskod                A(10) \n" +
-                "Analysnamn               A(20) \n" +
-                "Pris                     A(7)  \n";
-
+        String def = getInputFileColumns();
         Table table = new Table(def);
-
-
-        Table result = new Table("Line");
+        Table result = new Table();
 
         int i = 0;
         for (Tupel tupel : table.getTupels()) {
@@ -76,43 +73,48 @@ public class UnilabsLabTest {
         }
 
         for (String s : DummyPersonalNumbers.get()) {
-            if (s.startsWith("18")) {
-                // Remove those dummies born 18-1899...
-                continue;
-            }
-            //s = s.substring(2);
             Tupel tupel = new Tupel(result.getColumns(), "");
-            tupel.get("Personnr").set(s);
-            tupel.get("Provdatum").set("20160101");
+            tupel.get("personnr").set(s);
+            tupel.get("BesoksDatum").set("20160101");
             result.getTupels().add(tupel);
         }
 
+        i = 0;
+        for (Tupel tupel : result.getTupels()) {
+            for (Column column : result.getColumns()) {
+                if (!(column.getName().equals("personnr") || column.getName().equals("BesoksDatum"))) {
+                    tupel.get(column.getName()).set(i + "");
+                }
+            }
+            i++;
+        }
 
         return result;
     }
 
+    public String getResultFileColumns() {
+        return "" +
+                "key                   format\n" +
+                "korn_datum                  \n" +
+                "klockslag                   \n" +
+                "filnamn                     \n" +
+                "BesoksDatum             A(8)\n" +
+                "personnr               A(12)\n" +
+                "Namn                   A(30)\n" +
+                "Betalare                A(2)\n" +
+                "Bestallare             A(10)\n" +
+                "Analyskod              A(10)\n" +
+                "AnalysNamn             A(20)\n" +
+                "pris                    A(7)\n" +
+                "Pat_Nämnd               A(2)\n" +
+                "PatLan_+_kommun       A(4)\n" +
+                "Pat_SDN                 A(2)\n" +
+                "Pat_nyckelkod           A(6)\n" + "\n";
+    }
+
     public Table resultFileContent() {
-        String def = "" +
-                "key                      format\n" +
-                "Ursprungligt_filnamn           \n" +
-                "Körningsdatum            A(10) \n" +
-                "Klockslag körningsdatum        \n" +
-                "Provdatum                A(8)  \n" +
-                "Personnr                 A(12) \n" + // changed A(10) -> A(12)
-                "Namn                     A(30) \n" +
-                "Betalare                 A(2)  \n" +
-                "Beställare               A(10) \n" +
-                "Analyskod                A(10) \n" +
-                "Analysnamn               A(20) \n" +
-                "Pris                     A(7)  \n" +
-                "Just_Nämnd               A(2)  \n" +
-                "Just_länkommm            A(4)  \n" +
-                "Just_sdn                 A(2)  \n" +
-                "Just_nyckelkod           A(6)  \n";
-
+        String def = getResultFileColumns();
         Table table = new Table(def);
-
-
         Table result = new Table("Line");
 
         int i = 0;
