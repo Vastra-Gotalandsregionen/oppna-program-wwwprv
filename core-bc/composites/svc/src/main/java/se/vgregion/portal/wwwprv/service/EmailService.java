@@ -13,6 +13,9 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Properties;
 
 /**
@@ -34,6 +37,30 @@ public class EmailService {
 
     public void notifyNewUpload(String fullFileName, Supplier supplier, String userName) {
 
+        String subject = "Uppladdad fil: " + fullFileName + getEnvironmentString();
+        String text = fullFileName + " har laddats upp till " + SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).getLabel() + " av " + userName;
+
+        sendMessage(subject, text);
+    }
+
+    private String getEnvironmentString() {
+        return environment != null && !"".equals(environment) ? " - " + environment : "";
+    }
+
+    public void notifyError(Exception e) {
+        String subject = "Systemmeddelande - ett fel har inträffat - " + getEnvironmentString();
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream(); PrintStream s = new PrintStream(out)) {
+            e.printStackTrace(s);
+
+            sendMessage(subject, out.toString());
+        } catch (IOException e1) {
+            LOGGER.error(e1.getMessage(), e1);
+        }
+
+    }
+
+    private void sendMessage(String subject, String text) {
         // Sender's email ID needs to be mentioned
         String from = "dataprivata@vgregion.se";
 
@@ -65,10 +92,10 @@ public class EmailService {
             }
 
             // Set Subject: header field
-            message.setSubject("Uppladdad fil: " + fullFileName + (environment != null && !"".equals(environment) ? " - " + environment : ""));
+            message.setSubject(subject);
 
             // Now set the actual message
-            message.setText(fullFileName + " har laddats upp till " + SharedUploadFolder.getSharedUploadFolder(supplier.getSharedUploadFolder()).getLabel() + " av " + userName);
+            message.setText(text);
 
             // Send message
             Transport.send(message);

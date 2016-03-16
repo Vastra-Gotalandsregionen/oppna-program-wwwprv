@@ -28,13 +28,13 @@ import java.util.List;
 @Service
 public class RemoteFileAccessService implements FileAccessService {
 
-    @Value("${mars.folder1.user}")
+    @Value("${shared.folder.username}")
     private String user1;
 
     @Value("${mars.folder2.user}")
     private String user2;
 
-    @Value("${mars.folder1.password}")
+    @Value("${shared.folder.password}")
     private String password1;
 
     @Value("${mars.folder2.password}")
