@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
+import se.vgregion.portal.wwwprv.service.EmailService;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
@@ -45,6 +46,9 @@ public class UploadBackingBean implements Notifiable {
 
     @Autowired
     private DataPrivataService dataPrivataService;
+
+    @Autowired
+    private EmailService emailService;
 
     private String uploadedFileName;
     private Supplier chosenSupplier;
@@ -141,6 +145,7 @@ public class UploadBackingBean implements Notifiable {
             IOUtils.copy(is, bos);
         }
 
+        boolean uploadSuccess = false;
         try (FileInputStream fis = new FileInputStream(newFile);
              BufferedInputStream bis = new BufferedInputStream(fis)) {
 
@@ -153,11 +158,24 @@ public class UploadBackingBean implements Notifiable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Uppladdning lyckades. Filen fick namnet " + newFileName));
             }
 
+            // No exception means success.
+            uploadSuccess = true;
+
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
         } finally {
             this.uploadInProgress = false;
+        }
+
+        if (uploadSuccess) {
+            try {
+                new File(uploadDirectory, newFileName).deleteOnExit();
+                new File(System.getProperty("java.io.tmpdir"), newFileName).deleteOnExit();
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                emailService.notifyError(e);
+            }
         }
 
         updateUploadedFileList();

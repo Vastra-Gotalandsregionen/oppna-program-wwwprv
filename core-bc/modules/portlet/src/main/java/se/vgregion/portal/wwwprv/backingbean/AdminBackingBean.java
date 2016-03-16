@@ -2,9 +2,13 @@ package se.vgregion.portal.wwwprv.backingbean;
 
 import com.liferay.faces.util.portal.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.UserContainer;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
@@ -14,14 +18,19 @@ import se.vgregion.portal.wwwprv.service.LiferayServiceException;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,10 +50,101 @@ public class AdminBackingBean {
     private DataPrivataService dataPrivataService;
 
     private Supplier supplierToAdd;
+    private Supplier currentSupplier;
     private String supplierMessage;
     private String userMessage;
+    private String serverList;
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private Map<Long, Boolean> usersSupplierChooserExpanded = new HashMap<>();
+    private TreeNode remoteDirectoryTree;
+    private TreeNode[] selectedDirectoryNode;
+    private TreeNode selectedNamndFordelningDirectory;
+    private TreeNode namndFordelningRemoteDirectoryTree;
+
+    @Autowired
+    private RequestScopedModelBean requestScopedModelBean;
+
+    public AdminBackingBean() {
+    }
+
+    public AdminBackingBean(LiferayService liferayService, DataPrivataService dataPrivataService) {
+        this.liferayService = liferayService;
+        this.dataPrivataService = dataPrivataService;
+    }
+
+    @PostConstruct
+    public void init() {
+        remoteDirectoryTree = transformTree(dataPrivataService.retrieveRemoteFileTree());
+
+        // namndFordelningRemoteDirectoryTree
+        namndFordelningRemoteDirectoryTree = transformTree(dataPrivataService.retrieveRemoteFileTree());
+
+        List<String> serverList = dataPrivataService.getServerList();
+
+        if (serverList != null && serverList.size() > 0) {
+            this.serverList = StringUtils.join(serverList, ", ");
+        }
+
+        refreshNamndFordelningDirectory();
+    }
+
+    private void refreshNamndFordelningDirectory() {
+        String namndFordelningDirectory = dataPrivataService.getNamndFordelningDirectory();
+
+        traverseAndSetSelectedAndExpanded(namndFordelningRemoteDirectoryTree, namndFordelningDirectory);
+    }
+
+    private void traverseAndSetSelectedAndExpanded(TreeNode treeNode, String directory) {
+
+        // Defaults.
+        treeNode.setSelected(false);
+        treeNode.setExpanded(false);
+
+        if (getFullPath(treeNode).equals(directory)) {
+            treeNode.setSelected(true);
+
+            while (treeNode.getParent() != null) {
+                treeNode.getParent().setExpanded(true);
+                treeNode = treeNode.getParent();
+            }
+        } else {
+            if (treeNode.getChildren().size() > 0) {
+                for (TreeNode node : treeNode.getChildren()) {
+                    traverseAndSetSelectedAndExpanded(node, directory);
+                }
+            }
+        }
+    }
+
+    /**
+     * Transforms from {@link Node} to {@link TreeNode}.
+     * @return
+     */
+    public TreeNode transformTree(Node<String> tree) {
+        TreeNode target = new DefaultTreeNode(tree.getData());
+
+        Node<String> source = tree;
+
+        target.getChildren().addAll(transformTree(source.getChildren()));
+
+        return target;
+    }
+
+    private Collection<? extends TreeNode> transformTree(List<Node<String>> nodes) {
+        if (nodes == null || nodes.size() == 0) {
+            return new ArrayList<>();
+        } else {
+            Collection<TreeNode> nodesToAdd = new ArrayList<>();
+            for (Node node : nodes) {
+                TreeNode treeNode = new DefaultTreeNode(node.getData());
+                treeNode.getChildren().addAll(transformTree(node.getChildren()));
+
+                nodesToAdd.add(treeNode);
+            }
+
+            return nodesToAdd;
+        }
+    }
 
     public List<UserContainer> getAllUsers() {
         ThemeDisplay themeDisplay = (ThemeDisplay) ((PortletRequest) FacesContext.getCurrentInstance()
@@ -96,6 +196,31 @@ public class AdminBackingBean {
         setSupplierMessage(message);
     }
 
+    public void saveUploadFolders() {
+        Set<String> selectedUploadFolders = new HashSet<>();
+
+        for (TreeNode treeNode : selectedDirectoryNode) {
+            selectedUploadFolders.add(getFullPath(treeNode));
+        }
+
+        currentSupplier.setUploadFolders(selectedUploadFolders);
+
+        dataPrivataService.saveSupplier(currentSupplier);
+    }
+
+    public void saveNamndFordelningDirectory() {
+        String fullPath = getFullPath(selectedNamndFordelningDirectory);
+
+        dataPrivataService.saveNamndFordelningDirectory(fullPath);
+
+        refreshNamndFordelningDirectory();
+
+        FacesContext.getCurrentInstance()
+                .addMessage(
+                        getJustToAssociateMessageWithSomething().getClientId(),
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sparat!", "Sparat!"));
+    }
+
     public void removeSupplier(Supplier supplier) {
         try {
             dataPrivataService.remove(supplier);
@@ -115,6 +240,16 @@ public class AdminBackingBean {
         String message = "Lyckades spara till " + userContainer.getLiferayUser().getFullName() + ".";
 
         setUserMessage(message);
+    }
+
+    public void saveServerList() {
+        dataPrivataService.saveServerList(serverList);
+        init();
+
+        FacesContext.getCurrentInstance()
+                .addMessage(
+                        null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sparat!", "Sparat!"));
     }
 
     public List<Supplier> getAllSuppliers() {
@@ -220,5 +355,120 @@ public class AdminBackingBean {
         }, 2, TimeUnit.SECONDS);
 
         return userMessage;
+    }
+
+    public Supplier getCurrentSupplier() {
+        return currentSupplier;
+    }
+
+    public void setCurrentSupplier(Supplier currentSupplier) {
+        this.currentSupplier = currentSupplier;
+
+        traverseAndSetSelected(currentSupplier, remoteDirectoryTree);
+        traverseAndSetExpanded(currentSupplier, remoteDirectoryTree);
+    }
+
+    private static void traverseAndSetExpanded(Supplier supplier, TreeNode treeNode) {
+        Set<String> persistedUploadFolders = supplier.getUploadFolders();
+
+        boolean match = anyPersistedUploadFolderStartsWith(persistedUploadFolders, getFullPath(treeNode));
+
+        treeNode.setExpanded(match && treeNode.getChildren().size() > 0);
+
+        if (treeNode.getChildren().size() > 0) {
+            for (TreeNode node : treeNode.getChildren()) {
+                traverseAndSetExpanded(supplier, node);
+            }
+        }
+    }
+
+    private static boolean anyPersistedUploadFolderStartsWith(Set<String> strings, String string) {
+        for (String s : strings) {
+            // Just starts with. We don't want to expand when equal.
+            if (s.startsWith(string) && !s.equals(string)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void traverseAndSetSelected(Supplier supplier, TreeNode treeNode) {
+        Set<String> persistedUploadFolders = supplier.getUploadFolders();
+
+        boolean contains = persistedUploadFolders.contains(getFullPath(treeNode));
+        treeNode.setSelected(contains);
+
+        if (treeNode.getChildren().size() > 0) {
+            for (TreeNode node : treeNode.getChildren()) {
+                traverseAndSetSelected(supplier, node);
+            }
+        }
+    }
+
+    public TreeNode[] getSelectedDirectoryNode() {
+        return selectedDirectoryNode;
+    }
+
+    public void setSelectedDirectoryNode(TreeNode[] selectedDirectoryNode) {
+        this.selectedDirectoryNode = selectedDirectoryNode;
+    }
+
+    public TreeNode getRemoteDirectoryTree() {
+        return remoteDirectoryTree;
+    }
+
+    public TreeNode getNamndFordelningRemoteDirectoryTree() {
+        return namndFordelningRemoteDirectoryTree;
+    }
+
+    public void setNamndFordelningRemoteDirectoryTree(TreeNode namndFordelningRemoteDirectoryTree) {
+        this.namndFordelningRemoteDirectoryTree = namndFordelningRemoteDirectoryTree;
+    }
+
+    public TreeNode getSelectedNamndFordelningDirectory() {
+        return selectedNamndFordelningDirectory;
+    }
+
+    public void setSelectedNamndFordelningDirectory(TreeNode selectedNamndFordelningDirectory) {
+        this.selectedNamndFordelningDirectory = selectedNamndFordelningDirectory;
+    }
+
+    public static String getFullPath(TreeNode treeNode) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(treeNode.getData());
+
+        while (treeNode.getParent() != null && StringUtils.isNotEmpty((String) treeNode.getParent().getData())) {
+            sb.insert(0, treeNode.getParent().getData() + "/");
+
+            treeNode = treeNode.getParent();
+        }
+
+        return sb.toString();
+    }
+
+    public HtmlCommandButton getJustToAssociateMessageWithSomething() {
+        return requestScopedModelBean.getJustToAssociateMessageWithSomething();
+    }
+
+    public void setJustToAssociateMessageWithSomething(HtmlCommandButton testar) {
+        requestScopedModelBean.setJustToAssociateMessageWithSomething(testar);
+    }
+
+    public HtmlCommandButton getSaveServerListButton() {
+        return requestScopedModelBean.getSaveServerListButton();
+    }
+
+    public void setSaveServerListButton(HtmlCommandButton button) {
+        requestScopedModelBean.setSaveServerListButton(button);
+    }
+
+    public String getServerList() {
+        return serverList;
+    }
+
+    public void setServerList(String serverList) {
+        this.serverList = serverList;
     }
 }
