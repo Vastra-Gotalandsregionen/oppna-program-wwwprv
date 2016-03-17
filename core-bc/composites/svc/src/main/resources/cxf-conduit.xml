@@ -29,7 +29,7 @@
     </http:tlsClientParameters>
   </http:conduit>
 
-  <!--<cxf:bus>
+  <cxf:bus>
     <cxf:outInterceptors>
       <ref bean="loggingOutInterceptor"/>
     </cxf:outInterceptors>
@@ -43,6 +43,6 @@
   </bean>
   <bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor">
     <property name="prettyLogging" value="true"/>
-  </bean>-->
+  </bean>
 
 </beans>

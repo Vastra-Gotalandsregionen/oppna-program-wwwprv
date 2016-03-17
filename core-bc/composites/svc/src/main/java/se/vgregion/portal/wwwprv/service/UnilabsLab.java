@@ -1,5 +1,7 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.riv.population.residentmaster.extended.v1.AdministrativIndelningType;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
 import se.riv.population.residentmaster.lookupresidentforextendedprofileresponder.v1.LookupResidentForExtendedProfileResponseType;
@@ -21,6 +23,8 @@ import java.util.TreeMap;
  */
 public class UnilabsLab implements DistrictDistribution {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnilabsLab.class);
+
     protected PopulationService service;
 
     protected String originalFileName;
@@ -33,7 +37,7 @@ public class UnilabsLab implements DistrictDistribution {
     }
 
     @Override
-    public String process(String input) {
+    public String process(String input) throws DistrictDistributionException {
         Table table = new Table(input);
 
         //List<String> personalNumbers = new ArrayList<>();
@@ -86,13 +90,12 @@ public class UnilabsLab implements DistrictDistribution {
         return table.toString(";");
     }
 
-    ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {
+    ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) throws DistrictDistributionException {
         try {
             return service.lookup(new PopulationService.Arg(forPersonalNumber, fromDate)).get(0);
         } catch (Exception e) {
-            System.out.println("Problem with " + forPersonalNumber + " from date " + fromDate);
-            e.printStackTrace();
-            return null;
+            LOGGER.error("Problem with " + forPersonalNumber + " from date " + fromDate);
+            throw new DistrictDistributionException("Misslyckades med nämndfördelning.", e);
         }
     }
 

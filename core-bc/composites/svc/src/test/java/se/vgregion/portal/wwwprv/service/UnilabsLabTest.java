@@ -25,7 +25,7 @@ public class UnilabsLabTest {
     private PopulationService populationService;
 
     @Test
-    public void main() {
+    public void main() throws DistrictDistributionException {
         String originalFileName = "original_file_name.text";
         UnilabsLab unilabsLab = new UnilabsLab(populationService, originalFileName);
 

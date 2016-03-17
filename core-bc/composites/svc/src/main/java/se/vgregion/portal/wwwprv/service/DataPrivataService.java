@@ -105,7 +105,9 @@ public class DataPrivataService {
 
     @Transactional
     public void saveFileUpload(String supplierCode, String baseName, String datePart, String suffix, String userName,
-                               InputStream inputStream, long fileSize, Notifiable notifiable) {
+                               InputStream inputStream, long fileSize, Notifiable notifiable)
+            throws DistrictDistributionException {
+
         FileUpload fileUpload = new FileUpload(supplierCode, baseName, datePart, suffix, userName, fileSize);
 
         fileUpload.setUploaded(new Date());

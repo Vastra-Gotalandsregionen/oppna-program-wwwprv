@@ -66,7 +66,7 @@ public class RemoteFileAccessService implements FileAccessService {
                            final InputStream inputStreamSource,
                            long fileSize,
                            String namndFordelningDirectory,
-                           Notifiable notifiable) {
+                           Notifiable notifiable) throws DistrictDistributionException {
 
         List<String> uploadFoldersInOrder = new ArrayList<>(supplier.getUploadFolders());
         for (String uploadFolder : supplier.getUploadFolders()) {

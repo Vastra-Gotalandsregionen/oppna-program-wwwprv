@@ -5,6 +5,6 @@ package se.vgregion.portal.wwwprv.service;
  */
 public interface DistrictDistribution {
 
-    String process(String input);
+    String process(String input) throws DistrictDistributionException;
 
 }

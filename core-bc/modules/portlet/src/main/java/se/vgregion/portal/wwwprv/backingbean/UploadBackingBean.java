@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
+import se.vgregion.portal.wwwprv.service.DistrictDistributionException;
 import se.vgregion.portal.wwwprv.service.EmailService;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
@@ -162,17 +163,22 @@ public class UploadBackingBean implements Notifiable {
             // No exception means success.
             uploadSuccess = true;
 
+        } catch (DistrictDistributionException e) {
+            LOGGER.error(e.getMessage(), e);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
+            emailService.notifyError(e);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
+            emailService.notifyError(e);
         } finally {
             this.uploadInProgress = false;
         }
 
-        if (uploadSuccess) {
+        if (uploadSuccess && !currentlyDuplicateFileWorkflow) {
             try {
-                new File(uploadDirectory, newFileName).deleteOnExit();
-                new File(System.getProperty("java.io.tmpdir"), newFileName).deleteOnExit();
+                new File(uploadDirectory, newFileName).delete();
+                new File(System.getProperty("java.io.tmpdir"), newFileName).delete();
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 emailService.notifyError(e);
@@ -236,6 +242,12 @@ public class UploadBackingBean implements Notifiable {
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + tempFile.getName() + " skapades."));
 
+            target.delete();
+
+        } catch (DistrictDistributionException e) {
+            LOGGER.error(e.getMessage(), e);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
+            emailService.notifyError(e);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
