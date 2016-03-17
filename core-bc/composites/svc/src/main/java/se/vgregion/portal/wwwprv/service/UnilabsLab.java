@@ -7,6 +7,7 @@ import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
 import se.vgregion.portal.wwwprv.table.Column;
 import se.vgregion.portal.wwwprv.table.Table;
 import se.vgregion.portal.wwwprv.table.Tupel;
+import sun.misc.ExtensionInfo;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class UnilabsLab implements DistrictDistribution {
 
     protected String originalFileName;
 
-    protected LookupResidentForExtendedProfileResponseType data;
+    //protected LookupResidentForExtendedProfileResponseType data;
 
     public UnilabsLab(PopulationService service, String originalFileName) {
         this.service = service;
@@ -35,16 +36,14 @@ public class UnilabsLab implements DistrictDistribution {
     public String process(String input) {
         Table table = new Table(input);
 
-        List<String> personalNumbers = new ArrayList<>();
-
+        //List<String> personalNumbers = new ArrayList<>();
+        /*
         for (Tupel tupel : table.getTupels()) {
             personalNumbers.add(tupel.get("personnr").value());
         }
-
-        data = service.lookup(personalNumbers);
+        data = service.lookup(personalNumbers);*/
 
         String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
 
         table.insert(new Column("korn_datum", 0, 10));
         table.insert(new Column("klockslag", 1, 9)); //
@@ -55,12 +54,17 @@ public class UnilabsLab implements DistrictDistribution {
         table.insert(new Column("Pat_SDN", table.getColumns().size(), 2));
         table.insert(new Column("Pat_nyckelkod", table.getColumns().size(), 6));
 
+        Column dateKey = table.getColumns().get(3);
+        Column personalNumberKey = table.getColumns().get(4);
+
         for (Tupel tupel : table.getTupels()) {
-            String personalNumber = tupel.get("personnr").value();
-            String date = tupel.get("BesoksDatum").value();
-            ExtendedResidentType info = getLatestResidentInfo(personalNumber, date);
+            String personalNumber = tupel.get(personalNumberKey).value().trim();
+            String date = tupel.get(dateKey).value().trim();
+            ExtendedResidentType info = getResidentialInfo(personalNumber, date);
+            //ExtendedResidentType info = getLatestResidentInfo(personalNumber, date);
             tupel.get("korn_datum").set(nowDate);
             tupel.get("filnamn").set(originalFileName);
+            String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
             tupel.get("klockslag").set(nowTime);
             if (info != null) {
                 AdministrativIndelningType folkbok = info.getFolkbokforingsaddressIndelning();
@@ -79,9 +83,20 @@ public class UnilabsLab implements DistrictDistribution {
             }
         }
 
-        return table.toString();
+        return table.toString(";");
     }
 
+    ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {
+        try {
+            return service.lookup(new PopulationService.Arg(forPersonalNumber, fromDate)).get(0);
+        } catch (Exception e) {
+            System.out.println("Problem with " + forPersonalNumber + " from date " + fromDate);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /*
     protected ExtendedResidentType getLatestResidentInfo(String forPersonNumber, String justAfterThisTextDate) {
         TreeMap<String, ExtendedResidentType> tree = toTextDateMapped(getInfo(forPersonNumber));
         String floorKey = tree.floorKey(justAfterThisTextDate);
@@ -113,6 +128,6 @@ public class UnilabsLab implements DistrictDistribution {
             }
         }
         return result;
-    }
+    }*/
 
 }

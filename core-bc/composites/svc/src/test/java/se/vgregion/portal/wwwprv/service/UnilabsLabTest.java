@@ -75,7 +75,7 @@ public class UnilabsLabTest {
         for (String s : DummyPersonalNumbers.get()) {
             Tupel tupel = new Tupel(result.getColumns(), "");
             tupel.get("personnr").set(s);
-            tupel.get("BesoksDatum").set("20160101");
+            tupel.get("BesoksDatum").set("20120101");
             result.getTupels().add(tupel);
         }
 
