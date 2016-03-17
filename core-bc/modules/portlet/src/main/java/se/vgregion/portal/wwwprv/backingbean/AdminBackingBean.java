@@ -446,7 +446,8 @@ public class AdminBackingBean {
             treeNode = treeNode.getParent();
         }
 
-        return sb.toString();
+        // Remove double slashes if existing.
+        return sb.toString().replaceAll("//", "/");
     }
 
     public DistrictDistributionClassName[] getDistrictDistributionClassNameValues() {

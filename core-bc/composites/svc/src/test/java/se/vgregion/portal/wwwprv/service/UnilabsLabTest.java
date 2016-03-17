@@ -29,7 +29,9 @@ public class UnilabsLabTest {
         String originalFileName = "original_file_name.text";
         UnilabsLab unilabsLab = new UnilabsLab(populationService, originalFileName);
 
-        String output = unilabsLab.process(inputFileContent().toString());
+        String input = inputFileContent().toString();
+        System.out.println(input);
+        String output = unilabsLab.process(input);
         System.out.println(output);
         Table outputTable = new Table(output);
 

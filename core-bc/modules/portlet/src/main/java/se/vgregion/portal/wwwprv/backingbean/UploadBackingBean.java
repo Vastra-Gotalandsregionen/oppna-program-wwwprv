@@ -151,6 +151,7 @@ public class UploadBackingBean implements Notifiable {
 
             if (!currentlyDuplicateFileWorkflow) {
                 this.uploadInProgress = true;
+                progress = 0;
 
                 dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
                         suffixIncludingDot, userName, bis, uploadedFile.getSize(), this);
@@ -225,6 +226,8 @@ public class UploadBackingBean implements Notifiable {
         // We consider it done here so we don't get a warning dialog on refreshing the page.
         currentlyDuplicateFileWorkflow = false;
 
+        progress = 0;
+
         try (FileInputStream fis = new FileInputStream(target);
             BufferedInputStream bis = new BufferedInputStream(fis)) {
             dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
@@ -236,6 +239,7 @@ public class UploadBackingBean implements Notifiable {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
+            emailService.notifyError(e);
         } finally {
             this.uploadInProgress = false;
         }

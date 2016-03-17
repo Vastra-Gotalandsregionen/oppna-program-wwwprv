@@ -96,14 +96,7 @@ public class RemoteFileAccessService implements FileAccessService {
                 InputStream toUpload;
                 if (uploadFolder.equals(namndFordelningDirectory)) {
 
-                    DistrictDistributionClassName enumInstance = DistrictDistributionClassName
-                            .valueOf(supplier.getDistrictDistributionClassName());
-
-                    Class clazz = Class.forName(enumInstance.getCanonicalName());
-
-                    DistrictDistribution districtDistribution = (DistrictDistribution) clazz
-                            .getConstructor(populationService.getClass(), fileName.getClass())
-                            .newInstance(populationService, fileName);
+                    DistrictDistribution districtDistribution = getDistrictDistribution(fileName, supplier);
 
                     String processed = districtDistribution.process(new String(fileContent, "UTF-8"));
 
@@ -160,6 +153,21 @@ public class RemoteFileAccessService implements FileAccessService {
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private DistrictDistribution getDistrictDistribution(String fileName, Supplier supplier) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        /*DistrictDistributionClassName enumInstance = DistrictDistributionClassName
+                .valueOf(supplier.getDistrictDistributionClassName());
+
+        Class clazz = Class.forName(enumInstance.getCanonicalName());
+
+        return (DistrictDistribution) clazz
+                .getConstructor(populationService.getClass(), fileName.getClass())
+                .newInstance(populationService, fileName);*/
+
+        DistrictDistribution districtDistribution = new UnilabsLab(populationService, fileName);
+
+        return districtDistribution;
     }
 
     @Override
