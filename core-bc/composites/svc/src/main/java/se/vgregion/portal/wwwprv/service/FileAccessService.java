@@ -12,7 +12,7 @@ import java.io.InputStream;
 public interface FileAccessService {
 
     void uploadFile(String fileName, Supplier supplier, InputStream inputStream, long fileSize,
-                    String namndFordelningDirectory, Notifiable notifiable);
+                    String namndFordelningDirectory, Notifiable notifiable) throws DistrictDistributionException;
 
     Node<String> retrieveRemoteFileTree(String url);
 }

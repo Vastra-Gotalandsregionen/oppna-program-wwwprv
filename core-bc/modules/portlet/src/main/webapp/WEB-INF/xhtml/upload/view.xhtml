@@ -15,7 +15,7 @@
 
         <p:confirmDialog closable="false" widgetVar="confirmOverwrite" message="Filen ”#{uploadBackingBean.tempFileUpload.baseName}#{uploadBackingBean.tempFileUpload.suffix}” har laddats upp tidigare. Vill du ladda upp igen?" visible="#{uploadBackingBean.currentlyDuplicateFileWorkflow}">
             <h:commandButton value="Ladda upp" onclick="PF('confirmOverwrite').hide()">
-                <f:ajax listener="#{uploadBackingBean.moveTempFileToUploadDirectory()}" render="@form"/>
+                <f:ajax listener="#{uploadBackingBean.moveTempFileToUploadDirectory()}" render="@form" onevent="handleProgress"/>
             </h:commandButton>
             <h:commandButton value="Avbryt" onclick="PF('confirmOverwrite').hide()">
                 <f:ajax listener="#{uploadBackingBean.abortMoveTempFileToUploadDirectory()}" render="@form"/>
@@ -32,8 +32,11 @@
         <div class="file-upload-section">
             <p:fileUpload id="fileUploadInput" update="@form" label="Välj fil" uploadLabel="Ladda upp" cancelLabel="Avbryt"
                           dragDropSupport="true" mode="advanced" fileUploadListener="#{uploadBackingBean.fileUploadListener}"
-                          rendered="#{uploadBackingBean.showFileUpload}"/>
+                          rendered="#{uploadBackingBean.showFileUpload}" onstart="showSpinner();" oncomplete="hideSpinner();" />
         </div>
+
+        <img class="contact-spinner" src="#{request.contextPath}/image/spinner.gif"
+             style="visibility: hidden; margin-top: 10px; height: 40px;"/>
 
         <p:poll interval="2" update="progressBarWrapperWrapper"/>
 
@@ -65,5 +68,26 @@
 
         </h:panelGroup>
     </h:form>
+
+    <script type="application/javascript">
+        function showSpinner() {
+            $(".contact-spinner").css("visibility", "visible");
+        }
+
+        function hideSpinner() {
+            $(".contact-spinner").css("visibility", "hidden");
+        }
+
+        function handleProgress(data) {
+            if (data.status === "begin") {
+                showSpinner();
+            }
+
+            if (data.status === "complete") {
+                hideSpinner();
+
+            }
+        }
+    </script>
 
 </f:view>

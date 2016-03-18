@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
+import se.vgregion.portal.wwwprv.service.DistrictDistributionException;
 import se.vgregion.portal.wwwprv.service.EmailService;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
@@ -151,6 +152,7 @@ public class UploadBackingBean implements Notifiable {
 
             if (!currentlyDuplicateFileWorkflow) {
                 this.uploadInProgress = true;
+                progress = 0;
 
                 dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
                         suffixIncludingDot, userName, bis, uploadedFile.getSize(), this);
@@ -161,17 +163,22 @@ public class UploadBackingBean implements Notifiable {
             // No exception means success.
             uploadSuccess = true;
 
+        } catch (DistrictDistributionException e) {
+            LOGGER.error(e.getMessage(), e);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
+            emailService.notifyError(e);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
+            emailService.notifyError(e);
         } finally {
             this.uploadInProgress = false;
         }
 
-        if (uploadSuccess) {
+        if (uploadSuccess && !currentlyDuplicateFileWorkflow) {
             try {
-                new File(uploadDirectory, newFileName).deleteOnExit();
-                new File(System.getProperty("java.io.tmpdir"), newFileName).deleteOnExit();
+                new File(uploadDirectory, newFileName).delete();
+                new File(System.getProperty("java.io.tmpdir"), newFileName).delete();
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 emailService.notifyError(e);
@@ -225,6 +232,8 @@ public class UploadBackingBean implements Notifiable {
         // We consider it done here so we don't get a warning dialog on refreshing the page.
         currentlyDuplicateFileWorkflow = false;
 
+        progress = 0;
+
         try (FileInputStream fis = new FileInputStream(target);
             BufferedInputStream bis = new BufferedInputStream(fis)) {
             dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
@@ -233,9 +242,16 @@ public class UploadBackingBean implements Notifiable {
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + tempFile.getName() + " skapades."));
 
+            target.delete();
+
+        } catch (DistrictDistributionException e) {
+            LOGGER.error(e.getMessage(), e);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
+            emailService.notifyError(e);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
+            emailService.notifyError(e);
         } finally {
             this.uploadInProgress = false;
         }
