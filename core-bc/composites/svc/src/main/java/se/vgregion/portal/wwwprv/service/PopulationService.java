@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
 import se.riv.population.residentmaster.lookupresidentforextendedprofile.v1.rivtabp21.LookupResidentForExtendedProfileResponderInterface;
@@ -72,6 +73,10 @@ public class PopulationService {
             callArg.setLookUpSpecification(spec);
             callArg.getPersonId().add(arg.personalNumber);
             // spec.setSenasteAndringFolkbokforing(arg.textDate);
+            // 20120101. Förväntat format: yyyyMMddHHmmss
+            if (arg.textDate!=null) {
+                arg.textDate = StringUtils.rightPad(arg.textDate, 14, '0');
+            }
             spec.setHistoriskTidpunkt(arg.textDate);
             List<ExtendedResidentType> shouldJustBeOneOrNone = extendedProfileClient.lookupResidentForExtendedProfile("", callArg).getResident();
             if (shouldJustBeOneOrNone.size() > 1) {
