@@ -71,7 +71,8 @@ public class PopulationService {
             LookUpSpecificationType spec = new LookUpSpecificationType();
             callArg.setLookUpSpecification(spec);
             callArg.getPersonId().add(arg.personalNumber);
-            spec.setSenasteAndringFolkbokforing(arg.textDate);
+            // spec.setSenasteAndringFolkbokforing(arg.textDate);
+            spec.setHistoriskTidpunkt(arg.textDate);
             List<ExtendedResidentType> shouldJustBeOneOrNone = extendedProfileClient.lookupResidentForExtendedProfile("", callArg).getResident();
             if (shouldJustBeOneOrNone.size() > 1) {
                 throw new RuntimeException();

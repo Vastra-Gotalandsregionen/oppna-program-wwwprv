@@ -2,18 +2,13 @@ package se.vgregion.portal.wwwprv.service;
 
 import se.riv.population.residentmaster.extended.v1.AdministrativIndelningType;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
-import se.riv.population.residentmaster.lookupresidentforextendedprofileresponder.v1.LookupResidentForExtendedProfileResponseType;
 import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
 import se.vgregion.portal.wwwprv.table.Column;
 import se.vgregion.portal.wwwprv.table.Table;
 import se.vgregion.portal.wwwprv.table.Tupel;
-import sun.misc.ExtensionInfo;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.TreeMap;
 
 /**
  * Created by clalu4 on 2016-03-14.
@@ -87,13 +82,7 @@ public class UnilabsLab implements DistrictDistribution {
     }
 
     ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {
-        try {
-            return service.lookup(new PopulationService.Arg(forPersonalNumber, fromDate)).get(0);
-        } catch (Exception e) {
-            System.out.println("Problem with " + forPersonalNumber + " from date " + fromDate);
-            e.printStackTrace();
-            return null;
-        }
+        return service.lookup(new PopulationService.Arg(forPersonalNumber, fromDate)).get(0);
     }
 
     /*

@@ -77,13 +77,14 @@ public class Table {
      * instantiated.
      * @param column the column to insert into the collective of columns.
      */
-    public void insert(final Column column) {
+    public Column insert(final Column column) {
         columns.add(column.getIndex(), column);
         int counter = 0;
         for (Column c : columns) {
             c.setIndex(counter++);
         }
         Collections.sort(columns);
+        return column;
     }
 
     /**
@@ -157,9 +158,15 @@ public class Table {
      * (toString()) of the object to show the columns in an unforseen order. Use the insert(Column)-method for this
      * instead.
      * Removing one of the columns would be more appropriate usage.
+     *
      * @return the columns of this table.
      */
     public List<Column> getColumns() {
         return columns;
     }
+
+    public Column getColumnByName(String name) {
+        return Column.getColumnByName(columns, name);
+    }
+
 }

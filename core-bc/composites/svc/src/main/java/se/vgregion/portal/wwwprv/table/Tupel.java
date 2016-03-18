@@ -31,13 +31,8 @@ public class Tupel extends HashMap<String, Cell> {
         return super.get(key);
     }
 
-    private Column getColumnByName(String name) {
-        for (Column column : columns) {
-            if (name.equals(column.getName())) {
-                return column;
-            }
-        }
-        return null;
+    Column getColumnByName(String name) {
+        return Column.getColumnByName(columns, name);
     }
 
     /**

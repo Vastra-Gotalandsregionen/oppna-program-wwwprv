@@ -135,4 +135,16 @@ public class Column implements Comparable<Column> {
         this.rightAligned = rightAligned;
     }
 
+    public static Column getColumnByName(List<Column> columns, String name) {
+        for (Column column : columns) {
+            if (name.equals(column.getName())) {
+                return column;
+            }
+        }
+        return null;
+    }
+
+    public void setCharLength(int charLength) {
+        this.charLength = charLength;
+    }
 }
