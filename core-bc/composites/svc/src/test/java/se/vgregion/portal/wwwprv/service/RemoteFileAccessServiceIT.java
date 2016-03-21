@@ -19,7 +19,8 @@ public class RemoteFileAccessServiceIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFileAccessServiceIT.class);
 
-    private final String SHARED_FOLDER_SERVER = "VGFS0249";
+    private final String SHARED_FOLDER_SERVER = "VGREGION.SE/app/";
+//    private final String SHARED_FOLDER_SERVER = "VGFS0249";
 //    private final String SHARED_FOLDER_SERVER = "VGFS0233";
 
     @Test

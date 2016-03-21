@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
-import se.vgregion.portal.wwwprv.service.model.DistrictDistributionClassName;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 
 import java.io.BufferedOutputStream;
@@ -32,6 +31,8 @@ import java.util.List;
  */
 @Service
 public class RemoteFileAccessService implements FileAccessService {
+
+    private final int depthLimit = 2;
 
     @Value("${shared.folder.username}")
     private String user;
@@ -189,7 +190,7 @@ public class RemoteFileAccessService implements FileAccessService {
 
             Node<String> root = tree;
 
-            buildDirectoryTree(root, smbRoot);
+            buildDirectoryTree(root, smbRoot, depthLimit, 0);
 
             return tree;
         } catch (IOException e) {
@@ -198,6 +199,15 @@ public class RemoteFileAccessService implements FileAccessService {
     }
 
     private void buildDirectoryTree(Node<String> node, SmbFile smbRoot) {
+        buildDirectoryTree(node, smbRoot, null, null);
+    }
+
+    private void buildDirectoryTree(Node<String> node, SmbFile smbRoot, Integer depthLimit, Integer currentDepth) {
+
+        if ((currentDepth != null && depthLimit != null) && currentDepth >= depthLimit) {
+            return;
+        }
+
         SmbFile[] directories = null;
         try {
             directories = smbRoot.listFiles(new SmbFileFilter() {
@@ -229,7 +239,7 @@ public class RemoteFileAccessService implements FileAccessService {
         } else {
             for (SmbFile directory : directories) {
                 Node<String> newNode = new Node<>(directory.getName());
-                buildDirectoryTree(newNode, directory);
+                buildDirectoryTree(newNode, directory, depthLimit, currentDepth != null ? currentDepth + 1: null);
                 newNode.setParent(node);
                 node.getChildren().add(newNode);
             }
