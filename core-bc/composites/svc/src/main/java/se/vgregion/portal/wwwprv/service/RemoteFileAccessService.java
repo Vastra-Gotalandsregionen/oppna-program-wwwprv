@@ -62,7 +62,7 @@ public class RemoteFileAccessService implements FileAccessService {
     }
 
     @Override
-    public void uploadFile(String fileName,
+    public void uploadFile(String fileNameBase,
                            Supplier supplier,
                            final InputStream inputStreamSource,
                            long fileSize,
@@ -82,6 +82,9 @@ public class RemoteFileAccessService implements FileAccessService {
             byte[] fileContent = IOUtils.toByteArray(inputStreamSource);
 
             for (String uploadFolder : uploadFoldersInOrder) {
+                // We set this for every iteration.
+                String fileName = fileNameBase;
+
                 NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("VGREGION", user, password);
 
                 SmbFile dir = new SmbFile("smb://" + uploadFolder, auth);
@@ -96,6 +99,8 @@ public class RemoteFileAccessService implements FileAccessService {
 
                 InputStream toUpload;
                 if (uploadFolder.equals(namndFordelningDirectory)) {
+
+                    fileName = complementFileNameWithNamndfordelningPart(fileName);
 
                     DistrictDistribution districtDistribution = getDistrictDistribution(fileName, supplier);
 
@@ -154,6 +159,14 @@ public class RemoteFileAccessService implements FileAccessService {
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static String complementFileNameWithNamndfordelningPart(String fileName) {
+        if (fileName == null) {
+            throw new NullPointerException("Filename must not be null.");
+        }
+
+        return fileName + "_Nämndfördelad.csv";
     }
 
     private DistrictDistribution getDistrictDistribution(String fileName, Supplier supplier) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
