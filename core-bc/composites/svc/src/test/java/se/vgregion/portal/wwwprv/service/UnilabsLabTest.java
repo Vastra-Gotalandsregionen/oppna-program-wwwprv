@@ -1,6 +1,5 @@
 package se.vgregion.portal.wwwprv.service;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,10 @@ public class UnilabsLabTest {
         String originalFileName = "original_file_name.text";
         UnilabsLab unilabsLab = new UnilabsLab(populationService, originalFileName);
 
-        String input = inputFileContent().toString();
+        String input = inputFileContent(getInputFileColumnsUnilabsRontgen()).toString();
         System.out.println(input);
+        if (true)
+            return;
         String output = unilabsLab.process(input);
         System.out.println(output);
         Table outputTable = new Table(output);
@@ -51,7 +52,22 @@ public class UnilabsLabTest {
         System.out.println(new Table(output).toString(";"));
     }
 
-    public String getInputFileColumns() {
+    public String getInputFileColumnsUnilabsRontgen() {
+        return "" +
+                "key                    format\n" +
+                "BesoksDatum            A(8)\n" +
+                "personnr               A(12)\n" +
+                "Namn                   A(30)\n" +
+                "Lan                    A(2)\n" +
+                "Kommun                 A(2)\n" +
+                "Betalare               A(2)\n" +
+                "Bestallare             A(10)\n" +
+                "Analyskod              A(10)\n" +
+                "AnalysNamn             A(20)\n" +
+                "pris                    A(7)\n";
+    }
+
+    public String getInputFileColumnsUnilabsLab() {
         return "" +
                 "key                    format\n" +
                 "BesoksDatum             A(8)\n" +
@@ -64,9 +80,9 @@ public class UnilabsLabTest {
                 "pris                    A(7)\n";
     }
 
-    public Table inputFileContent() {
-        String def = getInputFileColumns();
-        Table table = new Table(def);
+    public Table inputFileContent(String inputFileColumns) {
+        //String def = getInputFileColumnsUnilabsLab();
+        Table table = new Table(inputFileColumns);
         Table result = new Table();
 
         int i = 0;

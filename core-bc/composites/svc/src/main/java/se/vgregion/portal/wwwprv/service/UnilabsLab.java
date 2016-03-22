@@ -2,6 +2,7 @@ package se.vgregion.portal.wwwprv.service;
 
 import se.riv.population.residentmaster.extended.v1.AdministrativIndelningType;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
+import se.riv.population.residentmaster.v1.PersonpostTYPE;
 import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
 import se.vgregion.portal.wwwprv.table.Column;
 import se.vgregion.portal.wwwprv.table.Table;
@@ -63,22 +64,32 @@ public class UnilabsLab implements DistrictDistribution {
             tupel.get("klockslag").set(nowTime);
             if (info != null) {
                 AdministrativIndelningType folkbok = info.getFolkbokforingsaddressIndelning();
+                PersonpostTYPE pp = info.getPersonpost();
+                if (pp != null) {
+                    SvenskAdressTYPE fba = pp.getFolkbokforingsadress();
+                    if (fba != null){
+                        tupel.get("PatLan_+_kommun").set(blank(fba.getLanKod()) + blank(fba.getKommunKod()));
+                    }
+                }
                 if (folkbok != null) {
-                    tupel.get("Pat_Nämnd").set(folkbok.getHalsoSjukvardsNamndKod());
-                    tupel.get("PatLan_+_kommun").set(folkbok.getPrimaromradeKod());
-                    // Split this into län - kom
-                    // Ask Pia about above...
                     tupel.get("Pat_SDN").set(folkbok.getStadsdelsnamndKod());
                     SvenskAdressTYPE adress = info.getPersonpost().getFolkbokforingsadress();
                     if (adress != null) {
                         tupel.get("Pat_nyckelkod").set(adress.getSCBNyckelkod());
                     }
                 }
-                // Ask Pia about above...
+                AdministrativIndelningType fbi = info.getFolkbokforingsaddressIndelning();
+                if (fbi != null) {
+                    tupel.get("Pat_Nämnd").set(fbi.getHalsoSjukvardsNamndKod());
+                }
             }
         }
 
-        return table.toString(";");
+        return table.toString();
+    }
+
+    String blank(String s) {
+        return s == null ? "" :s;
     }
 
     ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {
