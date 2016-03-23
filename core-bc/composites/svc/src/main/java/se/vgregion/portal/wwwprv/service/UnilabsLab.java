@@ -85,7 +85,7 @@ public class UnilabsLab implements DistrictDistribution {
             }
         }
 
-        return table.toString();
+        return table.toString(";");
     }
 
     String blank(String s) {
