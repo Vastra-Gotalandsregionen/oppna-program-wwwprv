@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>se.vgregion.common</groupId>
-    <artifactId>profile-internal</artifactId>
+    <artifactId>profile-open</artifactId>
     <version>2.13</version>
   </parent>
 

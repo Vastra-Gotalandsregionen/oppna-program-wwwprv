@@ -93,7 +93,8 @@ public class RemoteFileAccessService implements FileAccessService {
                 SmbFile dir = new SmbFile("smb://" + uploadFolder, auth);
 
                 // Create subfolder if not existent
-                SmbFile subDir = new SmbFile(dir, folderPrefix + supplier.getEnhetsKod());
+                String subDirName = folderPrefix + supplier.getEnhetsKod();
+                SmbFile subDir = new SmbFile(dir, subDirName);
 
                 if (!subDir.exists()) {
                     subDir.mkdirs();
@@ -118,7 +119,7 @@ public class RemoteFileAccessService implements FileAccessService {
 
                 LOGGER.info("subDir = " + subDir.getCanonicalPath());
 
-                SmbFile newFile = new SmbFile(dir, supplier.getEnhetsKod() + "/" + fileName);
+                SmbFile newFile = new SmbFile(dir, subDirName + "/" + fileName);
 
                 LOGGER.info("newFile = " + newFile.getCanonicalPath());
 

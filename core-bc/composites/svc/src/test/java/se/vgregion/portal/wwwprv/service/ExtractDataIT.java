@@ -19,7 +19,7 @@ import se.vgregion.portal.wwwprv.table.Tupel;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:population-test.xml")
-public class ExtractDataTest {
+public class ExtractDataIT {
 
     @Autowired
     private PopulationService populationService;
