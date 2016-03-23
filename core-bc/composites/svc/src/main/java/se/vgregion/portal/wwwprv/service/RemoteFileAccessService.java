@@ -32,6 +32,9 @@ import java.util.List;
 @Service
 public class RemoteFileAccessService implements FileAccessService {
 
+    public static final String namndFordeladFileNameSuffix = "_Namndfordelad.csv";
+    public static final String folderPrefix = "Vardgiv_";
+
     private final int depthLimit = 2;
 
     @Value("${shared.folder.username}")
@@ -90,7 +93,7 @@ public class RemoteFileAccessService implements FileAccessService {
                 SmbFile dir = new SmbFile("smb://" + uploadFolder, auth);
 
                 // Create subfolder if not existent
-                SmbFile subDir = new SmbFile(dir, supplier.getEnhetsKod());
+                SmbFile subDir = new SmbFile(dir, folderPrefix + supplier.getEnhetsKod());
 
                 if (!subDir.exists()) {
                     subDir.mkdirs();
@@ -166,7 +169,7 @@ public class RemoteFileAccessService implements FileAccessService {
             throw new NullPointerException("Filename must not be null.");
         }
 
-        return fileName + "_Nämndfördelad.csv";
+        return fileName + namndFordeladFileNameSuffix;
     }
 
     private DistrictDistribution getDistrictDistribution(String fileName, Supplier supplier) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

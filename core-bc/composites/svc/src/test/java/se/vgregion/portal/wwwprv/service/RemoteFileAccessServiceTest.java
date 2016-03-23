@@ -15,17 +15,17 @@ public class RemoteFileAccessServiceTest {
         // Happy days
         String fileName = "UNILABS_LAB.INPUT_20160322_1319.IN";
         String newName = RemoteFileAccessService.complementFileNameWithNamndfordelningPart(fileName);
-        assertEquals("UNILABS_LAB.INPUT_20160322_1319.IN_Nämndfördelad.csv", newName);
+        assertEquals("UNILABS_LAB.INPUT_20160322_1319.IN" + RemoteFileAccessService.namndFordeladFileNameSuffix, newName);
 
         // No dot - add last.
         fileName = "UNILABS_LABINPUT_20160322_1319IN";
         newName = RemoteFileAccessService.complementFileNameWithNamndfordelningPart(fileName);
-        assertEquals("UNILABS_LABINPUT_20160322_1319IN_Nämndfördelad.csv", newName);
+        assertEquals("UNILABS_LABINPUT_20160322_1319IN" + RemoteFileAccessService.namndFordeladFileNameSuffix, newName);
 
         // Empty - add last.
         fileName = "";
         newName = RemoteFileAccessService.complementFileNameWithNamndfordelningPart(fileName);
-        assertEquals("_Nämndfördelad.csv", newName);
+        assertEquals(RemoteFileAccessService.namndFordeladFileNameSuffix, newName);
 
         // Null - no change
         fileName = null;
