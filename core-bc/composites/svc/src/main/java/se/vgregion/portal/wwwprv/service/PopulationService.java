@@ -99,10 +99,19 @@ public class PopulationService {
         public String personalNumber;
         public String textDate;
 
+        /**
+         * No args constructor.
+         */
         public Arg() {
             super();
         }
 
+
+        /**
+         * Constructor that provides the actual data-content of the instance at the moment of creation.
+         * @param personalNumber in swedish 'personnummer'.
+         * @param textDate date of usage - of the personal number provided as first argument.
+         */
         public Arg(String personalNumber, String textDate) {
             super();
             this.personalNumber = personalNumber;

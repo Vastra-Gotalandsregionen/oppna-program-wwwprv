@@ -144,6 +144,10 @@ public class Column implements Comparable<Column> {
         return null;
     }
 
+    /**
+     * Setter for charLength.
+     * @param charLength new value.
+     */
     public void setCharLength(int charLength) {
         this.charLength = charLength;
     }

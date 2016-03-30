@@ -21,23 +21,39 @@ public class UnilabsLab implements DistrictDistribution {
 
     protected String originalFileName;
 
-    //protected LookupResidentForExtendedProfileResponseType data;
-
+    /**
+     * Constructor.
+     * @param service the source of extra data to use when complementing the input data.
+     * @param originalFileName name of the file that the process should output to. This to be able to write this name
+     *                         to the actual content.
+     */
     public UnilabsLab(PopulationService service, String originalFileName) {
         this.service = service;
         this.originalFileName = originalFileName;
     }
 
+    /**
+     * Complements the data hold in the text-table that is feed into the method.
+     * Seven extra columns are inserted.
+     *
+     * Three of them are inserted before the original content.
+     * 'korn_datum' - the date of the execution of this method. Format are yyyy-MM-dd.
+     * 'klockslag' - time of day when the execution is made.
+     * 'filnamn' is the name for the file that is provided in the constructor to this class earlier.
+     *
+     * Four of the columns are added after the original columns.
+     * 'Pat_Nämnd' - the patient board that the patient belonged to at the moment of hes/shes visit to the medical
+     * center that this row depicts.
+     * 'PatLan_+_kommun' - the patients lan and kommun as one field (the code for each entity).
+     * 'PAT_SDN' the sdn for the patient.
+     * 'Pat_nyckelkod' the key code for the patient.
+     *
+     * @param input a text forming at 'text-table' - a table with fixed length columns and headings that holds the data.
+     * @return a table with column-values separated by semicolons.
+     */
     @Override
     public String process(String input) {
         Table table = new Table(input);
-
-        //List<String> personalNumbers = new ArrayList<>();
-        /*
-        for (Tupel tupel : table.getTupels()) {
-            personalNumbers.add(tupel.get("personnr").value());
-        }
-        data = service.lookup(personalNumbers);*/
 
         String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -95,39 +111,5 @@ public class UnilabsLab implements DistrictDistribution {
     ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {
         return service.lookup(new PopulationService.Arg(forPersonalNumber, fromDate)).get(0);
     }
-
-    /*
-    protected ExtendedResidentType getLatestResidentInfo(String forPersonNumber, String justAfterThisTextDate) {
-        TreeMap<String, ExtendedResidentType> tree = toTextDateMapped(getInfo(forPersonNumber));
-        String floorKey = tree.floorKey(justAfterThisTextDate);
-        if (floorKey == null) {
-            return null;
-        }
-        return tree.get(floorKey);
-    }
-
-    private TreeMap<String, ExtendedResidentType> toTextDateMapped(List<ExtendedResidentType> info) {
-        TreeMap<String, ExtendedResidentType> result = new TreeMap<>();
-        int nullCount = 0;
-        for (ExtendedResidentType resident : info) {
-            String latestChange = resident.getSenasteAndringFolkbokforing();
-            if (latestChange == null) {
-                latestChange = "18" + String.format("%02d", nullCount++);
-                // Pretend this entry dates back to 1800+. Probably this is the first entry for the person... right?
-            }
-            result.put(latestChange, resident);
-        }
-        return result;
-    }
-
-    private List<ExtendedResidentType> getInfo(String byPersonalNumber) {
-        List<ExtendedResidentType> result = new ArrayList<>();
-        for (ExtendedResidentType resident : data.getResident()) {
-            if (resident.getPersonpost().getPersonId().equals(byPersonalNumber)) {
-                result.add(resident);
-            }
-        }
-        return result;
-    }*/
 
 }
