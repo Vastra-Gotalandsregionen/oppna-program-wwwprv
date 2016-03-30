@@ -95,4 +95,10 @@ public class TableTest {
         System.out.println(r);
     }
 
+    @Test
+    public void toSafeExcel() {
+        String result = Table.toSafeExcel("\"Some;values\";");
+        assertEquals("\"\"\"Some;values\"\";\"", result);
+    }
+
 }

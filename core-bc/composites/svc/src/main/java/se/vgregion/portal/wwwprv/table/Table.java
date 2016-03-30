@@ -3,6 +3,7 @@ package se.vgregion.portal.wwwprv.table;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by clalu4 on 2016-03-14.
@@ -140,12 +141,21 @@ public class Table {
         for (Tupel tupel : tupels) {
             list = new ArrayList<>();
             for (Column column : columns) {
-                list.add(tupel.get(column).value().trim());
+                list.add(toSafeExcel(tupel.get(column).value().trim()));
             }
             sb.append(StringUtils.join(list, withThisDelimiter));
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    static String toSafeExcel(String text) {
+        if (text == null || "null".equals(text)) {
+            return "";
+        }
+        text = text.replaceAll(Pattern.quote("\""), "\"\"");
+        text = '"' + text + '"';
+        return text;
     }
 
     /**
