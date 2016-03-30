@@ -1,6 +1,7 @@
 package se.vgregion.portal.wwwprv.table;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -141,6 +142,27 @@ public class Table {
         for (Tupel tupel : tupels) {
             list = new ArrayList<>();
             for (Column column : columns) {
+                list.add((tupel.get(column).value().trim()));
+            }
+            sb.append(StringUtils.join(list, withThisDelimiter));
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    public String toExcelCsvText() {
+        String withThisDelimiter = ";";
+        StringBuilder sb = new StringBuilder();
+        List<String> list = new ArrayList<>();
+        for (Column column : columns) {
+            list.add(column.getName());
+        }
+        sb.append(StringUtils.join(list, withThisDelimiter));
+        sb.append("\n");
+
+        for (Tupel tupel : tupels) {
+            list = new ArrayList<>();
+            for (Column column : columns) {
                 list.add(toSafeExcel(tupel.get(column).value().trim()));
             }
             sb.append(StringUtils.join(list, withThisDelimiter));
@@ -152,6 +174,9 @@ public class Table {
     static String toSafeExcel(String text) {
         if (text == null || "null".equals(text)) {
             return "";
+        }
+        if (NumberUtils.isNumber(text)) {
+            text = "=\"" + text + '"';
         }
         text = text.replaceAll(Pattern.quote("\""), "\"\"");
         text = '"' + text + '"';

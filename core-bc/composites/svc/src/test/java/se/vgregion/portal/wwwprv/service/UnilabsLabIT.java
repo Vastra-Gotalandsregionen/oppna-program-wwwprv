@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +50,9 @@ public class UnilabsLabIT {
             );
         }
 
-        System.out.println(Table.newTableFromSemiColonDelimInput(output).toString(";"));
+        //System.out.println(Table.newTableFromSemiColonDelimInput(output).toString(";"));
+        System.out.println(output);
+
     }
 
     public String getInputFileColumnsUnilabsRontgen() {
@@ -107,6 +110,12 @@ public class UnilabsLabIT {
             i++;
         }
 
+        i = 0;
+        for (Tupel tupel : result.getTupels()) {
+            tupel.get("Bestallare").set(StringUtils.rightPad("" + i, 6, '0'));
+            i++;
+        }
+
         return result;
     }
 
@@ -121,6 +130,8 @@ public class UnilabsLabIT {
                 "Namn                   A(30)\n" +
                 "Betalare                A(2)\n" +
                 "Bestallare             A(10)\n" +
+                "Specialitet            A(11)\n" +
+                "Avtalskod              A(9)\n" +
                 "Analyskod              A(10)\n" +
                 "AnalysNamn             A(20)\n" +
                 "pris                    A(7)\n" +

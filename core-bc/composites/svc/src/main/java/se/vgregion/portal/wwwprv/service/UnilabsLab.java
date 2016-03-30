@@ -60,11 +60,20 @@ public class UnilabsLab implements DistrictDistribution {
         table.insert(new Column("korn_datum", 0, 10));
         table.insert(new Column("klockslag", 1, 9)); //
         table.insert(new Column("filnamn", 2, originalFileName.length()));
+
+        Column purchaser = table.getColumnByName("Bestallare");
+        if (purchaser != null) {
+            table.insert(new Column("Specialitet", purchaser.getIndex() + 1, 11));
+            table.insert(new Column("Avtalskod", purchaser.getIndex() + 1, 9));
+        }
+
         // The original columns are here...
         table.insert(new Column("Pat_Nämnd", table.getColumns().size(), 2));
         table.insert(new Column("PatLan_+_kommun", table.getColumns().size(), 4));
         table.insert(new Column("Pat_SDN", table.getColumns().size(), 2));
         table.insert(new Column("Pat_nyckelkod", table.getColumns().size(), 6));
+
+
 
         Column dateKey = table.getColumns().get(3);
         Column personalNumberKey = table.getColumns().get(4);
@@ -78,6 +87,17 @@ public class UnilabsLab implements DistrictDistribution {
             tupel.get("filnamn").set(originalFileName);
             String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
             tupel.get("klockslag").set(nowTime);
+            String purchaserValue = tupel.get("Bestallare").value().trim();
+
+            if (!purchaserValue.isEmpty()) {
+                if (purchaserValue.length() >= 6) {
+                    tupel.get("Specialitet").set(purchaserValue.substring(0, 2));
+                    tupel.get("Avtalskod").set(purchaserValue.substring(2));
+                } else {
+                    tupel.get("Avtalskod").set(purchaserValue);
+                }
+            }
+
             if (info != null) {
                 AdministrativIndelningType folkbok = info.getFolkbokforingsaddressIndelning();
                 PersonpostTYPE pp = info.getPersonpost();
@@ -101,7 +121,7 @@ public class UnilabsLab implements DistrictDistribution {
             }
         }
 
-        return table.toString(";");
+        return table.toExcelCsvText();
     }
 
     String blank(String s) {
