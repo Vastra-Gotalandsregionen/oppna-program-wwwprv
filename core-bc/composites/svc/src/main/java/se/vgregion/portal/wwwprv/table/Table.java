@@ -3,7 +3,6 @@ package se.vgregion.portal.wwwprv.table;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Created by clalu4 on 2016-03-14.
@@ -23,7 +22,7 @@ public class Table {
     /**
      * Constructs an empty table. No columns and no data.
      */
-    public Table() {
+    private Table() {
         super();
         columns = new ArrayList<>();
     }
@@ -38,10 +37,10 @@ public class Table {
      * </pre>
      * Three tupel will be created.
      */
-    public Table(String text) {
+    private Table(String text) {
         super();
         List<String> lines = Arrays.asList(text.split(("\\n")));
-        columns = Column.toColumns(lines.get(0));
+        columns = Column.toColumnsSplitBySpaces(lines.get(0));
 
         if (lines.size() <= 1) {
             return;
@@ -53,6 +52,43 @@ public class Table {
             Tupel tupel = new Tupel(columns, line);
             tupels.add(tupel);
         }
+    }
+
+    public static Table newEmptyTable() {
+        return new Table();
+    }
+
+    public static Table newTableFromSpaceDelimInput(String text) {
+        List<String> lines = Arrays.asList(text.split(("\\n")));
+        List<Column> columns = Column.toColumnsSplitBySpaces(lines.get(0));
+
+        return newTable(lines, columns);
+    }
+
+    public static Table newTableFromSemiColonDelimInput(String text) {
+        List<String> lines = Arrays.asList(text.split(("\\n")));
+        List<Column> columns = Column.toColumnsSplitBySemicolon(lines.get(0));
+
+        return newTable(lines, columns);
+    }
+
+    private static Table newTable(List<String> lines, List<Column> columns) {
+        Table table = new Table();
+
+        table.columns.addAll(columns);
+
+        if (lines.size() <= 1) {
+            return table;
+        }
+
+        List<String> sub = lines.subList(1, lines.size());
+
+        for (String line : sub) {
+            Tupel tupel = new Tupel(table.columns, line);
+            table.tupels.add(tupel);
+        }
+
+        return table;
     }
 
     /**

@@ -108,9 +108,10 @@ public class RemoteFileAccessService implements FileAccessService {
 
                     DistrictDistribution districtDistribution = getDistrictDistribution(fileName, supplier);
 
-                    String processed = districtDistribution.process(new String(fileContent, "UTF-8"));
+                    String charsetName = "ISO-8859-1";
+                    String processed = districtDistribution.process(new String(fileContent, charsetName)); // todo Lägga på progressindikator?
 
-                    ByteArrayInputStream bais = new ByteArrayInputStream(processed.getBytes("UTF-8"));
+                    ByteArrayInputStream bais = new ByteArrayInputStream(processed.getBytes(charsetName));
 
                     toUpload = bais;
                 } else {
@@ -127,27 +128,18 @@ public class RemoteFileAccessService implements FileAccessService {
 
                 LOGGER.info("Uploading to samba share: dir=" + subDir.getCanonicalPath() + ", fileName=" + fileName);
 
-                try (OutputStream outputStream = newFile.getOutputStream();
-                     BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
+                upload(fileSize, notifiable, toUpload, newFile);
 
-                    byte[] buf = new byte[2048];
+                if (uploadFolder.equals(namndFordelningDirectory)) {
+                    // Also upload the original file content.
 
-                    int n;
-                    long accumulatedBytes = 0;
-                    int numberRoundsSoFar = 0;
+                    // Original file name here.
+                    SmbFile newFile2 = new SmbFile(dir, subDirName + "/" + fileNameBase);
+                    newFile2.createNewFile();
 
-                    while ((n = toUpload.read(buf)) != -1) {
-                        accumulatedBytes += n;
-                        bos.write(buf, 0, n);
-
-                        if (++numberRoundsSoFar % 10 == 0) {
-                            notifiable.notifyPercentage((int) ((100f * (float) accumulatedBytes) / (float) fileSize));
-                        }
-                    }
-
-                    notifiable.notifyPercentage(100);
-
+                    upload(fileSize, notifiable, new ByteArrayInputStream(fileContent), newFile2);
                 }
+
             }
 
         } catch (IOException e) {
@@ -162,6 +154,30 @@ public class RemoteFileAccessService implements FileAccessService {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void upload(float fileSize, Notifiable notifiable, InputStream toUpload, SmbFile newFile) throws IOException {
+        try (OutputStream outputStream = newFile.getOutputStream();
+             BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
+
+            byte[] buf = new byte[2048];
+
+            int n;
+            long accumulatedBytes = 0;
+            int numberRoundsSoFar = 0;
+
+            while ((n = toUpload.read(buf)) != -1) {
+                accumulatedBytes += n;
+                bos.write(buf, 0, n);
+
+                if (++numberRoundsSoFar % 10 == 0) {
+                    notifiable.notifyPercentage((int) ((100f * (float) accumulatedBytes) / fileSize));
+                }
+            }
+
+            notifiable.notifyPercentage(100);
+
         }
     }
 

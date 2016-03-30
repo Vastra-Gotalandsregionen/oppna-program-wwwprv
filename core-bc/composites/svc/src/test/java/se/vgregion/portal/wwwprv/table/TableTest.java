@@ -30,7 +30,7 @@ public class TableTest {
 
     @Test
     public void main() {
-        Table table = new Table(testText());
+        Table table = Table.newTableFromSpaceDelimInput(testText());
     }
 
     public static String testText() {
@@ -66,7 +66,7 @@ public class TableTest {
 
     @Test
     public void insertColumn() {
-        Table table = new Table(testText());
+        Table table = Table.newTableFromSpaceDelimInput(testText());
 
         int counter = 0;
         for (Column column : table.getColumns()) {
@@ -90,7 +90,7 @@ public class TableTest {
 
     @Test
     public void testToString() {
-        Table table = new Table(testText());
+        Table table = Table.newTableFromSpaceDelimInput(testText());
         String r = table.toString();
         System.out.println(r);
     }

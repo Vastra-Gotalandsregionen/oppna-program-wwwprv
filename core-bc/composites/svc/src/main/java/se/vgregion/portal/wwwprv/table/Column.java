@@ -49,11 +49,23 @@ public class Column implements Comparable<Column> {
      * @param heading the text to convert to a series of Columns.
      * @return the columns result of this operation.
      */
-    public static List<Column> toColumns(String heading) {
+    public static List<Column> toColumnsSplitBySpaces(String heading) {
+        String splitRegex = "(?<=\\s)(?=\\S)";
+
+        return toColumns(heading, splitRegex);
+    }
+
+    public static List<Column> toColumnsSplitBySemicolon(String heading) {
+        String splitRegex = ";";
+
+        return toColumns(heading, splitRegex);
+    }
+
+    private static List<Column> toColumns(String heading, String splitRegex) {
         heading += " ";
         List<Column> result = new ArrayList<>();
         int latestStart = 0;
-        String[] heads = heading.split("(?<=\\s)(?=\\S)");
+        String[] heads = heading.split(splitRegex);
         int count = 0;
         for (String head : heads) {
             Column column = new Column(head.trim(), count++, head.length() - 1);

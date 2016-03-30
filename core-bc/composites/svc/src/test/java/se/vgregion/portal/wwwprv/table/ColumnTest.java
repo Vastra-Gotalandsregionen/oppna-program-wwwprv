@@ -15,7 +15,7 @@ public class ColumnTest {
     @Test
     public void toColumns() {
         String testHeader = "one     two     three four";
-        List<Column> columns = Column.toColumns(testHeader);
+        List<Column> columns = Column.toColumnsSplitBySpaces(testHeader);
         System.out.println(testHeader);
         System.out.println(columns);
 
@@ -31,7 +31,7 @@ public class ColumnTest {
     @Test
     public void compareTo() {
         String testHeader = "one     two     three four";
-        List<Column> columns = Column.toColumns(testHeader);
+        List<Column> columns = Column.toColumnsSplitBySpaces(testHeader);
         Collections.shuffle(columns);
         Collections.sort(columns);
         System.out.println(columns);

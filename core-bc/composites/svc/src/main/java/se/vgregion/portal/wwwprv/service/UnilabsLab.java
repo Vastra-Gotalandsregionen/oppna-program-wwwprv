@@ -53,7 +53,7 @@ public class UnilabsLab implements DistrictDistribution {
      */
     @Override
     public String process(String input) {
-        Table table = new Table(input);
+        Table table = Table.newTableFromSpaceDelimInput(input);
 
         String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 

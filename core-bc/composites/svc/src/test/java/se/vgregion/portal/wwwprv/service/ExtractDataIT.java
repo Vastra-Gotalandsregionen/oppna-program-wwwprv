@@ -28,7 +28,7 @@ public class ExtractDataIT {
     public void main() {
         LookupResidentForExtendedProfileResponseType data = populationService.lookup(DummyPersonalNumbers.get());
 
-        Table table = new Table();
+        Table table = Table.newEmptyTable();
         table.insert(new Column("Senaste_Aandring", 0, 12));
         table.insert(new Column("Sekretess", 1, 2));
 

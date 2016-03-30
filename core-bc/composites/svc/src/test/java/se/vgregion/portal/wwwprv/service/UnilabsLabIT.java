@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.util.Set;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:population-test.xml")
-public class UnilabsLabTest {
+public class UnilabsLabIT {
 
     @Autowired
     private PopulationService populationService;
@@ -28,28 +29,27 @@ public class UnilabsLabTest {
         String originalFileName = "original_file_name.text";
         UnilabsLab unilabsLab = new UnilabsLab(populationService, originalFileName);
 
-        String input = inputFileContent(getInputFileColumnsUnilabsRontgen()).toString();
+        String input = inputFileContent(getInputFileColumnsUnilabsLab()).toString();
         System.out.println(input);
-        if (true)
-            return;
+
         String output = unilabsLab.process(input);
         System.out.println(output);
-        Table outputTable = new Table(output);
+        Table outputTable = Table.newTableFromSemiColonDelimInput(output);
 
-        Table headings = new Table(getResultFileColumns());
+        Table headings = Table.newTableFromSpaceDelimInput(getResultFileColumns());
 
         Set<String> columnNames = new HashSet<>();
         for (Tupel column : headings.getTupels()) {
             columnNames.add(column.get("key").value().trim());
         }
 
-        /*for (Column column : outputTable.getColumns()) {
+        for (Column column : outputTable.getColumns()) {
             Assert.assertTrue("Column " + column.getName() + " should have been inside.",
                     columnNames.contains(column.getName())
             );
-        }*/
+        }
 
-        System.out.println(new Table(output).toString(";"));
+        System.out.println(Table.newTableFromSemiColonDelimInput(output).toString(";"));
     }
 
     public String getInputFileColumnsUnilabsRontgen() {
@@ -82,8 +82,8 @@ public class UnilabsLabTest {
 
     public Table inputFileContent(String inputFileColumns) {
         //String def = getInputFileColumnsUnilabsLab();
-        Table table = new Table(inputFileColumns);
-        Table result = new Table();
+        Table table = Table.newTableFromSpaceDelimInput(inputFileColumns);
+        Table result = Table.newEmptyTable();
 
         int i = 0;
         for (Tupel tupel : table.getTupels()) {
@@ -132,8 +132,8 @@ public class UnilabsLabTest {
 
     public Table resultFileContent() {
         String def = getResultFileColumns();
-        Table table = new Table(def);
-        Table result = new Table("Line");
+        Table table = Table.newTableFromSpaceDelimInput(def);
+        Table result = Table.newTableFromSpaceDelimInput("Line");
 
         int i = 0;
         for (Tupel tupel : table.getTupels()) {
