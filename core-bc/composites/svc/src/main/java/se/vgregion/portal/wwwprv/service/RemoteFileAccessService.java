@@ -40,14 +40,8 @@ public class RemoteFileAccessService implements FileAccessService {
     @Value("${shared.folder.username}")
     private String user;
 
-    @Value("${mars.folder2.user}")
-    private String user2;
-
     @Value("${shared.folder.password}")
     private String password;
-
-    @Value("${mars.folder2.password}")
-    private String password2;
 
     @Autowired
     private PopulationService populationService;
@@ -57,11 +51,9 @@ public class RemoteFileAccessService implements FileAccessService {
     public RemoteFileAccessService() {
     }
 
-    public RemoteFileAccessService(String user, String user2, String password, String password2, String url1, String url2) {
+    public RemoteFileAccessService(String user, String password) {
         this.user = user;
-        this.user2 = user2;
         this.password = password;
-        this.password2 = password2;
     }
 
     @Override

@@ -29,11 +29,7 @@ public class RemoteFileAccessServiceIT {
 
         RemoteFileAccessService remoteFileAccessService = new RemoteFileAccessService(
                 properties.getProperty("shared.folder.username"),
-                null, // todo These parameters should be removed. I'll wait until the merge to avoid conflicts.
-                properties.getProperty("shared.folder.password"),
-                null,
-                null,
-                null
+                properties.getProperty("shared.folder.password")
         );
 
         Node<String> tree = remoteFileAccessService.retrieveRemoteFileTree(SHARED_FOLDER_SERVER);
