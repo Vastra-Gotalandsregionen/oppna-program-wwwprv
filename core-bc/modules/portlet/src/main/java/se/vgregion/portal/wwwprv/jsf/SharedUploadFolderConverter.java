@@ -1,9 +1,6 @@
 package se.vgregion.portal.wwwprv.jsf;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import se.vgregion.portal.wwwprv.model.jpa.Supplier;
-import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
 import javax.faces.component.UIComponent;

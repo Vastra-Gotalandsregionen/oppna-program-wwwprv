@@ -16,7 +16,6 @@ import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.service.LiferayService;
 import se.vgregion.portal.wwwprv.service.LiferayServiceException;
 import se.vgregion.portal.wwwprv.service.model.DistrictDistributionClassName;
-import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 import se.vgregion.portal.wwwprv.util.SupplierComparator;
 
 import javax.annotation.PostConstruct;
@@ -159,22 +158,6 @@ public class AdminBackingBean {
             FacesContext.getCurrentInstance().addMessage("usersMessage", new FacesMessage(e.getLocalizedMessage()));
             return null;
         }
-    }
-
-    public List<Short> getAllSharedUploadFolders() {
-        SharedUploadFolder[] values = SharedUploadFolder.values();
-
-        List<Short> toReturn = new ArrayList<>();
-
-        for (SharedUploadFolder value : values) {
-            toReturn.add(value.getIndex());
-        }
-
-        return toReturn;
-    }
-
-    public String getLabel(Short index) {
-        return SharedUploadFolder.getSharedUploadFolder(index).getLabel();
     }
 
     public void addSupplier() {

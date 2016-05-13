@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
-import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;

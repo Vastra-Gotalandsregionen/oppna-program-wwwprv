@@ -110,7 +110,11 @@ public class UploadBackingBean implements Notifiable {
         }
 
         // Always set the same suffix
-        suffixIncludingDot = chosenSupplier.getSharedUploadFolder() == SharedUploadFolder.MARS_SHARED_FOLDER.getIndex() ? ".IN" : ".in";
+        Short sharedUploadFolder = chosenSupplier.getSharedUploadFolder();
+        suffixIncludingDot =
+                sharedUploadFolder == null
+                || sharedUploadFolder == SharedUploadFolder.MARS_SHARED_FOLDER.getIndex()
+                        ? ".IN" : ".in";
 
         SimpleDateFormat sdf = new SimpleDateFormat("_yyyyMMdd_HHmm");
 
@@ -200,9 +204,10 @@ public class UploadBackingBean implements Notifiable {
         }
 
         // Modify case depending on supplier.
-        if (supplier.getSharedUploadFolder().equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
+        Short sharedUploadFolder = supplier.getSharedUploadFolder();
+        if (sharedUploadFolder == null || sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
             fileName = fileName.toUpperCase();
-        } else if (supplier.getSharedUploadFolder().equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
+        } else if (sharedUploadFolder.equals(SharedUploadFolder.AVESINA_SHARED_FOLDER.getIndex())) {
             fileName = fileName.toLowerCase();
         } else {
             throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
@@ -331,10 +336,6 @@ public class UploadBackingBean implements Notifiable {
 
     public Boolean getShowFileUpload() {
         return showFileUpload;
-    }
-
-    public String getLabel(Short index) {
-        return SharedUploadFolder.getSharedUploadFolder(index).getLabel();
     }
 
     @Override

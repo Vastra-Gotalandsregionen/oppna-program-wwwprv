@@ -143,7 +143,7 @@ public class DataPrivataService {
 
         String enhetsKod = chosenSupplier.getEnhetsKod();
 
-        if (sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
+        if (sharedUploadFolder == null || sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
 
             if (!fileName.toLowerCase().startsWith(enhetsKod.toLowerCase())) {
                 LOGGER.error("Filename \"" + fileName.toLowerCase() + "\" doesn't start with \""
@@ -162,21 +162,6 @@ public class DataPrivataService {
         } else {
             throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
         }
-    }
-
-    public String possiblyChangeSuffix(String suffixIncludingDot, Supplier chosenSupplier) {
-        Short sharedUploadFolder = chosenSupplier.getSharedUploadFolder();
-
-        if (sharedUploadFolder == null) {
-            throw new IllegalArgumentException("Tekniskt fel. Ingen destination är konfigurerad.");
-        }
-
-        if (sharedUploadFolder.equals(SharedUploadFolder.MARS_SHARED_FOLDER.getIndex())) {
-            return ".in";
-        }
-
-        // Unchanged.
-        return suffixIncludingDot;
     }
 
     public Node<String> retrieveRemoteFileTree() {
