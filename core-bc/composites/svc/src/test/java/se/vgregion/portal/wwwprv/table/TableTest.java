@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.table;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -92,6 +93,7 @@ public class TableTest {
     public void testToString() {
         Table table = Table.newTableFromSpaceDelimInput(testText());
         String r = table.toString();
+        System.out.println(table.toExcelCsvText());
         System.out.println(r);
     }
 
@@ -99,6 +101,9 @@ public class TableTest {
     public void toSafeExcel() {
         String result = Table.toSafeExcel("\"Some;values\";");
         assertEquals("\"\"\"Some;values\"\";\"", result);
+
+        result = Table.toSafeExcel("789,987");
+        assertEquals("\"=\"\"789.987\"\"\"", result);
     }
 
 }
