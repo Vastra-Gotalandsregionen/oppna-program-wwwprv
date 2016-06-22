@@ -79,6 +79,10 @@ public class UnilabsLab implements DistrictDistribution {
         Column personalNumberKey = table.getColumns().get(4);
 
         for (Tupel tupel : table.getTupels()) {
+            String pris = tupel.get("pris").value();
+            pris = pris.replace('.', ',');
+            tupel.get("pris").set(pris);
+
             String personalNumber = tupel.get(personalNumberKey).value().trim();
             String date = tupel.get(dateKey).value().trim();
             ExtendedResidentType info = getResidentialInfo(personalNumber, date);
