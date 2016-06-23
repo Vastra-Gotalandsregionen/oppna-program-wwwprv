@@ -3,13 +3,18 @@ package se.vgregion.portal.wwwprv.service;
 import org.apache.commons.io.output.NullOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
+import se.vgregion.portal.wwwprv.util.Callback;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Patrik Björk
@@ -18,35 +23,57 @@ public class MockFileAccessService implements FileAccessService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MockFileAccessService.class);
 
+    private ExecutorService backgroundExecutor = Executors.newFixedThreadPool(20, new CustomizableThreadFactory() {
+        @Override
+        public Thread newThread(Runnable runnable) {
+            Thread thread = super.newThread(runnable);
+
+            thread.setDaemon(true);
+
+            return thread;
+        }
+    });
+
     @Override
-    public void uploadFile(String fileName, Supplier supplier, InputStream inputStream, long fileSize,
-                           String namndFordelningDirectory, Notifiable notifiable) {
+    public Future<?> uploadFileInBackground(String fileName, final Supplier supplier, final InputStream inputStream, final long fileSize,
+                                            final String namndFordelningDirectory, final String uploader, final Notifiable notifiable,
+                                            final Callback callback) {
 
-        LOGGER.info("Uploading using " + MockFileAccessService.class.getName());
+        Future<?> submit = backgroundExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                LOGGER.info("Uploading using " + MockFileAccessService.class.getName());
 
-        try (OutputStream os = new NullOutputStream();) {
+                try (OutputStream os = new NullOutputStream();) {
 
-            byte[] buf = new byte[4096];
+                    byte[] buf = new byte[4096];
 
-            int n;
-            long accumulatedBytes = 0;
-            int numberRoundsSoFar = 0;
+                    int n;
+                    long accumulatedBytes = 0;
+                    int numberRoundsSoFar = 0;
 
-            while ((n = inputStream.read(buf)) != -1) {
-                accumulatedBytes += n;
-                os.write(buf, 0, n);
+                    while ((n = inputStream.read(buf)) != -1) {
+                        accumulatedBytes += n;
+                        os.write(buf, 0, n);
 
-                Thread.sleep(1);
+                        Thread.sleep(1);
 
-                if (++numberRoundsSoFar % 10 == 0) {
-                    notifiable.notifyPercentage((int) ((100f * (float) accumulatedBytes) / (float) fileSize));
+                        if (++numberRoundsSoFar % 10 == 0) {
+                            notifiable.notifyPercentage((int) ((100f * (float) accumulatedBytes) / (float) fileSize));
+                        }
+                    }
+
+                    notifiable.notifyPercentage(100);
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
+        });
 
-            notifiable.notifyPercentage(100);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+        // Since we run this as a background job the user is notified all is done pretty much immediately.
+        notifiable.notifyPercentage(100);
+
+        return submit;
     }
 
     @Override

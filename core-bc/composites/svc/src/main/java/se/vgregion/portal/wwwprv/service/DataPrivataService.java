@@ -10,6 +10,7 @@ import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
 import se.vgregion.portal.wwwprv.model.jpa.GlobalSetting;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
+import se.vgregion.portal.wwwprv.util.Callback;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
@@ -105,7 +106,7 @@ public class DataPrivataService {
 
     @Transactional
     public void saveFileUpload(String supplierCode, String baseName, String datePart, String suffix, String userName,
-                               InputStream inputStream, long fileSize, Notifiable notifiable)
+                               InputStream inputStream, long fileSize, Notifiable notifiable, Callback callback)
             throws DistrictDistributionException {
 
         FileUpload fileUpload = new FileUpload(supplierCode, baseName, datePart, suffix, userName, fileSize);
@@ -115,10 +116,9 @@ public class DataPrivataService {
 
         entityManager.persist(fileUpload);
 
-        fileAccessService.uploadFile(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream,
-                fileSize, getNamndFordelningDirectory(), notifiable);
+        fileAccessService.uploadFileInBackground(fileUpload.getFullFileName(), getSupplier(supplierCode), inputStream,
+                fileSize, getNamndFordelningDirectory(), userName, notifiable, callback);
 
-        emailService.notifyNewUpload(fileUpload.getFullFileName(), getSupplier(supplierCode), userName);
     }
 
     public List<FileUpload> getAllFileUploads() {

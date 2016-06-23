@@ -9,11 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
 import se.vgregion.portal.wwwprv.model.Node;
 import se.vgregion.portal.wwwprv.model.jpa.Supplier;
+import se.vgregion.portal.wwwprv.util.Callback;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 
+import javax.annotation.PreDestroy;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,6 +28,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Patrik Bergström
@@ -46,6 +52,20 @@ public class RemoteFileAccessService implements FileAccessService {
     @Autowired
     private PopulationService populationService;
 
+    @Autowired
+    private EmailService emailService;
+
+    private ExecutorService backgroundExecutor = Executors.newFixedThreadPool(20, new CustomizableThreadFactory() {
+        @Override
+        public Thread newThread(Runnable runnable) {
+            Thread thread = super.newThread(runnable);
+
+            thread.setDaemon(true);
+
+            return thread;
+        }
+    });
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFileAccessService.class);
 
     public RemoteFileAccessService() {
@@ -56,14 +76,42 @@ public class RemoteFileAccessService implements FileAccessService {
         this.password = password;
     }
 
-    @Override
-    public void uploadFile(String fileNameBase,
-                           Supplier supplier,
-                           final InputStream inputStreamSource,
-                           long fileSize,
-                           String namndFordelningDirectory,
-                           Notifiable notifiable) throws DistrictDistributionException {
+    @PreDestroy
+    public void shutdown() {
+        backgroundExecutor.shutdown();
+    }
 
+    @Override
+    public Future<?> uploadFileInBackground(final String fileNameBase,
+                                            final Supplier supplier,
+                                            final InputStream inputStreamSource,
+                                            final long fileSize,
+                                            final String namndFordelningDirectory,
+                                            final String uploader,
+                                            final Notifiable notifiable,
+                                            final Callback callback) {
+
+        Future<?> submit = backgroundExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    uploadFile(fileNameBase, supplier, inputStreamSource, fileSize, namndFordelningDirectory, notifiable);
+                    emailService.notifyNewUpload(fileNameBase, supplier, uploader);
+                    callback.callback();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                    emailService.notifyError(e);
+                }
+            }
+        });
+
+        // Since we run this as a background job the user is notified all is done pretty much immediately.
+        notifiable.notifyPercentage(100);
+
+        return submit;
+    }
+
+    private void uploadFile(String fileNameBase, Supplier supplier, InputStream inputStreamSource, long fileSize, String namndFordelningDirectory, Notifiable notifiable) throws DistrictDistributionException {
         List<String> uploadFoldersInOrder = new ArrayList<>(supplier.getUploadFolders());
         for (String uploadFolder : supplier.getUploadFolders()) {
             if (uploadFolder.equals(namndFordelningDirectory)) {
@@ -101,7 +149,7 @@ public class RemoteFileAccessService implements FileAccessService {
                     DistrictDistribution districtDistribution = getDistrictDistribution(fileName, supplier);
 
                     String charsetName = "ISO-8859-1";
-                    String processed = districtDistribution.process(new String(fileContent, charsetName)); // todo Lägga på progressindikator?
+                    String processed = districtDistribution.process(new String(fileContent, charsetName));
 
                     ByteArrayInputStream bais = new ByteArrayInputStream(processed.getBytes(charsetName));
 

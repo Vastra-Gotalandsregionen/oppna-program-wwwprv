@@ -13,6 +13,7 @@ import se.vgregion.portal.wwwprv.model.jpa.Supplier;
 import se.vgregion.portal.wwwprv.service.DataPrivataService;
 import se.vgregion.portal.wwwprv.service.DistrictDistributionException;
 import se.vgregion.portal.wwwprv.service.EmailService;
+import se.vgregion.portal.wwwprv.util.Callback;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 import se.vgregion.portal.wwwprv.util.SharedUploadFolder;
 
@@ -116,7 +117,7 @@ public class UploadBackingBean implements Notifiable {
 
         String datePart = sdf.format(new Date());
 
-        String newFileName = baseFileName + datePart + suffixIncludingDot;
+        final String newFileName = baseFileName + datePart + suffixIncludingDot;
 
         if (!uploadDirectory.exists()) {
             boolean success = uploadDirectory.mkdirs();
@@ -155,7 +156,22 @@ public class UploadBackingBean implements Notifiable {
                 progress = 0;
 
                 dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
-                        suffixIncludingDot, userName, bis, uploadedFile.getSize(), this);
+                        suffixIncludingDot, userName, bis, uploadedFile.getSize(), this, new Callback() {
+
+                            @Override
+                            public void callback() {
+                                LOGGER.info("Callback method deleting files");
+                                if (!currentlyDuplicateFileWorkflow) {
+                                    try {
+                                        new File(uploadDirectory, newFileName).delete();
+                                        new File(System.getProperty("java.io.tmpdir"), newFileName).delete();
+                                    } catch (Exception e) {
+                                        LOGGER.error(e.getMessage(), e);
+                                        emailService.notifyError(e);
+                                    }
+                                }
+                            }
+                        });
 
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Uppladdning lyckades. Filen fick namnet " + newFileName));
             }
@@ -173,16 +189,6 @@ public class UploadBackingBean implements Notifiable {
             emailService.notifyError(e);
         } finally {
             this.uploadInProgress = false;
-        }
-
-        if (uploadSuccess && !currentlyDuplicateFileWorkflow) {
-            try {
-                new File(uploadDirectory, newFileName).delete();
-                new File(System.getProperty("java.io.tmpdir"), newFileName).delete();
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-                emailService.notifyError(e);
-            }
         }
 
         updateUploadedFileList();
@@ -224,7 +230,7 @@ public class UploadBackingBean implements Notifiable {
     }
 
     public void moveTempFileToUploadDirectory() throws IOException {
-        File target = new File(uploadDirectory, tempFile.getName());
+        final File target = new File(uploadDirectory, tempFile.getName());
         Files.move(tempFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         this.uploadInProgress = true;
@@ -238,11 +244,23 @@ public class UploadBackingBean implements Notifiable {
             BufferedInputStream bis = new BufferedInputStream(fis)) {
             dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
                     tempFileUpload.getDatePart(), tempFileUpload.getSuffix(), getUserName(), bis,
-                    tempFileUpload.getFileSize(), this);
+                    tempFileUpload.getFileSize(), this, new Callback() {
+
+                        @Override
+                        public void callback() {
+                            LOGGER.info("Callback method deleting files");
+                            if (!currentlyDuplicateFileWorkflow) {
+                                try {
+                                    target.delete();
+                                } catch (Exception e) {
+                                    LOGGER.error(e.getMessage(), e);
+                                    emailService.notifyError(e);
+                                }
+                            }
+                        }
+                    });
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + tempFile.getName() + " skapades."));
-
-            target.delete();
 
         } catch (DistrictDistributionException e) {
             LOGGER.error(e.getMessage(), e);
