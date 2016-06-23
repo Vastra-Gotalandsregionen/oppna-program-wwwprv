@@ -84,7 +84,7 @@ Generation time : 2015-03-12 14:47:57 CET
     <dependency>
       <groupId>se.vgregion.icc.sd.population</groupId>
       <artifactId>population-schemas</artifactId>
-      <version>1.0.8</version>
+      <version>1.0.11</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>

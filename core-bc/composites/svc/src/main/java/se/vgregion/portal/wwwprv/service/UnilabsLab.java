@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.apache.cxf.common.util.StringUtils;
 import se.riv.population.residentmaster.extended.v1.AdministrativIndelningType;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
 import se.riv.population.residentmaster.v1.PersonpostTYPE;
@@ -104,11 +105,19 @@ public class UnilabsLab implements DistrictDistribution {
 
             if (info != null) {
                 AdministrativIndelningType folkbok = info.getFolkbokforingsaddressIndelning();
-                PersonpostTYPE pp = info.getPersonpost();
-                if (pp != null) {
-                    SvenskAdressTYPE fba = pp.getFolkbokforingsadress();
-                    if (fba != null){
-                        tupel.get("PatLan_+_kommun").set(blank(fba.getLanKod()) + blank(fba.getKommunKod()));
+
+                if (folkbok != null && !StringUtils.isEmpty(folkbok.getDebiteringsgruppKod())) {
+                    String debiteringsgruppKod = folkbok.getDebiteringsgruppKod();
+                    String lanKod = debiteringsgruppKod.substring(0, 2);
+                    String kommunKod = debiteringsgruppKod.substring(2, 4);
+                    tupel.get("PatLan_+_kommun").set(blank(lanKod) + blank(kommunKod));
+                } else {
+                    PersonpostTYPE pp = info.getPersonpost();
+                    if (pp != null) {
+                        SvenskAdressTYPE fba = pp.getFolkbokforingsadress();
+                        if (fba != null) {
+                            tupel.get("PatLan_+_kommun").set(blank(fba.getLanKod()) + blank(fba.getKommunKod()));
+                        }
                     }
                 }
                 if (folkbok != null) {

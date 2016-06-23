@@ -1,5 +1,6 @@
 package se.vgregion.portal.wwwprv.service;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ public class RemoteFileAccessServiceIT {
 //    private final String SHARED_FOLDER_SERVER = "VGFS0233";
 
     @Test
+    @Ignore // It takes a lot of time to run locally. Possibly because of network latency. The problem isn't as clear
+    // in the runtime servers.
     public void testRetrieveRemoteFileTree() throws Exception {
         Properties properties = loadProperties();
 
