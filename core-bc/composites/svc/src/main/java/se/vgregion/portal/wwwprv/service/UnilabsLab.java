@@ -5,12 +5,14 @@ import se.riv.population.residentmaster.extended.v1.AdministrativIndelningType;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
 import se.riv.population.residentmaster.v1.PersonpostTYPE;
 import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
+import se.vgregion.portal.wwwprv.table.Cell;
 import se.vgregion.portal.wwwprv.table.Column;
 import se.vgregion.portal.wwwprv.table.Table;
 import se.vgregion.portal.wwwprv.table.Tupel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by clalu4 on 2016-03-14.
@@ -80,9 +82,7 @@ public class UnilabsLab implements DistrictDistribution {
         Column personalNumberKey = table.getColumns().get(4);
 
         for (Tupel tupel : table.getTupels()) {
-            String pris = tupel.get("Pris").value();
-            pris = pris.replace('.', ',');
-            tupel.get("Pris").set(pris);
+            transformPriceDelimiter(tupel);
 
             String personalNumber = tupel.get(personalNumberKey).value().trim();
             String date = tupel.get(dateKey).value().trim();
@@ -135,6 +135,19 @@ public class UnilabsLab implements DistrictDistribution {
         }
 
         return table.toExcelCsvText();
+    }
+
+    private void transformPriceDelimiter(Tupel tupel) {
+
+        for (Map.Entry<String, Cell> entry : tupel.entrySet()) {
+            String key = entry.getKey();
+            if (key.equalsIgnoreCase("pris")) {
+                String pris = tupel.get(key).value();
+                pris = pris.replace('.', ',');
+                tupel.get(key).set(pris);
+            }
+        }
+
     }
 
     String blank(String s) {
