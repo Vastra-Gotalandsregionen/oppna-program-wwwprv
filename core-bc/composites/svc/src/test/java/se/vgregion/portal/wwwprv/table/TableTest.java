@@ -103,7 +103,7 @@ public class TableTest {
         assertEquals("\"\"\"Some;values\"\";\"", result);
 
         result = Table.toSafeExcel("789,987");
-        assertEquals("\"=\"\"789.987\"\"\"", result);
+        assertEquals("\"789,987\"", result);
     }
 
 }

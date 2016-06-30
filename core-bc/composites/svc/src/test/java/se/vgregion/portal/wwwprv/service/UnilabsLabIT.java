@@ -67,7 +67,7 @@ public class UnilabsLabIT {
                 "Bestallare             A(10)\n" +
                 "Analyskod              A(10)\n" +
                 "AnalysNamn             A(20)\n" +
-                "pris                    A(7)\n";
+                "Pris                    A(7)\n";
     }
 
     public String getInputFileColumnsUnilabsLab() {
@@ -80,7 +80,7 @@ public class UnilabsLabIT {
                 "Bestallare             A(10)\n" +
                 "Analyskod              A(10)\n" +
                 "AnalysNamn             A(20)\n" +
-                "pris                    A(7)\n";
+                "Pris                    A(7)\n";
     }
 
     public Table inputFileContent(String inputFileColumns) {
@@ -103,7 +103,9 @@ public class UnilabsLabIT {
         i = 0;
         for (Tupel tupel : result.getTupels()) {
             for (Column column : result.getColumns()) {
-                if (!(column.getName().equals("personnr") || column.getName().equals("BesoksDatum"))) {
+                if (column.getName().equals("Pris")) {
+                    tupel.get(column.getName()).set(i + "." + (i + 1)); // Decimal value
+                } else if (!(column.getName().equals("personnr") || column.getName().equals("BesoksDatum"))) {
                     tupel.get(column.getName()).set(i + "");
                 }
             }
@@ -134,7 +136,7 @@ public class UnilabsLabIT {
                 "Avtalskod              A(9)\n" +
                 "Analyskod              A(10)\n" +
                 "AnalysNamn             A(20)\n" +
-                "pris                    A(7)\n" +
+                "Pris                    A(7)\n" +
                 "Pat_Nämnd               A(2)\n" +
                 "PatLan_+_kommun       A(4)\n" +
                 "Pat_SDN                 A(2)\n" +

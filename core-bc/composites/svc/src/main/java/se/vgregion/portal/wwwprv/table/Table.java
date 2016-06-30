@@ -175,9 +175,6 @@ public class Table {
         if (text == null || "null".equals(text)) {
             return "";
         }
-        if (text.trim().matches("^[0-9]+,[0-9]+$")) {
-            text = text.replace(',', '.');
-        }
         if (NumberUtils.isNumber(text)) {
             text = "=\"" + text + '"';
         }
