@@ -75,127 +75,133 @@ public class UploadBackingBean implements Notifiable {
     }
 
     public void fileUploadListener(FileUploadEvent event) throws IOException {
-        if (this.uploadInProgress) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Du har redan en pågående uppladdning.", "Du har redan en pågående uppladdning."));
-            return;
-        }
-
-        UploadedFile uploadedFile = event.getFile();
-
-        String originalFileName = uploadedFile.getFileName();
-
-        String fileNameToUse = preProcessFileName(originalFileName, chosenSupplier);
-
-        this.latestFileName = fileNameToUse;
-
+        String faultMessage = "Ett tekniskt fel inträffade.";
         try {
-            dataPrivataService.verifyFileName(fileNameToUse, chosenSupplier);
-        } catch (IllegalArgumentException e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    e.getMessage(), e.getMessage()));
-            return;
-        }
-
-        this.progress = null;
-
-        int lastDot = fileNameToUse.lastIndexOf(".");
-
-        String baseFileName = null;
-        String suffixIncludingDot = null;
-        if (lastDot > -1) {
-            baseFileName = fileNameToUse.substring(0, lastDot);
-        } else {
-            baseFileName = fileNameToUse;
-        }
-
-        // Always set the same suffix
-        Short sharedUploadFolder = chosenSupplier.getSharedUploadFolder();
-        suffixIncludingDot =
-                sharedUploadFolder == null
-                || sharedUploadFolder == SharedUploadFolder.MARS_SHARED_FOLDER.getIndex()
-                        ? ".IN" : ".in";
-
-        SimpleDateFormat sdf = new SimpleDateFormat("_yyyyMMdd_HHmm");
-
-        String datePart = sdf.format(new Date());
-
-        final String newFileName = baseFileName + datePart + suffixIncludingDot;
-
-        if (!uploadDirectory.exists()) {
-            boolean success = uploadDirectory.mkdirs();
-
-            if (!success) {
-                throw new RuntimeException("Couldn't create upload directory.");
+            if (this.uploadInProgress) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Du har redan en pågående uppladdning.", "Du har redan en pågående uppladdning."));
+                return;
             }
-        }
 
-        File newFile = new File(uploadDirectory, newFileName);
+            UploadedFile uploadedFile = event.getFile();
 
-        String userName = getUserName();
+            String originalFileName = uploadedFile.getFileName();
 
-        if (dataPrivataService.isFileAlreadyUploaded(baseFileName, suffixIncludingDot, chosenSupplier)) {
-            // Make a temporary file upload and ask the user whether he/she wants to continue.
-            tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, suffixIncludingDot,
-                    userName, uploadedFile.getSize());
+            String fileNameToUse = preProcessFileName(originalFileName, chosenSupplier);
 
-            tempFile = new File(System.getProperty("java.io.tmpdir"), newFileName);
-            newFile = tempFile;
-            currentlyDuplicateFileWorkflow = true;
-        }
+            this.latestFileName = fileNameToUse;
 
-        try (FileOutputStream fos = new FileOutputStream(newFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
-            InputStream is = uploadedFile.getInputstream();
+            try {
+                dataPrivataService.verifyFileName(fileNameToUse, chosenSupplier);
+            } catch (IllegalArgumentException e) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        e.getMessage(), e.getMessage()));
+                return;
+            }
 
-            IOUtils.copy(is, bos);
-        }
+            this.progress = null;
 
-        boolean uploadSuccess = false;
-        try (FileInputStream fis = new FileInputStream(newFile);
-             BufferedInputStream bis = new BufferedInputStream(fis)) {
+            int lastDot = fileNameToUse.lastIndexOf(".");
 
-            if (!currentlyDuplicateFileWorkflow) {
-                this.uploadInProgress = true;
-                progress = 0;
+            String baseFileName = null;
+            String suffixIncludingDot = null;
+            if (lastDot > -1) {
+                baseFileName = fileNameToUse.substring(0, lastDot);
+            } else {
+                baseFileName = fileNameToUse;
+            }
 
-                dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
-                        suffixIncludingDot, userName, bis, uploadedFile.getSize(), this, new Callback() {
+            // Always set the same suffix
+            Short sharedUploadFolder = chosenSupplier.getSharedUploadFolder();
+            suffixIncludingDot =
+                    sharedUploadFolder == null
+                            || sharedUploadFolder == SharedUploadFolder.MARS_SHARED_FOLDER.getIndex()
+                            ? ".IN" : ".in";
 
-                            @Override
-                            public void callback() {
-                                LOGGER.info("Callback method deleting files");
-                                if (!currentlyDuplicateFileWorkflow) {
-                                    try {
-                                        new File(uploadDirectory, newFileName).delete();
-                                        new File(System.getProperty("java.io.tmpdir"), newFileName).delete();
-                                    } catch (Exception e) {
-                                        LOGGER.error(e.getMessage(), e);
-                                        emailService.notifyError(e);
+            SimpleDateFormat sdf = new SimpleDateFormat("_yyyyMMdd_HHmm");
+
+            String datePart = sdf.format(new Date());
+
+            final String newFileName = baseFileName + datePart + suffixIncludingDot;
+
+            if (!uploadDirectory.exists()) {
+                boolean success = uploadDirectory.mkdirs();
+
+                if (!success) {
+                    throw new RuntimeException("Couldn't create upload directory.");
+                }
+            }
+
+            File newFile = new File(uploadDirectory, newFileName);
+
+            String userName = getUserName();
+
+            if (dataPrivataService.isFileAlreadyUploaded(baseFileName, suffixIncludingDot, chosenSupplier)) {
+                // Make a temporary file upload and ask the user whether he/she wants to continue.
+                tempFileUpload = new FileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart, suffixIncludingDot,
+                        userName, uploadedFile.getSize());
+
+                tempFile = new File(System.getProperty("java.io.tmpdir"), newFileName);
+                newFile = tempFile;
+                currentlyDuplicateFileWorkflow = true;
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(newFile); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                InputStream is = uploadedFile.getInputstream();
+
+                IOUtils.copy(is, bos);
+            }
+
+            boolean uploadSuccess = false;
+            try (FileInputStream fis = new FileInputStream(newFile);
+                 BufferedInputStream bis = new BufferedInputStream(fis)) {
+
+                if (!currentlyDuplicateFileWorkflow) {
+                    this.uploadInProgress = true;
+                    progress = 0;
+
+                    dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
+                            suffixIncludingDot, userName, bis, uploadedFile.getSize(), this, new Callback() {
+
+                                @Override
+                                public void callback() {
+                                    LOGGER.info("Callback method deleting files");
+                                    if (!currentlyDuplicateFileWorkflow) {
+                                        try {
+                                            new File(uploadDirectory, newFileName).delete();
+                                            new File(System.getProperty("java.io.tmpdir"), newFileName).delete();
+                                        } catch (Exception e) {
+                                            LOGGER.error(e.getMessage(), e);
+                                            emailService.notifyError(e);
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
 
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Uppladdning lyckades. Filen fick namnet " + newFileName));
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Uppladdning lyckades. Filen fick namnet " + newFileName));
+                }
+
+                // No exception means success.
+                uploadSuccess = true;
+
+            } catch (DistrictDistributionException e) {
+                LOGGER.error(e.getMessage(), e);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
+                emailService.notifyError(e);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, faultMessage, faultMessage));
+                emailService.notifyError(e);
+            } finally {
+                this.uploadInProgress = false;
             }
 
-            // No exception means success.
-            uploadSuccess = true;
-
-        } catch (DistrictDistributionException e) {
-            LOGGER.error(e.getMessage(), e);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), e.getMessage()));
-            emailService.notifyError(e);
+            updateUploadedFileList();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ett tekniskt fel inträffade.", "Ett tekniskt fel inträffade."));
-            emailService.notifyError(e);
-        } finally {
-            this.uploadInProgress = false;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, faultMessage, faultMessage));
         }
-
-        updateUploadedFileList();
     }
 
     static String preProcessFileName(String fileName, Supplier supplier) {
