@@ -174,5 +174,59 @@ Generation time : 2015-03-12 14:47:57 CET
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>buildNumber</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>buildnumber-maven-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>create</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <buildNumberPropertyName>build.number</buildNumberPropertyName>
+                            <timestampFormat>{0, time, yyyy-MM-dd HH:mm:ss z}</timestampFormat>
+                            <timestampPropertyName>build.time</timestampPropertyName>
+                            <doCheck>true</doCheck>
+                            <doUpdate>false</doUpdate>
+                            <shortRevisionLength>7</shortRevisionLength>
+                            <scmBranchPropertyName>build.branch</scmBranchPropertyName>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                </manifest>
+                                <manifestEntries>
+                                    <Build-Number>${build.number}</Build-Number>
+                                    <Build-Time>${build.time}</Build-Time>
+                                    <Branch>${build.branch}</Branch>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

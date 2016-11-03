@@ -151,13 +151,17 @@ public class UploadBackingBean implements Notifiable {
                 InputStream is = uploadedFile.getInputstream();
 
                 IOUtils.copy(is, bos);
+
+                LOGGER.info("Wrote to file " + newFile.getCanonicalPath());
             }
 
             boolean uploadSuccess = false;
-            try (FileInputStream fis = new FileInputStream(newFile);
-                 BufferedInputStream bis = new BufferedInputStream(fis)) {
+            try {
 
                 if (!currentlyDuplicateFileWorkflow) {
+                    final FileInputStream fis = new FileInputStream(newFile);
+                    final BufferedInputStream bis = new BufferedInputStream(fis);
+
                     this.uploadInProgress = true;
                     progress = 0;
 
@@ -166,16 +170,7 @@ public class UploadBackingBean implements Notifiable {
 
                                 @Override
                                 public void callback() {
-                                    LOGGER.info("Callback method deleting files");
-                                    if (!currentlyDuplicateFileWorkflow) {
-                                        try {
-                                            new File(uploadDirectory, newFileName).delete();
-                                            new File(System.getProperty("java.io.tmpdir"), newFileName).delete();
-                                        } catch (Exception e) {
-                                            LOGGER.error(e.getMessage(), e);
-                                            emailService.notifyError(e);
-                                        }
-                                    }
+                                    cleanup(bis, fis, newFileName);
                                 }
                             });
 
@@ -201,6 +196,58 @@ public class UploadBackingBean implements Notifiable {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, faultMessage, faultMessage));
+        }
+    }
+
+    private void cleanup(BufferedInputStream bis, FileInputStream fis, String newFileName) {
+        LOGGER.info("Callback method deleting files and closing streams.");
+        if (!currentlyDuplicateFileWorkflow) {
+            try {
+                try {
+                    bis.close();
+                    LOGGER.info("Successfully closed BufferedInputStream.");
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+
+                try {
+                    fis.close();
+                    LOGGER.info("Successfully closed FileInputStream.");
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+
+                final File file = new File(uploadDirectory, newFileName);
+                if (file.exists()) {
+                    boolean delete = file.delete();
+
+                    if (delete) {
+                        LOGGER.info("Successfully deleted " + newFileName + " in " + uploadDirectory.getAbsolutePath());
+                    } else if (!delete) {
+                        LOGGER.error("Failed to delete " + newFileName + " in " + uploadDirectory.getAbsolutePath());
+                    }
+                } else {
+                    LOGGER.info(newFileName + " in " + uploadDirectory.getAbsolutePath() + " doesn't exist so it doesn't need to be deleted.");
+                }
+
+                String tempDir = System.getProperty("java.io.tmpdir");
+                final File tempFile = new File(tempDir, newFileName);
+
+                if (tempFile.exists()) {
+                    boolean delete = tempFile.delete();
+
+                    if (delete) {
+                        LOGGER.info("Successfully deleted " + newFileName + " in " + tempDir);
+                    } else if (!delete) {
+                        LOGGER.error("Failed to delete " + newFileName + " in " + tempDir);
+                    }
+                } else {
+                    LOGGER.info(newFileName + " in " + tempDir + " doesn't exist so it doesn't need to be deleted.");
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                emailService.notifyError(e);
+            }
         }
     }
 
@@ -241,7 +288,8 @@ public class UploadBackingBean implements Notifiable {
     }
 
     public void moveTempFileToUploadDirectory() throws IOException {
-        final File target = new File(uploadDirectory, tempFile.getName());
+        final String fileName = tempFile.getName();
+        final File target = new File(uploadDirectory, fileName);
         Files.move(tempFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         this.uploadInProgress = true;
@@ -251,27 +299,20 @@ public class UploadBackingBean implements Notifiable {
 
         progress = 0;
 
-        try (FileInputStream fis = new FileInputStream(target);
-            BufferedInputStream bis = new BufferedInputStream(fis)) {
+        final FileInputStream fis = new FileInputStream(target);
+        final BufferedInputStream bis = new BufferedInputStream(fis);
+        try  {
             dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
                     tempFileUpload.getDatePart(), tempFileUpload.getSuffix(), getUserName(), bis,
                     tempFileUpload.getFileSize(), this, new Callback() {
 
                         @Override
                         public void callback() {
-                            LOGGER.info("Callback method deleting files");
-                            if (!currentlyDuplicateFileWorkflow) {
-                                try {
-                                    target.delete();
-                                } catch (Exception e) {
-                                    LOGGER.error(e.getMessage(), e);
-                                    emailService.notifyError(e);
-                                }
-                            }
+                            cleanup(bis, fis, fileName);
                         }
                     });
 
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + tempFile.getName() + " skapades."));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Filen " + fileName + " skapades."));
 
         } catch (DistrictDistributionException e) {
             LOGGER.error(e.getMessage(), e);

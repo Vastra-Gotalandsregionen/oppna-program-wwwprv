@@ -182,18 +182,17 @@ public class RemoteFileAccessService implements FileAccessService {
 
             }
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
+        } catch (IOException
+                | ClassNotFoundException
+                | NoSuchMethodException |
+                IllegalAccessException |
+                InstantiationException |
+                InvocationTargetException e) {
+
+            String message = "Failure. FileNameBase=" + fileNameBase + ", Supplier="
+                    + supplier != null ? supplier.getEnhetsKod() : ". ";
+
+            throw new RuntimeException(message + e.getMessage(), e);
         }
     }
 
