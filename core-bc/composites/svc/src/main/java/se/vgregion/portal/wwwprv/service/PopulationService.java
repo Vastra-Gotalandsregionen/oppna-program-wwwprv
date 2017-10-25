@@ -84,7 +84,7 @@ public class PopulationService {
             spec.setHistoriskTidpunkt(arg.textDate);
 
             List<ExtendedResidentType> shouldJustBeOneOrNone = null;
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 20; i++) {
                 try {
                     shouldJustBeOneOrNone = extendedProfileClient.lookupResidentForExtendedProfile("", callArg).getResident();
                     if (i > 0) {
@@ -92,7 +92,7 @@ public class PopulationService {
                     }
                     break;
                 } catch (Exception e) {
-                    if (i == 4) {
+                    if (i == 19) {
                         throw e;
                     } else {
                         LOGGER.error("Try number " + (i + 1) + ". Failed to lookupResidentForExtendedProfile. Will retry...");
