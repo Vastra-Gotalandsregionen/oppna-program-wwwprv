@@ -61,6 +61,12 @@ public class EmailService {
 
     }
 
+    public void notifyErrorMessage(String message) {
+        String subject = "Systemmeddelande - ett fel har inträffat - " + getEnvironmentString();
+
+        sendMessage(subject, message);
+    }
+
     private void sendMessage(String subject, String text) {
         // Sender's email ID needs to be mentioned
         String from = "dataprivata@vgregion.se";

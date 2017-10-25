@@ -208,6 +208,7 @@ public class UploadBackingBean implements Notifiable {
                     LOGGER.info("Successfully closed BufferedInputStream.");
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
+                    emailService.notifyError(e);
                 }
 
                 try {
@@ -224,7 +225,9 @@ public class UploadBackingBean implements Notifiable {
                     if (delete) {
                         LOGGER.info("Successfully deleted " + newFileName + " in " + uploadDirectory.getAbsolutePath());
                     } else if (!delete) {
-                        LOGGER.error("Failed to delete " + newFileName + " in " + uploadDirectory.getAbsolutePath());
+                        String msg = "Failed to delete " + newFileName + " in " + uploadDirectory.getAbsolutePath();
+                        LOGGER.error(msg);
+                        emailService.notifyErrorMessage(msg);
                     }
                 } else {
                     LOGGER.info(newFileName + " in " + uploadDirectory.getAbsolutePath() + " doesn't exist so it doesn't need to be deleted.");
@@ -239,7 +242,9 @@ public class UploadBackingBean implements Notifiable {
                     if (delete) {
                         LOGGER.info("Successfully deleted " + newFileName + " in " + tempDir);
                     } else if (!delete) {
-                        LOGGER.error("Failed to delete " + newFileName + " in " + tempDir);
+                        String msg = "Failed to delete " + newFileName + " in " + tempDir;
+                        LOGGER.error(msg);
+                        emailService.notifyErrorMessage(msg);
                     }
                 } else {
                     LOGGER.info(newFileName + " in " + tempDir + " doesn't exist so it doesn't need to be deleted.");

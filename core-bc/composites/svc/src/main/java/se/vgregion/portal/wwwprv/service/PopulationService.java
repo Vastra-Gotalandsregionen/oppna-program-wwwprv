@@ -1,6 +1,8 @@
 package se.vgregion.portal.wwwprv.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
 import se.riv.population.residentmaster.lookupresidentforextendedprofile.v1.rivtabp21.LookupResidentForExtendedProfileResponderInterface;
@@ -16,6 +18,8 @@ import java.util.List;
  * Service to get residential information about patients in the region.
  */
 public class PopulationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PopulationService.class);
 
     @Autowired
     private LookupResidentForExtendedProfileResponderInterface extendedProfileClient;
@@ -65,7 +69,7 @@ public class PopulationService {
      * @return an object graph describing where a person lives an additional information about what administrative
      * units that takes responsibility for the area where the person lives.
      */
-    public List<ExtendedResidentType> lookup(Arg ... bySocialSecurityNumbersAndStringDates) {
+    public List<ExtendedResidentType> lookup(Arg... bySocialSecurityNumbersAndStringDates) {
         List<ExtendedResidentType> result = new ArrayList<>();
         for (Arg arg : bySocialSecurityNumbersAndStringDates) {
             LookupResidentForExtendedProfileType callArg = new LookupResidentForExtendedProfileType();
@@ -74,11 +78,27 @@ public class PopulationService {
             callArg.getPersonId().add(arg.personalNumber);
             // spec.setSenasteAndringFolkbokforing(arg.textDate);
             // 20120101. Förväntat format: yyyyMMddHHmmss
-            if (arg.textDate!=null) {
+            if (arg.textDate != null) {
                 arg.textDate = StringUtils.rightPad(arg.textDate, 14, '0');
             }
             spec.setHistoriskTidpunkt(arg.textDate);
-            List<ExtendedResidentType> shouldJustBeOneOrNone = extendedProfileClient.lookupResidentForExtendedProfile("", callArg).getResident();
+
+            List<ExtendedResidentType> shouldJustBeOneOrNone = null;
+            for (int i = 0; i < 5; i++) {
+                try {
+                    shouldJustBeOneOrNone = extendedProfileClient.lookupResidentForExtendedProfile("", callArg).getResident();
+                    if (i > 0) {
+                        LOGGER.info("Succeded with lookupResidentForExtendedProfile after " + (i + 1) + " tries.");
+                    }
+                    break;
+                } catch (Exception e) {
+                    if (i == 4) {
+                        throw e;
+                    } else {
+                        LOGGER.error("Try number " + (i + 1) + ". Failed to lookupResidentForExtendedProfile. Will retry...");
+                    }
+                }
+            }
             if (shouldJustBeOneOrNone.size() > 1) {
                 throw new RuntimeException();
             }
