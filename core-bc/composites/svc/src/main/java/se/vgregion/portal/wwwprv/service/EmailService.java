@@ -48,10 +48,17 @@ public class EmailService {
         return environment != null && !"".equals(environment) ? " - " + environment : "";
     }
 
-    public void notifyError(Exception e) {
+    public void notifyError(Exception e, String... args) {
         String subject = "Systemmeddelande - ett fel har inträffat - " + getEnvironmentString();
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream(); PrintStream s = new PrintStream(out)) {
+            if (args != null && args.length > 0) {
+                String lineSeparator = System.getProperty("line.separator");
+                for (String arg : args) {
+                    out.write(arg.getBytes("UTF-8"));
+                    out.write(lineSeparator.getBytes("UTF-8"));
+                }
+            }
             e.printStackTrace(s);
 
             sendMessage(subject, out.toString());

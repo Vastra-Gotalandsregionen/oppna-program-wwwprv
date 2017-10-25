@@ -251,7 +251,7 @@ public class UploadBackingBean implements Notifiable {
                 }
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
-                emailService.notifyError(e);
+                emailService.notifyError(e, newFileName);
             }
         }
     }
