@@ -96,6 +96,11 @@ public class PopulationService {
                         throw e;
                     } else {
                         LOGGER.error("Try number " + (i + 1) + ". Failed to lookupResidentForExtendedProfile. Will retry...");
+                        try {
+                            Thread.sleep(4000);
+                        } catch (InterruptedException e1) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
                     }
                 }
             }
