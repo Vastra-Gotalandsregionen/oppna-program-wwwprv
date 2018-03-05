@@ -9,6 +9,7 @@ import se.vgregion.portal.wwwprv.model.Node;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 import static org.junit.Assert.assertTrue;
@@ -20,9 +21,7 @@ public class RemoteFileAccessServiceIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFileAccessServiceIT.class);
 
-    private final String SHARED_FOLDER_SERVER = "VGREGION.SE/app/";
-//    private final String SHARED_FOLDER_SERVER = "VGFS0249";
-//    private final String SHARED_FOLDER_SERVER = "VGFS0233";
+    String remoteDirList = "vgregion.se/app/DATAPRIVATA.INFILER/,vgregion.se/app/DATAPRIVATA.Halland_o_Koptvard/,vgregion.se/app/DATAPRIVATA.Integration/,vgregion.se/app/DATAPRIVATA.NAMNDFORDELNING/";
 
     @Test
     @Ignore // It takes a lot of time to run locally. Possibly because of network latency. The problem isn't as clear
@@ -32,14 +31,19 @@ public class RemoteFileAccessServiceIT {
 
         RemoteFileAccessService remoteFileAccessService = new RemoteFileAccessService(
                 properties.getProperty("shared.folder.username"),
-                properties.getProperty("shared.folder.password")
+                properties.getProperty("shared.folder.password"),
+                properties.getProperty("shared.folder.domain")
         );
 
-        Node<String> tree = remoteFileAccessService.retrieveRemoteFileTree(SHARED_FOLDER_SERVER);
 
-        assertTrue(tree.getChildren() != null && tree.getChildren().size() > 0);
+        Arrays.asList(remoteDirList.split(",")).stream()
+                .forEach(share -> {
+                    Node<String> tree = remoteFileAccessService.retrieveRemoteFileTree(share);
 
-        print(tree);
+                    assertTrue(share + " failed.", tree.getChildren() != null && tree.getChildren().size() >= 0);
+
+                    print(tree);
+                });
     }
 
     private Properties loadProperties() throws IOException {

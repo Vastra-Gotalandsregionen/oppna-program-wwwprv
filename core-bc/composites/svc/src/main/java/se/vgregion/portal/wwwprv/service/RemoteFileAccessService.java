@@ -1,5 +1,7 @@
 package se.vgregion.portal.wwwprv.service;
 
+import jcifs.CIFSContext;
+import jcifs.context.SingletonContext;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -41,7 +43,7 @@ public class RemoteFileAccessService implements FileAccessService {
     public static final String namndFordeladFileNameSuffix = "_Namndfordelad.csv";
     public static final String folderPrefix = "Vardgiv_";
 
-    private final int depthLimit = 2;
+    private final int depthLimit = 1;
 
     @Value("${shared.folder.username}")
     private String user;
@@ -49,11 +51,20 @@ public class RemoteFileAccessService implements FileAccessService {
     @Value("${shared.folder.password}")
     private String password;
 
+    @Value("${shared.folder.domain}")
+    private String domain;
+
     @Autowired
     private PopulationService populationService;
 
     @Autowired
     private EmailService emailService;
+
+    static {
+        System.setProperty("jcifs.encoding", "ISO-8859-1");
+        System.setProperty("jcifs.smb.client.minVersion", "2.1");
+        System.setProperty("jcifs.smb.client.enableSMB2", "true");
+    }
 
     private ExecutorService backgroundExecutor = Executors.newFixedThreadPool(20, new CustomizableThreadFactory() {
         @Override
@@ -71,9 +82,10 @@ public class RemoteFileAccessService implements FileAccessService {
     public RemoteFileAccessService() {
     }
 
-    public RemoteFileAccessService(String user, String password) {
+    public RemoteFileAccessService(String user, String password, String domain) {
         this.user = user;
         this.password = password;
+        this.domain = domain;
     }
 
     @PreDestroy
@@ -128,9 +140,13 @@ public class RemoteFileAccessService implements FileAccessService {
                 // We set this for every iteration.
                 String fileName = fileNameBase;
 
-                NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("VGREGION", user, password);
+                CIFSContext cifsContext = SingletonContext.getInstance();
 
-                SmbFile dir = new SmbFile("smb://" + uploadFolder, auth);
+                NtlmPasswordAuthentication auth = getAuth(cifsContext);
+
+                cifsContext = cifsContext.withCredentials(auth);
+
+                SmbFile dir = new SmbFile("smb://" + uploadFolder, cifsContext);
 
                 // Create subfolder if not existent
                 String subDirName = folderPrefix + supplier.getEnhetsKod();
@@ -243,15 +259,28 @@ public class RemoteFileAccessService implements FileAccessService {
         return districtDistribution;
     }
 
+    private NtlmPasswordAuthentication getAuth(CIFSContext cifsContext) {
+        return new NtlmPasswordAuthentication(
+                cifsContext,
+                this.domain,
+                this.user,
+                this.password
+        );
+    }
+
     @Override
     public Node<String> retrieveRemoteFileTree(String host) {
 
         String url = "smb://" + host;
         try {
 
-            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("VGREGION", user, password);
+            CIFSContext cifsContext = SingletonContext.getInstance();
 
-            SmbFile smbRoot = new SmbFile(url, auth);
+            NtlmPasswordAuthentication auth = getAuth(cifsContext);
+
+            cifsContext = cifsContext.withCredentials(auth);
+
+            SmbFile smbRoot = new SmbFile(url, cifsContext);
 
             if (!smbRoot.isDirectory()) {
                 throw new RuntimeException("Root is expected to be a directory.");
