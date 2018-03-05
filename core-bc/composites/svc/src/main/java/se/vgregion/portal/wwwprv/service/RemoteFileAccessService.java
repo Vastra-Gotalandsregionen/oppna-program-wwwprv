@@ -333,6 +333,9 @@ public class RemoteFileAccessService implements FileAccessService {
             if (!("Access is denied.".equals(message) || "Invalid operation for IPC service".equals(message))) {
                 LOGGER.error(message, e);
             }
+        } catch (RuntimeException e) {
+            String message = e.getMessage();
+            LOGGER.error(message, e);
         }
 
         if (directories == null || directories.length == 0) {

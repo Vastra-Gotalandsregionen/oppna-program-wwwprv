@@ -24,6 +24,7 @@ import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -348,6 +349,8 @@ public class AdminBackingBean {
     public void setCurrentSupplier(Supplier currentSupplier) {
         this.currentSupplier = currentSupplier;
 
+        // Reset this selection
+        selectedDirectoryNode = new TreeNode[0];
         traverseAndSetSelected(currentSupplier, remoteDirectoryTree);
         traverseAndSetExpanded(currentSupplier, remoteDirectoryTree);
     }
@@ -377,11 +380,17 @@ public class AdminBackingBean {
         return false;
     }
 
-    private static void traverseAndSetSelected(Supplier supplier, TreeNode treeNode) {
+    private void traverseAndSetSelected(Supplier supplier, TreeNode treeNode) {
         Set<String> persistedUploadFolders = supplier.getUploadFolders();
 
         boolean contains = persistedUploadFolders.contains(getFullPath(treeNode));
         treeNode.setSelected(contains);
+
+        if (contains) {
+            List<TreeNode> list = new ArrayList(Arrays.asList(selectedDirectoryNode));
+            list.add(treeNode);
+            selectedDirectoryNode = list.toArray(new TreeNode[0]);
+        }
 
         if (treeNode.getChildren().size() > 0) {
             for (TreeNode node : treeNode.getChildren()) {
