@@ -165,12 +165,14 @@ public class UploadBackingBean implements Notifiable {
                     this.uploadInProgress = true;
                     progress = 0;
 
+                    final File uploadDirectoryForCleanup = this.uploadDirectory;
+
                     dataPrivataService.saveFileUpload(chosenSupplier.getEnhetsKod(), baseFileName, datePart,
                             suffixIncludingDot, userName, bis, uploadedFile.getSize(), this, new Callback() {
 
                                 @Override
                                 public void callback() {
-                                    cleanup(bis, fis, newFileName);
+                                    cleanup(bis, fis, uploadDirectoryForCleanup, newFileName);
                                 }
                             });
 
@@ -199,60 +201,59 @@ public class UploadBackingBean implements Notifiable {
         }
     }
 
-    private void cleanup(BufferedInputStream bis, FileInputStream fis, String newFileName) {
+    private void cleanup(BufferedInputStream bis, FileInputStream fis, File uploadDirectory, String newFileName) {
         LOGGER.info("Callback method deleting files and closing streams.");
-        if (!currentlyDuplicateFileWorkflow) {
+
+        try {
             try {
-                try {
-                    bis.close();
-                    LOGGER.info("Successfully closed BufferedInputStream.");
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    emailService.notifyError(e);
-                }
-
-                try {
-                    fis.close();
-                    LOGGER.info("Successfully closed FileInputStream.");
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-
-                final File file = new File(uploadDirectory, newFileName);
-                if (file.exists()) {
-                    boolean delete = file.delete();
-
-                    if (delete) {
-                        LOGGER.info("Successfully deleted " + newFileName + " in " + uploadDirectory.getAbsolutePath());
-                    } else if (!delete) {
-                        String msg = "Failed to delete " + newFileName + " in " + uploadDirectory.getAbsolutePath();
-                        LOGGER.error(msg);
-                        emailService.notifyErrorMessage(msg);
-                    }
-                } else {
-                    LOGGER.info(newFileName + " in " + uploadDirectory.getAbsolutePath() + " doesn't exist so it doesn't need to be deleted.");
-                }
-
-                String tempDir = System.getProperty("java.io.tmpdir");
-                final File tempFile = new File(tempDir, newFileName);
-
-                if (tempFile.exists()) {
-                    boolean delete = tempFile.delete();
-
-                    if (delete) {
-                        LOGGER.info("Successfully deleted " + newFileName + " in " + tempDir);
-                    } else if (!delete) {
-                        String msg = "Failed to delete " + newFileName + " in " + tempDir;
-                        LOGGER.error(msg);
-                        emailService.notifyErrorMessage(msg);
-                    }
-                } else {
-                    LOGGER.info(newFileName + " in " + tempDir + " doesn't exist so it doesn't need to be deleted.");
-                }
+                bis.close();
+                LOGGER.info("Successfully closed BufferedInputStream.");
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
-                emailService.notifyError(e, newFileName);
+                emailService.notifyError(e);
             }
+
+            try {
+                fis.close();
+                LOGGER.info("Successfully closed FileInputStream.");
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+
+            final File file = new File(uploadDirectory, newFileName);
+            if (file.exists()) {
+                boolean delete = file.delete();
+
+                if (delete) {
+                    LOGGER.info("Successfully deleted " + newFileName + " in " + uploadDirectory.getAbsolutePath());
+                } else if (!delete) {
+                    String msg = "Failed to delete " + newFileName + " in " + uploadDirectory.getAbsolutePath();
+                    LOGGER.error(msg);
+                    emailService.notifyErrorMessage(msg);
+                }
+            } else {
+                LOGGER.info(newFileName + " in " + uploadDirectory.getAbsolutePath() + " doesn't exist so it doesn't need to be deleted.");
+            }
+
+            String tempDir = System.getProperty("java.io.tmpdir");
+            final File tempFile = new File(tempDir, newFileName);
+
+            if (tempFile.exists()) {
+                boolean delete = tempFile.delete();
+
+                if (delete) {
+                    LOGGER.info("Successfully deleted " + newFileName + " in " + tempDir);
+                } else if (!delete) {
+                    String msg = "Failed to delete " + newFileName + " in " + tempDir;
+                    LOGGER.error(msg);
+                    emailService.notifyErrorMessage(msg);
+                }
+            } else {
+                LOGGER.info(newFileName + " in " + tempDir + " doesn't exist so it doesn't need to be deleted.");
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            emailService.notifyError(e, newFileName);
         }
     }
 
@@ -307,13 +308,15 @@ public class UploadBackingBean implements Notifiable {
         final FileInputStream fis = new FileInputStream(target);
         final BufferedInputStream bis = new BufferedInputStream(fis);
         try  {
+            final File uploadDirectoryForCleanup = this.uploadDirectory;
+
             dataPrivataService.saveFileUpload(tempFileUpload.getSupplierCode(), tempFileUpload.getBaseName(),
                     tempFileUpload.getDatePart(), tempFileUpload.getSuffix(), getUserName(), bis,
                     tempFileUpload.getFileSize(), this, new Callback() {
 
                         @Override
                         public void callback() {
-                            cleanup(bis, fis, fileName);
+                            cleanup(bis, fis, uploadDirectoryForCleanup,fileName);
                         }
                     });
 

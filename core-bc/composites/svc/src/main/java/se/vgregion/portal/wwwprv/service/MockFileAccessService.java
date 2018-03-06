@@ -56,7 +56,7 @@ public class MockFileAccessService implements FileAccessService {
                         accumulatedBytes += n;
                         os.write(buf, 0, n);
 
-                        Thread.sleep(1);
+                        Thread.sleep(500);
 
                         if (++numberRoundsSoFar % 10 == 0) {
                             notifiable.notifyPercentage((int) ((100f * (float) accumulatedBytes) / (float) fileSize));
@@ -64,6 +64,7 @@ public class MockFileAccessService implements FileAccessService {
                     }
 
                     notifiable.notifyPercentage(100);
+                    callback.callback();
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                 }
