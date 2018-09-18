@@ -1,6 +1,6 @@
 package se.vgregion.portal.wwwprv.model;
 
-import com.liferay.portal.model.User;
+import com.liferay.portal.kernel.model.User;
 import se.vgregion.portal.wwwprv.model.jpa.DataPrivataUser;
 
 /**

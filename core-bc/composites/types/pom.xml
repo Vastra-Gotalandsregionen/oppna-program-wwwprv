@@ -31,12 +31,17 @@ Generation time : 2015-03-12 14:47:57 CET
       <artifactId>hibernate-jpa-2.0-api</artifactId>
       <version>1.0.1.Final</version>
     </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>4.3.1.Final</version>
+    </dependency>
 
     <dependency>
       <groupId>com.liferay.portal</groupId>
-      <artifactId>portal-service</artifactId>
-      <version>${liferay.version}</version>
+      <artifactId>com.liferay.portal.kernel</artifactId>
       <scope>provided</scope>
+      <version>2.50.0</version>
     </dependency>
   </dependencies>
 </project>

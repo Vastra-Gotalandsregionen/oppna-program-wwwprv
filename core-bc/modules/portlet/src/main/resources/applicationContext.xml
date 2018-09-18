@@ -41,7 +41,7 @@
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource" />
-        <property name="persistenceXmlLocation" value="classpath:persistence.xml"></property>
+        <property name="persistenceXmlLocation" value="classpath:persistence.xml"/>
         <property name="jpaVendorAdapter" ref="jpaVendor" />
         <property name="jpaPropertyMap">
             <map>
@@ -57,7 +57,7 @@
         <property name="showSql" value="false" />
     </bean>
 
-    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <bean id="dataSource" class="se.vgregion.portal.wwwprv.service.config.DataSourceFactory">
         <property name="jndiName" value="java:comp/env/jdbc/HotellDbPool" />
     </bean>
 </beans>

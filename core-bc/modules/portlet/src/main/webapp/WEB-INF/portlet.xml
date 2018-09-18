@@ -18,7 +18,7 @@
         <description>Filuppladdning</description>
         <portlet-name>fileupload</portlet-name>
         <display-name>Filuppladdning</display-name>
-        <portlet-class>com.liferay.faces.bridge.GenericLiferayFacesPortlet</portlet-class>
+        <portlet-class>com.liferay.faces.bridge.ext.GenericLiferayFacesPortlet</portlet-class>
 
         <init-param>
             <name>javax.portlet.faces.defaultViewId.view</name>
@@ -47,7 +47,7 @@
         <description>Användar- och leverantörshantering</description>
         <portlet-name>adminportlet</portlet-name>
         <display-name>Användar- och leverantörshantering</display-name>
-        <portlet-class>com.liferay.faces.bridge.GenericLiferayFacesPortlet</portlet-class>
+        <portlet-class>com.liferay.faces.bridge.ext.GenericLiferayFacesPortlet</portlet-class>
 
         <init-param>
             <name>javax.portlet.faces.defaultViewId.view</name>
@@ -72,7 +72,7 @@
         <description>Lista uppladdade filer</description>
         <portlet-name>listfiles</portlet-name>
         <display-name>Lista uppladdade filer</display-name>
-        <portlet-class>com.liferay.faces.bridge.GenericLiferayFacesPortlet</portlet-class>
+        <portlet-class>com.liferay.faces.bridge.ext.GenericLiferayFacesPortlet</portlet-class>
 
         <init-param>
             <name>javax.portlet.faces.defaultViewId.view</name>
