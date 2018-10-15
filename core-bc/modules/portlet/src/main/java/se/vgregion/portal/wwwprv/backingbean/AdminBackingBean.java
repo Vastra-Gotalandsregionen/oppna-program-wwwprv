@@ -5,6 +5,8 @@ import com.liferay.portal.theme.ThemeDisplay;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -44,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 @Scope("session")
 public class AdminBackingBean {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminBackingBean.class);
+
     @Autowired
     private LiferayService liferayService;
 
@@ -64,6 +68,8 @@ public class AdminBackingBean {
 
     @Autowired
     private RequestScopedModelBean requestScopedModelBean;
+    private List<Supplier> allSuppliers;
+    private List<UserContainer> uploaderUsers;
 
     public AdminBackingBean() {
     }
@@ -148,13 +154,18 @@ public class AdminBackingBean {
     }
 
     public List<UserContainer> getAllUsers() {
+        if (uploaderUsers != null) {
+            return uploaderUsers;
+        }
+
         ThemeDisplay themeDisplay = (ThemeDisplay) ((PortletRequest) FacesContext.getCurrentInstance()
                 .getExternalContext().getRequest()).getAttribute(WebKeys.THEME_DISPLAY);
 
         long companyId = themeDisplay.getCompanyId();
 
         try {
-            return liferayService.getUploaderUsers(companyId);
+            uploaderUsers = liferayService.getUploaderUsers(companyId);
+            return uploaderUsers;
         } catch (LiferayServiceException e) {
             FacesContext.getCurrentInstance().addMessage("usersMessage", new FacesMessage(e.getLocalizedMessage()));
             return null;
@@ -238,8 +249,10 @@ public class AdminBackingBean {
     }
 
     public List<Supplier> getAllSuppliers() {
-        List<Supplier> allSuppliers = dataPrivataService.getAllSuppliers();
-        Collections.sort(allSuppliers, new SupplierComparator());
+        if (allSuppliers == null) {
+            allSuppliers = dataPrivataService.getAllSuppliers();
+            Collections.sort(allSuppliers, new SupplierComparator());
+        }
         return allSuppliers;
     }
 
