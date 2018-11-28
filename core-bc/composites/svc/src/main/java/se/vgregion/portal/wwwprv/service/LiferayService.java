@@ -63,8 +63,8 @@ public class LiferayService {
             LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
             List<User> users = userLocalService.search(companyId, null, null, null, null, null,
-                    WorkflowConstants.STATUS_APPROVED, params, andSearch, 0,
-                    userLocalService.getUsersCount(), new UserFirstNameComparator(true));
+                    0, params, andSearch, 0,
+                    userLocalService.getCompanyUsersCount(companyId), new UserFirstNameComparator(true));
 
             filterOutNonFileUploaders(users);
 

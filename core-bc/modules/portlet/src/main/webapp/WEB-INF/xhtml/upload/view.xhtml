@@ -22,7 +22,7 @@
             </h:commandButton>
         </p:confirmDialog>
 
-        <div class="label">Välj leverantör:</div>
+        <div class="app-label">Välj leverantör:</div>
         <h:selectOneMenu id="chooseSupplier" value="#{uploadBackingBean.chosenSupplier}" converter="#{supplierConverter}">
             <f:selectItem itemLabel="Välj leverantör..." itemValue=""/>
             <f:selectItems value="#{uploadRequestScopeBackingBean.usersSuppliers}" var="supplier" itemValue="#{supplier}" itemLabel="#{supplier.enhetsNamn}"/>
@@ -50,7 +50,7 @@
         </h:panelGroup>
 
         <h:panelGroup layout="block" class="uploaded-file-list" rendered="#{not empty uploadBackingBean.chosenSupplier}">
-            <div class="label">Redan uppladdade filer för <span style="font-size: 1.2em;">#{uploadBackingBean.chosenSupplier.enhetsNamn}</span></div>
+            <div class="app-label">Redan uppladdade filer för <span style="font-size: 1.2em;">#{uploadBackingBean.chosenSupplier.enhetsNamn}</span></div>
 
             <p:dataTable value="#{uploadBackingBean.uploadedFileList}" var="fileUpload" emptyMessage="Ingen data">
                 <p:column headerText="Filnamn">
