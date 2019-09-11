@@ -143,7 +143,7 @@ Generation time : 2015-03-12 14:47:57 CET
             <name>Primefaces</name>
             <id>Primefaces</id>
             <releases/>
-            <url>http://repository.primefaces.org</url>
+            <url>https://repository.primefaces.org</url>
         </repository>
     </repositories>
 

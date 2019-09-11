@@ -86,7 +86,9 @@ public class PopulationService {
             List<ExtendedResidentType> shouldJustBeOneOrNone = null;
             for (int i = 0; i < 200; i++) {
                 try {
+                    LOGGER.info("About to make call for lookupResidentForExtendedProfile...");
                     shouldJustBeOneOrNone = extendedProfileClient.lookupResidentForExtendedProfile("", callArg).getResident();
+                    LOGGER.info("Finished making call for lookupResidentForExtendedProfile...");
                     if (i > 0) {
                         LOGGER.info("Succeded with lookupResidentForExtendedProfile after " + (i + 1) + " tries.");
                     }

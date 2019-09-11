@@ -1,6 +1,8 @@
 package se.vgregion.portal.wwwprv.service;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.riv.population.residentmaster.extended.v1.AdministrativIndelningType;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
 import se.riv.population.residentmaster.v1.PersonpostTYPE;
@@ -19,6 +21,8 @@ import java.util.Map;
  * Should mirror the meaning of Filspec_Unilabs_Lab__Nämndf_ver2.doc.
  */
 public class UnilabsLab implements DistrictDistribution {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnilabsLab.class);
 
     protected PopulationService service;
 
@@ -155,6 +159,7 @@ public class UnilabsLab implements DistrictDistribution {
     }
 
     ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {
+        LOGGER.info("Looking up...");
         return service.lookup(new PopulationService.Arg(forPersonalNumber, fromDate)).get(0);
     }
 

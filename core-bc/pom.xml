@@ -21,6 +21,7 @@ Generation time : 2015-03-12 14:47:57 CET
   <name>${project.artifactId}</name>
 
   <modules>
+    <module>applications/mock-population-service</module>
     <module>composites/types</module>
     <module>composites/svc</module>
     <module>composites/webcomp</module>

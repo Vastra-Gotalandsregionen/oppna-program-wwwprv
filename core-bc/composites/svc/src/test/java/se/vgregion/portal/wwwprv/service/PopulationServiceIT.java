@@ -1,6 +1,7 @@
 package se.vgregion.portal.wwwprv.service;
 
 import com.google.gson.Gson;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -8,9 +9,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
 import se.riv.population.residentmaster.lookupresidentforextendedprofileresponder.v1.LookupResidentForExtendedProfileResponseType;
+import se.vgregion.portal.wwwprv.table.Table;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +23,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author Claes Lundahl
@@ -25,6 +37,8 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:population-test.xml")
 public class PopulationServiceIT {
+
+    ExecutorService executorService = Executors.newFixedThreadPool(24);
 
     List<String> ids =
             Arrays.asList(
@@ -83,6 +97,43 @@ public class PopulationServiceIT {
         Path path = Paths.get(new File("src\\test\\resources\\se\\vgregion\\portal\\wwwprv".replace("\\", File.separator))
                 .getAbsolutePath() + File.separator + "lookup.dump");
         return path;
+    }
+
+    volatile int counter = 0;
+
+    @Test
+    @Ignore
+    public void unilabsLookup() throws IOException {
+
+        FileInputStream input = new FileInputStream("/tmp/UNILABS_LAB_201907_20190823_1124.IN");
+        Table table = Table.newTableFromSpaceDelimInput(IOUtils.toString(input));
+
+        List<String> pnrs = table.getTupels().stream().map(tupel -> tupel.get(tupel.getColumns().get(1)).value()).collect(Collectors.toList());
+//        CompletableFuture<List<ExtendedResidentType>>[] a = ;
+
+        List<String> failed = new ArrayList<>();
+
+        CompletableFuture<List<ExtendedResidentType>>[] collect = pnrs.stream().map(s -> {
+            return CompletableFuture.supplyAsync(
+                    () -> {
+                        try {
+                            System.out.println("Räknar... " + counter++);
+                            return populationService.lookup(new PopulationService.Arg(s, "20190823000000"));
+                        } catch (Exception e) {
+                            failed.add(s);
+//                            throw new RuntimeException(e);
+                            return new ArrayList<>();
+                        }
+                    }, executorService);
+        }).collect(Collectors.toList()).toArray(new CompletableFuture[0]);
+
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(collect);
+        allOf.whenComplete((aVoid, throwable) -> System.out.println("Färdig...."));
+
+        allOf.join();
+
+        System.out.println(failed);
+
     }
 
 }

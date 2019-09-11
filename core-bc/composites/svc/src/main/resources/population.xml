@@ -12,11 +12,7 @@
 
   <jaxws:client id="extendedProfileClient"
                 serviceClass="se.riv.population.residentmaster.lookupresidentforextendedprofile.v1.rivtabp21.LookupResidentForExtendedProfileResponderInterface"
-                endpointName="e:LookupResidentForExtendedProfileResponderInterface"
-                serviceName="s:LookupResidentForExtendedProfileResponderInterface"
-                address="${population.service.url}/population/services/lookupResidentForExtendedProfile/v1"
-                xmlns:e="http://service.jaxws.cxf.apache.org/endpoint"
-                xmlns:s="http://service.jaxws.cxf.apache.org/service">
+                address="${population.service.url}">
     <jaxws:binding>
       <soap:soapBinding version="1.1"/>
     </jaxws:binding>
