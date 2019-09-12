@@ -23,8 +23,8 @@ Generation time : 2015-03-12 14:47:57 CET
   <name>${project.artifactId}</name>
 
   <properties>
-<!--    <apache.cxf.version>2.4.1</apache.cxf.version>-->
-    <apache.cxf.version>3.3.3</apache.cxf.version>
+    <apache.cxf.version>2.4.1</apache.cxf.version>
+<!--    <apache.cxf.version>3.3.3</apache.cxf.version>-->
   </properties>
 
 <!-- UNCOMMENT AND CHANGE THIS TO USE JAX-WS WSDL CODE GENERATION
@@ -123,12 +123,12 @@ Generation time : 2015-03-12 14:47:57 CET
       <version>4.0.1</version>
     </dependency>-->
 
-    <dependency>
+    <!--<dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-features-logging</artifactId>
       <version>${apache.cxf.version}</version>
-<!--      &lt;!&ndash;      <scope>test</scope>&ndash;&gt;-->
-    </dependency>
+&lt;!&ndash;      &lt;!&ndash;      <scope>test</scope>&ndash;&gt;&ndash;&gt;
+    </dependency>-->
 
 
     <dependency>
