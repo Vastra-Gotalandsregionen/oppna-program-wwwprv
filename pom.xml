@@ -32,10 +32,10 @@
 
 
     <properties>
-        <compileSource>1.7</compileSource>
-        <compileTarget>1.7</compileTarget>
-        <liferay.version>6.2.5</liferay.version>
+        <compileSource>1.8</compileSource>
+        <compileTarget>1.8</compileTarget>
         <hibernate.version>3.6.0.Final</hibernate.version>
+        <spring.fw.version>3.2.18.RELEASE</spring.fw.version>
     </properties>
 
     <profiles>
