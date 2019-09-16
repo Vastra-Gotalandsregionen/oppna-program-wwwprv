@@ -77,60 +77,64 @@ public class UnilabsLab implements DistrictDistribution {
         table.insert(new Column("Pat_nyckelkod", table.getColumns().size(), 6));
 
 
-
         Column dateKey = table.getColumns().get(3);
         Column personalNumberKey = table.getColumns().get(4);
-
+        int rowCursor = 0;
         for (Tupel tupel : table.getTupels()) {
-            transformPriceDelimiter(tupel);
+            rowCursor++;
+            try {
+                transformPriceDelimiter(tupel);
 
-            String personalNumber = tupel.get(personalNumberKey).value().trim();
-            String date = tupel.get(dateKey).value().trim();
-            ExtendedResidentType info = getResidentialInfo(personalNumber, date);
-            //ExtendedResidentType info = getLatestResidentInfo(personalNumber, date);
-            tupel.get("korn_datum").set(nowDate);
-            tupel.get("filnamn").set(originalFileName);
-            String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
-            tupel.get("klockslag").set(nowTime);
-            String purchaserValue = tupel.get("Bestallare").value().trim();
+                String personalNumber = tupel.get(personalNumberKey).value().trim();
+                String date = tupel.get(dateKey).value().trim();
+                ExtendedResidentType info = getResidentialInfo(personalNumber, date);
+                //ExtendedResidentType info = getLatestResidentInfo(personalNumber, date);
+                tupel.get("korn_datum").set(nowDate);
+                tupel.get("filnamn").set(originalFileName);
+                String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
+                tupel.get("klockslag").set(nowTime);
+                String purchaserValue = tupel.get("Bestallare").value().trim();
 
-            if (!purchaserValue.isEmpty()) {
-                if (purchaserValue.length() >= 6) {
-                    tupel.get("Specialitet").set(purchaserValue.substring(0, 2));
-                    tupel.get("Avtalskod").set(purchaserValue.substring(2));
-                } else {
-                    tupel.get("Avtalskod").set(purchaserValue);
+                if (!purchaserValue.isEmpty()) {
+                    if (purchaserValue.length() >= 6) {
+                        tupel.get("Specialitet").set(purchaserValue.substring(0, 2));
+                        tupel.get("Avtalskod").set(purchaserValue.substring(2));
+                    } else {
+                        tupel.get("Avtalskod").set(purchaserValue);
+                    }
                 }
-            }
 
-            if (info != null) {
-                AdministrativIndelningType folkbok = info.getFolkbokforingsaddressIndelning();
+                if (info != null) {
+                    AdministrativIndelningType folkbok = info.getFolkbokforingsaddressIndelning();
 
-                if (folkbok != null && !StringUtils.isEmpty(folkbok.getDebiteringsgruppKod())) {
-                    String debiteringsgruppKod = folkbok.getDebiteringsgruppKod();
-                    String lanKod = debiteringsgruppKod.substring(0, 2);
-                    String kommunKod = debiteringsgruppKod.substring(2, 4);
-                    tupel.get("PatLan_+_kommun").set(blank(lanKod) + blank(kommunKod));
-                } else {
-                    PersonpostTYPE pp = info.getPersonpost();
-                    if (pp != null) {
-                        SvenskAdressTYPE fba = pp.getFolkbokforingsadress();
-                        if (fba != null) {
-                            tupel.get("PatLan_+_kommun").set(blank(fba.getLanKod()) + blank(fba.getKommunKod()));
+                    if (folkbok != null && !StringUtils.isEmpty(folkbok.getDebiteringsgruppKod())) {
+                        String debiteringsgruppKod = folkbok.getDebiteringsgruppKod();
+                        String lanKod = debiteringsgruppKod.substring(0, 2);
+                        String kommunKod = debiteringsgruppKod.substring(2, 4);
+                        tupel.get("PatLan_+_kommun").set(blank(lanKod) + blank(kommunKod));
+                    } else {
+                        PersonpostTYPE pp = info.getPersonpost();
+                        if (pp != null) {
+                            SvenskAdressTYPE fba = pp.getFolkbokforingsadress();
+                            if (fba != null) {
+                                tupel.get("PatLan_+_kommun").set(blank(fba.getLanKod()) + blank(fba.getKommunKod()));
+                            }
                         }
                     }
-                }
-                if (folkbok != null) {
-                    tupel.get("Pat_SDN").set(folkbok.getStadsdelsnamndKod());
-                    SvenskAdressTYPE adress = info.getPersonpost().getFolkbokforingsadress();
-                    if (adress != null) {
-                        tupel.get("Pat_nyckelkod").set(adress.getSCBNyckelkod());
+                    if (folkbok != null) {
+                        tupel.get("Pat_SDN").set(folkbok.getStadsdelsnamndKod());
+                        SvenskAdressTYPE adress = info.getPersonpost().getFolkbokforingsadress();
+                        if (adress != null) {
+                            tupel.get("Pat_nyckelkod").set(adress.getSCBNyckelkod());
+                        }
+                    }
+                    AdministrativIndelningType fbi = info.getFolkbokforingsaddressIndelning();
+                    if (fbi != null) {
+                        tupel.get("Pat_Nämnd").set(fbi.getHalsoSjukvardsNamndKod());
                     }
                 }
-                AdministrativIndelningType fbi = info.getFolkbokforingsaddressIndelning();
-                if (fbi != null) {
-                    tupel.get("Pat_Nämnd").set(fbi.getHalsoSjukvardsNamndKod());
-                }
+            } catch (Exception e) {
+                throw new RuntimeException("Misslyckades vid rad " + rowCursor + ". Kontrollera personnummer, mm. Samma felaktiga nummer kan förekomma flera gånger i filen.", e);
             }
         }
 
