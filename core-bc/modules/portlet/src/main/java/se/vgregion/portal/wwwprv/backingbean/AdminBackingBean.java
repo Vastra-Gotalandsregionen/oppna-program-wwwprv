@@ -176,6 +176,8 @@ public class AdminBackingBean {
 
         dataPrivataService.persistNewSupplier(supplierToAdd);
 
+        updateAllSuppliers();
+
         String message = "Lyckades lägga till " + supplierToAdd.getEnhetsKod() + ".";
 
         setSupplierMessage(message);
@@ -221,6 +223,8 @@ public class AdminBackingBean {
         try {
             dataPrivataService.remove(supplier);
 
+            updateAllSuppliers();
+
             String message = "Lyckades ta bort " + supplier.getEnhetsKod() + ".";
 
             setSupplierMessage(message);
@@ -250,10 +254,14 @@ public class AdminBackingBean {
 
     public List<Supplier> getAllSuppliers() {
         if (allSuppliers == null) {
-            allSuppliers = dataPrivataService.getAllSuppliers();
-            Collections.sort(allSuppliers, new SupplierComparator());
+            updateAllSuppliers();
         }
         return allSuppliers;
+    }
+
+    private void updateAllSuppliers() {
+        allSuppliers = dataPrivataService.getAllSuppliers();
+        Collections.sort(allSuppliers, new SupplierComparator());
     }
 
     public Supplier getSupplierToAdd() {
