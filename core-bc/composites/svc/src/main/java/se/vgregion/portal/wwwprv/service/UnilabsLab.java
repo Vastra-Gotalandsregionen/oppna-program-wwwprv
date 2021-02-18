@@ -38,12 +38,12 @@ public class UnilabsLab implements DistrictDistribution {
     /**
      * Complements the data hold in the text-table that is feed into the method.
      * Seven extra columns are inserted.
-     *
+     * <p>
      * Three of them are inserted before the original content.
      * 'korn_datum' - the date of the execution of this method. Format are yyyy-MM-dd.
      * 'klockslag' - time of day when the execution is made.
      * 'filnamn' is the name for the file that is provided in the constructor to this class earlier.
-     *
+     * <p>
      * Four of the columns are added after the original columns.
      * 'Pat_Nämnd' - the patient board that the patient belonged to at the moment of hes/shes visit to the medical
      * center that this row depicts.
@@ -88,7 +88,6 @@ public class UnilabsLab implements DistrictDistribution {
                 String personalNumber = tupel.get(personalNumberKey).value().trim();
                 String date = tupel.get(dateKey).value().trim();
                 ExtendedResidentType info = getResidentialInfo(personalNumber, date);
-                //ExtendedResidentType info = getLatestResidentInfo(personalNumber, date);
                 tupel.get("korn_datum").set(nowDate);
                 tupel.get("filnamn").set(originalFileName);
                 String nowTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
@@ -155,7 +154,7 @@ public class UnilabsLab implements DistrictDistribution {
     }
 
     String blank(String s) {
-        return s == null ? "" :s;
+        return s == null ? "" : s;
     }
 
     ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {

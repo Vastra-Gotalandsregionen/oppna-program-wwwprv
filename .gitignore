@@ -75,3 +75,6 @@ crashlytics.properties
 crashlytics-build.properties
 
 
+/deploy.to.prod.sh
+/deploy.to.stage.sh
+/deploy.to.test.sh

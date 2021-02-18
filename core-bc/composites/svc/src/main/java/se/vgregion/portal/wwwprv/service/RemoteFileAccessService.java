@@ -19,17 +19,9 @@ import se.vgregion.portal.wwwprv.util.Callback;
 import se.vgregion.portal.wwwprv.util.Notifiable;
 
 import javax.annotation.PreDestroy;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -159,16 +151,12 @@ public class RemoteFileAccessService implements FileAccessService {
 
                 InputStream toUpload;
                 if (uploadFolder.equals(namndFordelningDirectory)) {
-
                     fileName = complementFileNameWithNamndfordelningPart(fileName);
-
                     DistrictDistribution districtDistribution = getDistrictDistribution(fileName, supplier);
-
-                    String charsetName = "ISO-8859-1";
-                    String processed = districtDistribution.process(new String(fileContent, charsetName));
-
+                    String charsetName = guessCharacterEncoding(fileContent);
+                    String input = new String(fileContent, charsetName);
+                    String processed = districtDistribution.process(input);
                     ByteArrayInputStream bais = new ByteArrayInputStream(processed.getBytes(charsetName));
-
                     toUpload = bais;
                 } else {
                     toUpload = new ByteArrayInputStream(fileContent);
@@ -210,6 +198,19 @@ public class RemoteFileAccessService implements FileAccessService {
 
             throw new RuntimeException(message + e.getMessage(), e);
         }
+    }
+
+    static String guessCharacterEncoding(byte[] fromRawBytes) throws UnsupportedEncodingException {
+        String[] charFormats = {"ISO-8859-1", "UTF-8"};
+        NavigableMap<Long, String> ranking = new TreeMap<>();
+        for (String charFormat : charFormats) {
+            long occurrence = new String(fromRawBytes, charFormat).chars().filter(
+                    c -> c == 'å' || c == 'ä' || c == 'ö' || c == 'Å' || c == 'Ä' || c == 'Ö'
+            ).count();
+            ranking.put(occurrence, charFormat);
+        }
+        String charsetName = ranking.lastEntry().getValue();
+        return charsetName;
     }
 
     private void upload(float fileSize, Notifiable notifiable, InputStream toUpload, SmbFile newFile) throws IOException {
@@ -343,7 +344,7 @@ public class RemoteFileAccessService implements FileAccessService {
         } else {
             for (SmbFile directory : directories) {
                 Node<String> newNode = new Node<>(directory.getName());
-                buildDirectoryTree(newNode, directory, depthLimit, currentDepth != null ? currentDepth + 1: null);
+                buildDirectoryTree(newNode, directory, depthLimit, currentDepth != null ? currentDepth + 1 : null);
                 newNode.setParent(node);
                 node.getChildren().add(newNode);
             }
