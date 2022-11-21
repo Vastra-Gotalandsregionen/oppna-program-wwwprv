@@ -47,7 +47,10 @@ public class RemoteFileAccessService implements FileAccessService {
     private String domain;
 
     @Autowired
-    private PopulationService populationService;
+    private ExtendedPopulationService extendedPopulationService;
+
+    @Autowired
+    private FullPopulationService fullPopulationService;
 
     @Autowired
     private EmailService emailService;
@@ -246,18 +249,11 @@ public class RemoteFileAccessService implements FileAccessService {
     }
 
     private DistrictDistribution getDistrictDistribution(String fileName, Supplier supplier) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        /*DistrictDistributionClassName enumInstance = DistrictDistributionClassName
-                .valueOf(supplier.getDistrictDistributionClassName());
-
-        Class clazz = Class.forName(enumInstance.getCanonicalName());
-
-        return (DistrictDistribution) clazz
-                .getConstructor(populationService.getClass(), fileName.getClass())
-                .newInstance(populationService, fileName);*/
-
-        DistrictDistribution districtDistribution = new UnilabsLab(populationService, fileName);
-
-        return districtDistribution;
+        if (supplier.getEnhetsNamn().equals("Evidia")) {
+            return new EvidiaDistribution(fullPopulationService);
+        } else {
+            return new UnilabsLab(extendedPopulationService, fileName);
+        }
     }
 
     private NtlmPasswordAuthentication getAuth(CIFSContext cifsContext) {

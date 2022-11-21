@@ -1,18 +1,16 @@
 package se.vgregion.portal.wwwprv.service;
 
-import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import se.riv.population.residentmaster.lookupresidentforextendedprofileresponder.v1.LookupResidentForExtendedProfileResponseType;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,7 +22,10 @@ import java.util.List;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:population-test.xml")
-public class PopulationServiceIT {
+public class ExtendedPopulationServiceIT {
+
+    @Value("${population.service.password}")
+    private String password;
 
     List<String> ids =
             Arrays.asList(
@@ -35,18 +36,18 @@ public class PopulationServiceIT {
                     "199801222390", "200112152384", "196801029288", "194803022328", "193302129220", "199604222399",
                     "199508232387", "199711232398", "199801152381", "199801042392", "196508122857", "194512267743",
                     "199711172396", "198504199897", "197006121144", "198508199885", "196804159264", "199508232387",
-                    "199711232398", "196708282584"
+                    "199711232398", "196708282584", "197508191934"
             );
 
     @Autowired
-    private PopulationService populationService;
+    private ExtendedPopulationService extendedPopulationService;
 
     @Ignore
     @Test
     public void oneCallLookup() throws Exception {
         long now = System.currentTimeMillis();
         try {
-            LookupResidentForExtendedProfileResponseType result = populationService.lookup(ids);
+            LookupResidentForExtendedProfileResponseType result = extendedPopulationService.lookup(ids);
             System.out.print("result.getResident().isEmpty(): " + result.getResident().isEmpty());
         } catch (Exception e) {
             System.out.print("F: " + e.getMessage());
@@ -63,7 +64,7 @@ public class PopulationServiceIT {
             long now = System.currentTimeMillis();
             try {
                 System.out.print(id);
-                LookupResidentForExtendedProfileResponseType r = populationService.lookup(id);
+                LookupResidentForExtendedProfileResponseType r = extendedPopulationService.lookup(id);
                 correctNumbers.add(id);
                 if (!r.getResident().isEmpty()) {
                     System.out.print(" Y");
@@ -72,6 +73,8 @@ public class PopulationServiceIT {
                 }
             } catch (Exception e) {
                 System.out.print(" F:" + e.getMessage());
+                e.printStackTrace();
+                return;
             }
             System.out.println(" Tidsåtgång " + (System.currentTimeMillis() - now) + " ms.");
         }

@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class UnilabsLab implements DistrictDistribution {
 
-    protected PopulationService service;
+    protected ExtendedPopulationService service;
 
     protected String originalFileName;
 
@@ -30,7 +30,7 @@ public class UnilabsLab implements DistrictDistribution {
      * @param originalFileName name of the file that the process should output to. This to be able to write this name
      *                         to the actual content.
      */
-    public UnilabsLab(PopulationService service, String originalFileName) {
+    public UnilabsLab(ExtendedPopulationService service, String originalFileName) {
         this.service = service;
         this.originalFileName = originalFileName;
     }
@@ -158,7 +158,7 @@ public class UnilabsLab implements DistrictDistribution {
     }
 
     ExtendedResidentType getResidentialInfo(String forPersonalNumber, String fromDate) {
-        return service.lookup(new PopulationService.Arg(forPersonalNumber, fromDate)).get(0);
+        return service.lookup(new ExtendedPopulationService.Arg(forPersonalNumber, fromDate)).get(0);
     }
 
 }

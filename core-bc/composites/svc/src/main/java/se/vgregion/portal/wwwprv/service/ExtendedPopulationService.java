@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * Service to get residential information about patients in the region.
  */
-public class PopulationService {
+public class ExtendedPopulationService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PopulationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedPopulationService.class);
 
     @Autowired
     private LookupResidentForExtendedProfileResponderInterface extendedProfileClient;

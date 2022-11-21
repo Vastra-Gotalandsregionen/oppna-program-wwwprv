@@ -22,11 +22,11 @@ import se.vgregion.portal.wwwprv.table.Tupel;
 public class ExtractDataIT {
 
     @Autowired
-    private PopulationService populationService;
+    private ExtendedPopulationService extendedPopulationService;
 
     @Test
     public void main() {
-        LookupResidentForExtendedProfileResponseType data = populationService.lookup(DummyPersonalNumbers.get());
+        LookupResidentForExtendedProfileResponseType data = extendedPopulationService.lookup(DummyPersonalNumbers.get());
 
         Table table = Table.newEmptyTable();
         table.insert(new Column("Senaste_Aandring", 0, 12));

@@ -23,14 +23,16 @@ import java.util.Set;
 public class UnilabsLabIT {
 
     @Autowired
-    private PopulationService populationService;
+    private ExtendedPopulationService extendedPopulationService;
 
     @Test
     public void main() throws DistrictDistributionException {
         String originalFileName = "original_file_name.text";
-        UnilabsLab unilabsLab = new UnilabsLab(populationService, originalFileName);
+        UnilabsLab unilabsLab = new UnilabsLab(extendedPopulationService, originalFileName);
 
-        String input = inputFileContent(getInputFileColumnsUnilabsLab()).toString();
+        String otherPath = "C:\\Users\\clalu4\\Kod\\Diverse\\misc-vgr-database-work\\src\\main\\resources\\my\\misc\\vgr\\work\\dataprivata\\data\\that\\failed\\unpersonal.test.in";
+        //String input = inputFileContent(getInputFileColumnsUnilabsLab()).toString();
+        String input = inputFileContent(otherPath).toString();
         System.out.println(input);
 
         String output = unilabsLab.process(input);
