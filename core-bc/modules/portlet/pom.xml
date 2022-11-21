@@ -49,7 +49,6 @@ Generation time : 2015-03-12 14:47:57 CET
             <groupId>com.liferay.portal</groupId>
             <artifactId>com.liferay.portal.kernel</artifactId>
             <scope>provided</scope>
-            <version>2.50.0</version>
         </dependency>
 
         <dependency>
@@ -91,25 +90,31 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
             <groupId>com.sun.faces</groupId>
             <artifactId>jsf-api</artifactId>
-            <version>2.2.13</version>
+            <version>${jsf.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sun.faces</groupId>
             <artifactId>jsf-impl</artifactId>
-            <version>2.2.13</version>
+            <version>${jsf.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.liferay.faces</groupId>
+            <artifactId>com.liferay.faces.bridge.api</artifactId>
+            <version>4.2.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.liferay.faces</groupId>
             <artifactId>com.liferay.faces.bridge.impl</artifactId>
-            <version>4.1.0</version>
+            <version>4.2.0</version>
         </dependency>
 
         <dependency>
-            <groupId>com.liferay.faces</groupId>
-            <artifactId>com.liferay.faces.bridge.ext</artifactId>
-            <version>5.0.2</version>
+          <groupId>com.liferay.faces</groupId>
+          <artifactId>com.liferay.faces.bridge.ext</artifactId>
+          <version>5.1.0</version>
         </dependency>
 
         <dependency>
@@ -122,7 +127,7 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
-            <version>5.3.3</version>
+            <version>5.3</version>
         </dependency>
 
         <dependency>
