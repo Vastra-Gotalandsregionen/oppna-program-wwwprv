@@ -53,15 +53,26 @@ public class EvidiaDistribution implements DistrictDistribution {
             if (!personInf.getResident().isEmpty()) {
                 ResidentType first = personInf.getResident().get(0);
                 String lk = first.getPersonpost().getFolkbokforingsadress().getLanKod();
-                if (row.length() > 108) {
-                    row += new String(new char[row.length() - 108]).replace("\0", " ");
-                }
-                row += " " + lk;
+                if (lk==null) lk = "";
+                lk = padTextLeft(lk, 3, ' ');
+                row = padTextLeft(row, 108, ' ');
+                /*if (row.length() < 108) {
+                    row += new String(new char[108 - row.length()]).replace("\0", " ");
+                }*/
+                row += lk;
             }
+            row = padTextLeft(row, 111, ' ');
             sb.append(row);
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    static String padTextLeft(String that, int totalLength, char ch) {
+        if (that.length() < totalLength) {
+            that += new String(new char[totalLength - that.length()]).replace('\0', ch);
+        }
+        return that;
     }
 
 }

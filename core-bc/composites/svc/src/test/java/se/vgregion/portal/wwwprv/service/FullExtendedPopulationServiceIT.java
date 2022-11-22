@@ -91,7 +91,11 @@ public class FullExtendedPopulationServiceIT {
     @Test
     public void evidiaDistribution() {
         EvidiaDistribution evidiaDistribution = new EvidiaDistribution(populationService);
-        String input = "20220830 191212121212 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00";
+        String input = "20220830 191212121212 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00"
+                + "\n"
+                + "20220830 191212121212 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00";
+
+
         System.out.println(evidiaDistribution.process(input));
     }
 
