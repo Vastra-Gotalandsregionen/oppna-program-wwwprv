@@ -15,6 +15,7 @@ public class EvidiaDistribution implements DistrictDistribution {
 
     /**
      * Constructor.
+     *
      * @param service the source of extra data to use when complementing the input data.
      */
     public EvidiaDistribution(FullPopulationService service) {
@@ -52,6 +53,9 @@ public class EvidiaDistribution implements DistrictDistribution {
             if (!personInf.getResident().isEmpty()) {
                 ResidentType first = personInf.getResident().get(0);
                 String lk = first.getPersonpost().getFolkbokforingsadress().getLanKod();
+                if (row.length() > 108) {
+                    row += new String(new char[row.length() - 108]).replace("\0", " ");
+                }
                 row += " " + lk;
             }
             sb.append(row);

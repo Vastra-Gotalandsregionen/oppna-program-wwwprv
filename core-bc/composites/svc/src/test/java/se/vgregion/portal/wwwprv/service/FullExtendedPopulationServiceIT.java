@@ -36,7 +36,7 @@ public class FullExtendedPopulationServiceIT {
                     "199801222390", "200112152384", "196801029288", "194803022328", "193302129220", "199604222399",
                     "199508232387", "199711232398", "199801152381", "199801042392", "196508122857", "194512267743",
                     "199711172396", "198504199897", "197006121144", "198508199885", "196804159264", "199508232387",
-                    "199711232398", "196708282584", "197508191934"
+                    "199711232398", "196708282584"
             );
 
     @Autowired
@@ -91,7 +91,7 @@ public class FullExtendedPopulationServiceIT {
     @Test
     public void evidiaDistribution() {
         EvidiaDistribution evidiaDistribution = new EvidiaDistribution(populationService);
-        String input = "20220830 197508191934 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00";
+        String input = "20220830 191212121212 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00";
         System.out.println(evidiaDistribution.process(input));
     }
 
