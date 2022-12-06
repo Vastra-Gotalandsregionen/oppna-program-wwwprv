@@ -1,8 +1,16 @@
 package se.vgregion.portal.wwwprv.service;
 
 import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileResponseType;
+import se.riv.population.residentmaster.v1.PersonpostTYPE;
 import se.riv.population.residentmaster.v1.ResidentType;
+import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
+import se.vgregion.portal.wwwprv.table.Cell;
+import se.vgregion.portal.wwwprv.table.Column;
+import se.vgregion.portal.wwwprv.table.Table;
+import se.vgregion.portal.wwwprv.table.Tupel;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -43,29 +51,61 @@ public class EvidiaDistribution implements DistrictDistribution {
      */
     @Override
     public String process(String input) {
-        String[] rows = input.split("\\n");
-        System.out.println("Processar " + rows.length + " rader.");
-        StringBuilder sb = new StringBuilder();
-        for (String row : rows) {
-            row = row.trim();
-            String[] cells = row.split(Pattern.quote(" "));
-            LookupResidentForFullProfileResponseType personInf = service.lookup(cells[1]);
-            if (!personInf.getResident().isEmpty()) {
-                ResidentType first = personInf.getResident().get(0);
-                String lk = first.getPersonpost().getFolkbokforingsadress().getLanKod();
-                if (lk==null) lk = "";
-                lk = padTextLeft(lk, 3, ' ');
-                row = padTextLeft(row, 108, ' ');
-                /*if (row.length() < 108) {
-                    row += new String(new char[108 - row.length()]).replace("\0", " ");
-                }*/
-                row += lk;
+        input = "Datum    Personnummer Namn                           N1 Kod1       Kod2 Kod3  C1 Text              Pris    LK\n" + input;
+        /*String[] rows = input.split("\\n");
+        System.out.println("Processar " + rows.length + " rader.");*/
+
+        Table table = Table.newTableFromSpaceDelimInput(input);
+
+        String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        /*table.insert(new Column("Datum", 0, 8));
+        table.insert(new Column("Personnummer", 1, 12));
+        table.insert(new Column("Namn", 2, 30));
+        table.insert(new Column("Namn", 3, 30));
+        table.insert(new Column("N1", 4, 2));
+        table.insert(new Column("Kod", 5, 10));
+        table.insert(new Column("A", 6, 4));
+        table.insert(new Column("N2", 7, 4));
+        table.insert(new Column("C", 8, 2));
+        table.insert(new Column("Text", 9, 17));
+        table.insert(new Column("Pris", 10, 7));
+        table.insert(new Column("LK", 11, 2));*/
+
+        int rowCursor = 0;
+
+        Column kod1Prefix = new Column("Kp1", table.getColumnByName("Kod1").getIndex(), 10);
+        table.insert(kod1Prefix);
+
+        for (Tupel tupel : table.getTupels()) {
+            rowCursor++;
+            try {
+                Cell kod1 = tupel.get("Kod1");
+                String[] parts = kod1.value().split(Pattern.quote("-"));
+                if (parts.length == 2) {
+                    kod1.set(parts[1]);
+                    tupel.get("Kp1").set(parts[0]);
+                }
+
+                LookupResidentForFullProfileResponseType personInf = service.lookup(tupel.get("Personnummer").value());
+                String lk = null;
+                if (!personInf.getResident().isEmpty()) {
+                    ResidentType first = personInf.getResident().get(0);
+                    PersonpostTYPE pp = first.getPersonpost();
+                    if (pp != null) {
+                        SvenskAdressTYPE fba = pp.getFolkbokforingsadress();
+                        if (fba != null) {
+                            lk = fba.getLanKod();
+                        }
+                    }
+                }
+                if (lk == null) lk = "";
+                tupel.get("LK").set(lk);
+            } catch (Exception e) {
+                throw new RuntimeException("EvidiaDistribution misslyckades vid rad " + rowCursor + ". Kontrollera personnummer, mm. Samma felaktiga nummer kan förekomma flera gånger i filen.", e);
             }
-            row = padTextLeft(row, 111, ' ');
-            sb.append(row);
-            sb.append("\n");
         }
-        return sb.toString();
+        return table.toExcelCsvText();
     }
 
     static String padTextLeft(String that, int totalLength, char ch) {

@@ -176,7 +176,7 @@ public class Table {
             return "";
         }
         if (NumberUtils.isNumber(text)) {
-            text = "=\"" + text + '"';
+            return text = "=\"" + text + '"';
         }
         text = text.replaceAll(Pattern.quote("\""), "\"\"");
         text = '"' + text + '"';

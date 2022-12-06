@@ -11,11 +11,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileResponseType;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Claes Lundahl
@@ -89,12 +92,14 @@ public class FullExtendedPopulationServiceIT {
     }
 
     @Test
-    public void evidiaDistribution() {
+    public void evidiaDistribution() throws IOException {
         EvidiaDistribution evidiaDistribution = new EvidiaDistribution(populationService);
         String input = "20220830 191212121212 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00"
                 + "\n"
-                + "20220830 191212121212 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00";
+                + "20220830 197508191934 12345678,1234                  38 TL-0240    AM10 000   MR Hjärna            1250,00";
 
+        input = Files.readAllLines(Paths.get("P:\\DATAPRIVATA.INFILER\\Vardgiv_Evidia","EVIDIA_202211_10029721_20221201_1648.IN"))
+                .stream().collect(Collectors.joining("\n"));
 
         System.out.println(evidiaDistribution.process(input));
     }
