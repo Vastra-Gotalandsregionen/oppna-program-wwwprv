@@ -127,7 +127,7 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
-            <version>5.3</version>
+            <version>6.0</version>
         </dependency>
 
         <dependency>
