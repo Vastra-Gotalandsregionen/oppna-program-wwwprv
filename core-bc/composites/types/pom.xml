@@ -34,7 +34,7 @@ Generation time : 2015-03-12 14:47:57 CET
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>4.3.1.Final</version>
+      <version>6.0.23.Final</version>
     </dependency>
 
     <dependency>
