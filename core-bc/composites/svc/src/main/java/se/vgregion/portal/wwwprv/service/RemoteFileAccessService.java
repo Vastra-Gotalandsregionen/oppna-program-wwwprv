@@ -57,8 +57,8 @@ public class RemoteFileAccessService implements FileAccessService {
 
     static {
         System.setProperty("jcifs.encoding", "ISO-8859-1");
-        System.setProperty("jcifs.smb.client.minVersion", "2.1");
-        System.setProperty("jcifs.smb.client.enableSMB2", "true");
+//        System.setProperty("jcifs.smb.client.minVersion", "2.1");
+//        System.setProperty("jcifs.smb.client.enableSMB2", "true");
     }
 
     private ExecutorService backgroundExecutor = Executors.newFixedThreadPool(20, new CustomizableThreadFactory() {
