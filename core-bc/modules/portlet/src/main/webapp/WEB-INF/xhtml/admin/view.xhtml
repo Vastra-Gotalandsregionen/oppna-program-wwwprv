@@ -8,297 +8,299 @@
 
     <link href="#{request.contextPath}/css/wwwprv.css" rel="stylesheet" type="text/css"/>
 
-    <div class="portlet-content-wrapper">
-        <h:form id="theForm" onkeypress="javascript:formKeyPress(event);">
+    <h:body>
+        <div class="portlet-content-wrapper">
+            <h:form id="theForm" onkeypress="javascript:formKeyPress(event);">
 
-            <p:remoteCommand name="toggleSupplierChooser" actionListener="#{adminBackingBean.toggleSupplierChooser()}"/>
+                <p:remoteCommand name="toggleSupplierChooser" actionListener="#{adminBackingBean.toggleSupplierChooser()}"/>
 
-            <p:growl autoUpdate="true" sticky="false" />
+                <p:growl autoUpdate="true" sticky="false" />
 
-            <h1>Administration</h1>
+                <h1>Administration</h1>
 
-            <section>
-                <h2>Användare med rollen "Filuppladdare"</h2>
+                <section>
+                    <h2>Användare med rollen "Filuppladdare"</h2>
 
-                <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.userMessage}">#{adminBackingBean.userMessage}</h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.userMessage}">#{adminBackingBean.userMessage}</h:panelGroup>
 
-                <h:panelGroup id="userTable">
-                    <table>
-                        <thead>
-                        <tr>
-                            <td>Namn</td>
-                            <td>Leverantör</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <ui:repeat value="#{adminBackingBean.allUsers}" var="userContainer">
+                    <h:panelGroup id="userTable">
+                        <table>
+                            <thead>
                             <tr>
-                                <td>#{userContainer.liferayUser.fullName}</td>
-                                <td>
-                                    <div class="chosen-suppliers" data-userid="#{userContainer.dataPrivataUser.liferayUserId}">
-                                        <h:commandLink class="toggle-choose-suppliers #{adminBackingBean.showSupplierChooser(userContainer) ? 'expanded' : ''}" value="#{utilBean.chosenSupplierString(userContainer)}">
-                                            <f:ajax execute="" render=""/>
-                                        </h:commandLink>
-
-                                        <div class="supplier-chooser" style="#{adminBackingBean.showSupplierChooser(userContainer) ? '' : 'display: none;'}">
-
-                                            <ui:repeat value="#{adminBackingBean.allSuppliers}"
-                                                       var="supplier">
-                                                <div class="supplier-select">
-                                                    <h:selectBooleanCheckbox value="#{adminBackingBean.getUserWithSuppliersHelper()[userContainer][supplier]}">
-                                                        <f:ajax render="@form"
-                                                                listener="#{adminBackingBean.toggleSupplier(userContainer, supplier)}" onevent="reinitAfterPageUpdate"/>
-                                                    </h:selectBooleanCheckbox>
-                                                    #{supplier.enhetsKod}
-                                                </div>
-                                            </ui:repeat>
-                                        </div>
-                                    </div>
-                                </td>
+                                <td>Namn</td>
+                                <td>Leverantör</td>
                             </tr>
-                        </ui:repeat>
-                        </tbody>
-                    </table>
-                </h:panelGroup>
-            </section>
+                            </thead>
+                            <tbody>
+                            <ui:repeat value="#{adminBackingBean.allUsers}" var="userContainer">
+                                <tr>
+                                    <td>#{userContainer.liferayUser.fullName}</td>
+                                    <td>
+                                        <div class="chosen-suppliers" data-userid="#{userContainer.dataPrivataUser.liferayUserId}">
+                                            <h:commandLink class="toggle-choose-suppliers #{adminBackingBean.showSupplierChooser(userContainer) ? 'expanded' : ''}" value="#{utilBean.chosenSupplierString(userContainer)}">
+                                                <f:ajax execute="" render=""/>
+                                            </h:commandLink>
 
-            <section>
-                <h2>Leverantörer</h2>
+                                            <div class="supplier-chooser" style="#{adminBackingBean.showSupplierChooser(userContainer) ? '' : 'display: none;'}">
 
-                <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.supplierMessage}">#{adminBackingBean.supplierMessage}</h:panelGroup>
+                                                <ui:repeat value="#{adminBackingBean.allSuppliers}"
+                                                           var="supplier">
+                                                    <div class="supplier-select">
+                                                        <h:selectBooleanCheckbox value="#{adminBackingBean.getUserWithSuppliersHelper()[userContainer][supplier]}">
+                                                            <f:ajax render="@form"
+                                                                    listener="#{adminBackingBean.toggleSupplier(userContainer, supplier)}" onevent="reinitAfterPageUpdate"/>
+                                                        </h:selectBooleanCheckbox>
+                                                        #{supplier.enhetsKod}
+                                                    </div>
+                                                </ui:repeat>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                            </tbody>
+                        </table>
+                    </h:panelGroup>
+                </section>
 
-                <h:panelGroup id="supplierTable">
-                    <table>
-                        <thead>
-                        <tr>
-                            <td>Enhetskod</td>
-                            <td>Enhetsnamn</td>
-                            <td>Ansvarigt kansli</td>
-                            <td>Delad uppladdningsmapp</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <ui:repeat value="#{adminBackingBean.allSuppliers}" var="supplier">
+                <section>
+                    <h2>Leverantörer</h2>
+
+                    <h:panelGroup layout="block" styleClass="portlet-msg-success" rendered="#{not empty adminBackingBean.supplierMessage}">#{adminBackingBean.supplierMessage}</h:panelGroup>
+
+                    <h:panelGroup id="supplierTable">
+                        <table>
+                            <thead>
+                            <tr>
+                                <td>Enhetskod</td>
+                                <td>Enhetsnamn</td>
+                                <td>Ansvarigt kansli</td>
+                                <td>Delad uppladdningsmapp</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <ui:repeat value="#{adminBackingBean.allSuppliers}" var="supplier">
+                                <tr>
+                                    <td>
+                                        <p:inplace editor="true" emptyLabel="Ej angiven">
+                                            <h:inputText value="#{supplier.enhetsKod}" onchange="javascript:showSaveButton(this);"/>
+                                        </p:inplace>
+                                    </td>
+                                    <td>
+                                        <p:inplace editor="true" emptyLabel="Ej angiven">
+                                            <h:inputText value="#{supplier.enhetsNamn}" onchange="javascript:showSaveButton(this);"/>
+                                        </p:inplace>
+                                    </td>
+                                    <td>
+                                        <!--#{supplier.ansvarigtKansli}-->
+                                        <p:inplace editor="true" emptyLabel="Ej angiven">
+                                            <h:selectOneMenu value="#{supplier.ansvarigtKansli}" onchange="javascript:showSaveButton(this);">
+                                                <f:selectItem itemLabel="Välj..." itemValue=""/>
+                                                <f:selectItem itemLabel="Borås" itemValue="Borås"/>
+                                                <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
+                                                <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
+                                                <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
+                                            </h:selectOneMenu>
+                                        </p:inplace>
+                                    </td>
+                                    <td>
+                                        <h:commandLink>
+                                            <f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}"
+                                                    render=":theForm:uploadFolderWrapper"
+                                                    onevent="showUploadFolderDialogOnComplete"/>
+                                            <ui:repeat value="#{utilBean.toList(supplier.uploadFolders)}" var="folder">
+                                                <div>#{folder}</div>
+                                            </ui:repeat>
+                                            <h:panelGroup rendered="#{empty supplier.uploadFolders}">
+                                                <span style="color: red">
+                                                    Ingen vald
+                                                </span>
+                                            </h:panelGroup>
+                                            <span class="btn btn-primary" style="margin-left: 5px;">
+                                                <i class="icon-edit"></i>
+                                            </span>
+                                        </h:commandLink>
+                                    </td>
+                                    <td>
+                                        <h:commandLink styleClass="save-link" style="display: none;" value="Spara">
+                                            <f:ajax listener="#{adminBackingBean.saveSupplier(supplier)}"
+                                                    execute=":theForm:supplierTable" render="@form" onevent="reinitAfterPageUpdate"/>
+                                        </h:commandLink>
+                                    </td>
+                                    <td>
+                                        <h:commandButton value="Ta bort" styleClass="btn btn-danger" style="margin: 0 0 0 25px">
+                                            <f:ajax listener="#{adminBackingBean.removeSupplier(supplier)}"
+                                                    execute=":theForm:supplierTable" render="@form" onevent="reinitAfterPageUpdate"/>
+                                        </h:commandButton>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+
+                            <tr class="app-label">
+                                <td>Lägg till leverantör:</td>
+                            </tr>
                             <tr>
                                 <td>
-                                    <p:inplace editor="true" emptyLabel="Ej angiven">
-                                        <h:inputText value="#{supplier.enhetsKod}" onchange="javascript:showSaveButton(this);"/>
-                                    </p:inplace>
+                                    <h:inputText value="#{adminBackingBean.supplierToAdd.enhetsKod}"/>
                                 </td>
                                 <td>
-                                    <p:inplace editor="true" emptyLabel="Ej angiven">
-                                        <h:inputText value="#{supplier.enhetsNamn}" onchange="javascript:showSaveButton(this);"/>
-                                    </p:inplace>
+                                    <h:inputText value="#{adminBackingBean.supplierToAdd.enhetsNamn}"/>
                                 </td>
                                 <td>
-                                    <!--#{supplier.ansvarigtKansli}-->
-                                    <p:inplace editor="true" emptyLabel="Ej angiven">
-                                        <h:selectOneMenu value="#{supplier.ansvarigtKansli}" onchange="javascript:showSaveButton(this);">
-                                            <f:selectItem itemLabel="Välj..." itemValue=""/>
-                                            <f:selectItem itemLabel="Borås" itemValue="Borås"/>
-                                            <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
-                                            <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
-                                            <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
-                                        </h:selectOneMenu>
-                                    </p:inplace>
+                                    <h:selectOneMenu value="#{adminBackingBean.supplierToAdd.ansvarigtKansli}">
+                                        <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
+                                        <f:selectItem itemLabel="Borås" itemValue="Borås"/>
+                                        <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
+                                        <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
+                                        <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
+                                    </h:selectOneMenu>
                                 </td>
                                 <td>
-                                    <h:commandLink>
-                                        <f:ajax listener="#{adminBackingBean.setCurrentSupplier(supplier)}"
-                                                render=":theForm:uploadFolderWrapper"
-                                                onevent="showUploadFolderDialogOnComplete"/>
-                                        <ui:repeat value="#{utilBean.toList(supplier.uploadFolders)}" var="folder">
-                                            <div>#{folder}</div>
-                                        </ui:repeat>
-                                        <h:panelGroup rendered="#{empty supplier.uploadFolders}">
-                                            <span style="color: red">
-                                                Ingen vald
-                                            </span>
-                                        </h:panelGroup>
-                                        <span class="btn btn-primary" style="margin-left: 5px;">
-                                            <i class="icon-edit"></i>
-                                        </span>
-                                    </h:commandLink>
-                                </td>
-                                <td>
-                                    <h:commandLink styleClass="save-link" style="display: none;" value="Spara">
-                                        <f:ajax listener="#{adminBackingBean.saveSupplier(supplier)}"
-                                                execute=":theForm:supplierTable" render="@form" onevent="reinitAfterPageUpdate"/>
-                                    </h:commandLink>
-                                </td>
-                                <td>
-                                    <h:commandButton value="Ta bort" styleClass="btn btn-danger" style="margin: 0 0 0 25px">
-                                        <f:ajax listener="#{adminBackingBean.removeSupplier(supplier)}"
-                                                execute=":theForm:supplierTable" render="@form" onevent="reinitAfterPageUpdate"/>
+                                    <h:commandButton value="Lägg till" styleClass="btn btn-primary">
+                                        <f:ajax execute="supplierTable" listener="#{adminBackingBean.addSupplier}"
+                                                render="@form" onevent="reinitAfterPageUpdate"/>
                                     </h:commandButton>
                                 </td>
                             </tr>
-                        </ui:repeat>
+                            </tbody>
+                        </table>
+                    </h:panelGroup>
+                </section>
 
-                        <tr class="app-label">
-                            <td>Lägg till leverantör:</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h:inputText value="#{adminBackingBean.supplierToAdd.enhetsKod}"/>
-                            </td>
-                            <td>
-                                <h:inputText value="#{adminBackingBean.supplierToAdd.enhetsNamn}"/>
-                            </td>
-                            <td>
-                                <h:selectOneMenu value="#{adminBackingBean.supplierToAdd.ansvarigtKansli}">
-                                    <f:selectItem itemLabel="Välj..." itemValue="#{null}"/>
-                                    <f:selectItem itemLabel="Borås" itemValue="Borås"/>
-                                    <f:selectItem itemLabel="Göteborg" itemValue="Göteborg"/>
-                                    <f:selectItem itemLabel="Mariestad" itemValue="Mariestad"/>
-                                    <f:selectItem itemLabel="Uddevalla" itemValue="Uddevalla"/>
-                                </h:selectOneMenu>
-                            </td>
-                            <td>
-                                <h:commandButton value="Lägg till" styleClass="btn btn-primary">
-                                    <f:ajax execute="supplierTable" listener="#{adminBackingBean.addSupplier}"
-                                            render="@form" onevent="reinitAfterPageUpdate"/>
-                                </h:commandButton>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <section>
+                    <h:panelGroup id="serverList">
+                        <h2>Uppladdningsservrar</h2>
+                        <p>Skriv en kommaseparerad lista för vilka servrar som ska laddas upp till. T.ex. "VGFS0249,VGFS0233".</p>
+
+                        <div class="input-row">
+                            <p:ajaxStatus>
+                                <f:facet name="default">
+                                    <h:inputText id="defaultInput" value="#{adminBackingBean.serverList}"/>
+                                    <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                        <f:ajax execute="defaultInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                                    </h:commandButton>
+                                </f:facet>
+
+                                <f:facet name="start">
+                                    <h:inputText value="Sparar..." disabled="true"/>
+                                    <h:commandButton id="saveServerListButtonDisabled" disabled="true" styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                    </h:commandButton>
+                                </f:facet>
+
+                                <f:facet name="complete">
+                                    <h:inputText id="completeInput" value="#{adminBackingBean.serverList}"/>
+                                    <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
+                                        <f:ajax execute="completeInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
+                                    </h:commandButton>
+                                </f:facet>
+                            </p:ajaxStatus>
+                        </div>
+
+                    </h:panelGroup>
+
+                </section>
+
+                <section>
+                    <h:panelGroup id="namndFordelningDirectory">
+                        <h2>Nämndfördelningsmapp</h2>
+                        <p>Någon mapp behöver märkas som "nämndfördelningsmapp" för att systemet ska veta vart den nämndfördelade filen ska skickas.</p>
+
+                        <p:tree value="#{adminBackingBean.namndFordelningRemoteDirectoryTree}" var="node" selectionMode="single" selection="#{adminBackingBean.selectedNamndFordelningDirectory}">
+                            <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+                                <h:outputText value="#{node}"/>
+                            </p:treeNode>
+                        </p:tree>
+
+                        <div>
+                            <h:commandButton value="Spara nämndfördelningsmapp" id="saveNamndFordelningButton" binding="#{adminBackingBean.justToAssociateMessageWithSomething}" styleClass="btn btn-primary">
+                                <f:ajax listener="#{adminBackingBean.saveNamndFordelningDirectory}" execute=":theForm:namndFordelningDirectory" render="@form" onevent="reinitAfterPageUpdate"/>
+                            </h:commandButton>
+
+                            <h:message for="saveNamndFordelningButton" style="display: inline; margin-left: 20px"/>
+                        </div>
+                    </h:panelGroup>
+                </section>
+
+                <h:panelGroup id="uploadFolderWrapper">
+                    <p:dialog widgetVar="uploadFolderDialog">
+                        <p>Markera den eller de uppladdningsmappar som är aktuella för #{adminBackingBean.currentSupplier.enhetsNamn}.</p>
+                        <p>Vid flera val, håll nere Ctrl-knappen medan du klickar på mapparna.</p>
+
+                        <p:tree value="#{adminBackingBean.remoteDirectoryTree}" var="node"
+                                selectionMode="multiple"
+                                selection="#{adminBackingBean.selectedDirectoryNode}"
+                                style="max-height: 500px;min-height: 500px;overflow: scroll;"
+                                >
+                            <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+                                <h:outputText value="#{node}"/>
+                            </p:treeNode>
+
+                        </p:tree>
+
+                        <div>
+                            <h:commandButton value="Spara" styleClass="btn btn-primary">
+                                <f:ajax listener="#{adminBackingBean.saveUploadFolders}" execute=":theForm:uploadFolderWrapper" render="@form" onevent="reinitAfterPageUpdate"/>
+                            </h:commandButton>
+                        </div>
+                    </p:dialog>
                 </h:panelGroup>
-            </section>
 
-            <section>
-                <h:panelGroup id="serverList">
-                    <h2>Uppladdningsservrar</h2>
-                    <p>Skriv en kommaseparerad lista för vilka servrar som ska laddas upp till. T.ex. "VGFS0249,VGFS0233".</p>
+            </h:form>
 
-                    <div class="input-row">
-                        <p:ajaxStatus>
-                            <f:facet name="default">
-                                <h:inputText id="defaultInput" value="#{adminBackingBean.serverList}"/>
-                                <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
-                                    <f:ajax execute="defaultInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
-                                </h:commandButton>
-                            </f:facet>
+            <script type="application/javascript">
 
-                            <f:facet name="start">
-                                <h:inputText value="Sparar..." disabled="true"/>
-                                <h:commandButton id="saveServerListButtonDisabled" disabled="true" styleClass="btn btn-primary" value="Spara uppladdningsservrar">
-                                </h:commandButton>
-                            </f:facet>
+                initPage();
 
-                            <f:facet name="complete">
-                                <h:inputText id="completeInput" value="#{adminBackingBean.serverList}"/>
-                                <h:commandButton styleClass="btn btn-primary" value="Spara uppladdningsservrar">
-                                    <f:ajax execute="completeInput" render="@form" listener="#{adminBackingBean.saveServerList}"/>
-                                </h:commandButton>
-                            </f:facet>
-                        </p:ajaxStatus>
-                    </div>
-
-                </h:panelGroup>
-
-            </section>
-
-            <section>
-                <h:panelGroup id="namndFordelningDirectory">
-                    <h2>Nämndfördelningsmapp</h2>
-                    <p>Någon mapp behöver märkas som "nämndfördelningsmapp" för att systemet ska veta vart den nämndfördelade filen ska skickas.</p>
-
-                    <p:tree value="#{adminBackingBean.namndFordelningRemoteDirectoryTree}" var="node" selectionMode="single" selection="#{adminBackingBean.selectedNamndFordelningDirectory}">
-                        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
-                            <h:outputText value="#{node}"/>
-                        </p:treeNode>
-                    </p:tree>
-
-                    <div>
-                        <h:commandButton value="Spara nämndfördelningsmapp" id="saveNamndFordelningButton" binding="#{adminBackingBean.justToAssociateMessageWithSomething}" styleClass="btn btn-primary">
-                            <f:ajax listener="#{adminBackingBean.saveNamndFordelningDirectory}" execute=":theForm:namndFordelningDirectory" render="@form" onevent="reinitAfterPageUpdate"/>
-                        </h:commandButton>
-
-                        <h:message for="saveNamndFordelningButton" style="display: inline; margin-left: 20px"/>
-                    </div>
-                </h:panelGroup>
-            </section>
-
-            <h:panelGroup id="uploadFolderWrapper">
-                <p:dialog widgetVar="uploadFolderDialog">
-                    <p>Markera den eller de uppladdningsmappar som är aktuella för #{adminBackingBean.currentSupplier.enhetsNamn}.</p>
-                    <p>Vid flera val, håll nere Ctrl-knappen medan du klickar på mapparna.</p>
-
-                    <p:tree value="#{adminBackingBean.remoteDirectoryTree}" var="node"
-                            selectionMode="multiple"
-                            selection="#{adminBackingBean.selectedDirectoryNode}"
-                            style="max-height: 500px;min-height: 500px;overflow: scroll;"
-                            >
-                        <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
-                            <h:outputText value="#{node}"/>
-                        </p:treeNode>
-
-                    </p:tree>
-
-                    <div>
-                        <h:commandButton value="Spara" styleClass="btn btn-primary">
-                            <f:ajax listener="#{adminBackingBean.saveUploadFolders}" execute=":theForm:uploadFolderWrapper" render="@form" onevent="reinitAfterPageUpdate"/>
-                        </h:commandButton>
-                    </div>
-                </p:dialog>
-            </h:panelGroup>
-
-        </h:form>
-
-        <script type="application/javascript">
-
-            initPage();
-
-            function showUploadFolderDialogOnComplete(data) {
-                if (data.status === "success") {
-                    PF('uploadFolderDialog').show();
-                }
-            }
-
-            function reinitAfterPageUpdate(data) {
-                if (data.status === 'complete') {
-                    setTimeout(function() {initPage();}, 100);
-                }
-            }
-
-            function initPage() {
-                var chooseSuppliersTrigger = $('.toggle-choose-suppliers');
-                chooseSuppliersTrigger.on('click', function (e) {
-                    var chosenSuppliersDiv = $(e.target).parent();
-                    chosenSuppliersDiv.find('.supplier-chooser').slideToggle(200);
-                    var toggleLink = chosenSuppliersDiv.find('.toggle-choose-suppliers');
-                    toggleLink.toggleClass('expanded');
-
-                    var userId = chosenSuppliersDiv.closest('.chosen-suppliers').attr('data-userid');
-                    toggleSupplierChooser([{name: 'userId', value: userId}, {name: 'isExpanded', value: toggleLink.hasClass('expanded')}]); /* Primefaces remoteCommand */
-                });
-
-                /* Catch enter-press. */
-                formKeyPress = function(event) {
-                    if (event.keyCode == 13) {
-                        event.returnValue = false; /* IE8 */
-                        if (event.preventDefault) {
-                            event.preventDefault();
-                        }
-
-                        var submitButton = $(event.target).closest('tr').find('input[type=submit]');
-
-                        if (submitButton) {
-                            submitButton.click();
-                        }
-                        return false;
+                function showUploadFolderDialogOnComplete(data) {
+                    if (data.status === "success") {
+                        PF('uploadFolderDialog').show();
                     }
-                };
-            }
+                }
 
-            function showSaveButton(element) {
-                $(element).closest('tr').find('.save-link').fadeIn(200);
-            }
+                function reinitAfterPageUpdate(data) {
+                    if (data.status === 'complete') {
+                        setTimeout(function() {initPage();}, 100);
+                    }
+                }
 
-        </script>
-    </div>
+                function initPage() {
+                    var chooseSuppliersTrigger = $('.toggle-choose-suppliers');
+                    chooseSuppliersTrigger.on('click', function (e) {
+                        var chosenSuppliersDiv = $(e.target).parent();
+                        chosenSuppliersDiv.find('.supplier-chooser').slideToggle(200);
+                        var toggleLink = chosenSuppliersDiv.find('.toggle-choose-suppliers');
+                        toggleLink.toggleClass('expanded');
+
+                        var userId = chosenSuppliersDiv.closest('.chosen-suppliers').attr('data-userid');
+                        toggleSupplierChooser([{name: 'userId', value: userId}, {name: 'isExpanded', value: toggleLink.hasClass('expanded')}]); /* Primefaces remoteCommand */
+                    });
+
+                    /* Catch enter-press. */
+                    formKeyPress = function(event) {
+                        if (event.keyCode == 13) {
+                            event.returnValue = false; /* IE8 */
+                            if (event.preventDefault) {
+                                event.preventDefault();
+                            }
+
+                            var submitButton = $(event.target).closest('tr').find('input[type=submit]');
+
+                            if (submitButton) {
+                                submitButton.click();
+                            }
+                            return false;
+                        }
+                    };
+                }
+
+                function showSaveButton(element) {
+                    $(element).closest('tr').find('.save-link').fadeIn(200);
+                }
+
+            </script>
+        </div>
+    </h:body>
 
 </f:view>

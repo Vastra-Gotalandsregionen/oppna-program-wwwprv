@@ -18,9 +18,6 @@ import java.util.List;
 public class ListFilesBackingBean {
 
     @Autowired
-    private LiferayService liferayService;
-
-    @Autowired
     private DataPrivataService dataPrivataService;
 
     private List<FileUpload> allFileUploads;

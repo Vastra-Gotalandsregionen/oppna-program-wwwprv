@@ -23,7 +23,7 @@ Generation time : 2015-03-12 14:47:57 CET
   <name>${project.artifactId}</name>
 
   <properties>
-    <apache.cxf.version>2.4.1</apache.cxf.version>
+    <apache.cxf.version>3.3.13</apache.cxf.version>
   </properties>
 
 <!-- UNCOMMENT AND CHANGE THIS TO USE JAX-WS WSDL CODE GENERATION

@@ -35,7 +35,7 @@
         <compileSource>1.8</compileSource>
         <compileTarget>1.8</compileTarget>
         <hibernate.version>3.6.0.Final</hibernate.version>
-        <liferay.version>7.2.1</liferay.version>
+        <liferay.version>7.4.13.u73</liferay.version>
         <spring.fw.version>3.2.18.RELEASE</spring.fw.version>
         <jsf.version>2.2.20</jsf.version>
     </properties>
@@ -44,7 +44,7 @@
         <dependencies>
             <dependency>
                 <groupId>com.liferay.portal</groupId>
-                <artifactId>release.portal.bom</artifactId>
+                <artifactId>release.dxp.bom</artifactId>
                 <version>${liferay.version}</version>
                 <type>pom</type>
                 <scope>import</scope>

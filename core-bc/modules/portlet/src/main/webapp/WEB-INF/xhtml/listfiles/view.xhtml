@@ -8,28 +8,30 @@
 
     <link href="#{request.contextPath}/css/wwwprv.css" rel="stylesheet" type="text/css"/>
 
-    <h:form enctype="multipart/form-data">
-        <h2>Lista uppladdade filer</h2>
+    <h:body>
+        <h:form enctype="multipart/form-data">
+            <h2>Lista uppladdade filer</h2>
 
-        <h:messages />
+            <h:messages />
 
-        <p:dataTable value="#{listFilesBackingBean.allFileUploads}" var="fileUpload" emptyMessage="Inga träffar.">
-            <p:column headerText="Filnamn">
-                <h:outputText value="#{fileUpload.fullFileName}"/>
-            </p:column>
-            <p:column headerText="Leverantör">
-                <h:outputText value="#{fileUpload.supplierCode}"/>
-            </p:column>
-            <p:column headerText="Uppladdad">
-                <h:outputText value="#{fileUpload.uploaded}">
-                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="Europe/Stockholm"/>
-                </h:outputText>
-            </p:column>
-            <p:column headerText="Uppladdad av">
-                <h:outputText value="#{fileUpload.uploader}"/>
-            </p:column>
-        </p:dataTable>
+            <p:dataTable value="#{listFilesBackingBean.allFileUploads}" var="fileUpload" emptyMessage="Inga träffar.">
+                <p:column headerText="Filnamn">
+                    <h:outputText value="#{fileUpload.fullFileName}"/>
+                </p:column>
+                <p:column headerText="Leverantör">
+                    <h:outputText value="#{fileUpload.supplierCode}"/>
+                </p:column>
+                <p:column headerText="Uppladdad">
+                    <h:outputText value="#{fileUpload.uploaded}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="Europe/Stockholm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Uppladdad av">
+                    <h:outputText value="#{fileUpload.uploader}"/>
+                </p:column>
+            </p:dataTable>
 
-    </h:form>
+        </h:form>
+    </h:body>
 
 </f:view>
