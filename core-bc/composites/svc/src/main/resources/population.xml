@@ -1,40 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:soap="http://cxf.apache.org/bindings/soap"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:oxm="http://www.springframework.org/schema/oxm"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                            http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
-                                 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd">
+                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/oxm https://www.springframework.org/schema/oxm/spring-oxm.xsd">
 
-  <import resource="cxf-conduit.xml"/>
+    <context:property-placeholder
+            location="file:${user.home}/.hotell/wwwprv/secret.properties" />
 
-  <jaxws:client id="extendedProfileClient"
-                serviceClass="se.riv.population.residentmaster.lookupresidentforextendedprofile.v1.rivtabp21.LookupResidentForExtendedProfileResponderInterface"
-                endpointName="e:LookupResidentForExtendedProfileResponderInterface"
-                serviceName="s:LookupResidentForExtendedProfileResponderInterface"
-                address="${population.service.url}/population/services/lookupResidentForExtendedProfile/v1"
-                xmlns:e="http://service.jaxws.cxf.apache.org/endpoint"
-                xmlns:s="http://service.jaxws.cxf.apache.org/service">
-    <jaxws:binding>
-      <soap:soapBinding version="1.1"/>
-    </jaxws:binding>
-  </jaxws:client>
+    <bean id="populationClient" class="se.vgregion.portal.wwwprv.service.ExtendedPopulationService"/>
+    <bean id="litePopulationClient" class="se.vgregion.portal.wwwprv.service.FullPopulationService"/>
 
-  <jaxws:client id="liteExtendedProfileClient"
-                serviceClass="se.riv.population.residentmaster.lookupresidentforfullprofile.v1.rivtabp21.LookupResidentForFullProfileResponderInterface"
-                endpointName="e:LookupResidentForFullProfileResponderInterface"
-                serviceName="s:LookupResidentForFullProfileResponderInterface"
-                address="${population.service.url}/population/services/lookupResidentForFullProfile/v1"
-                xmlns:e="http://service.jaxws.cxf.apache.org/endpoint"
-                xmlns:s="http://service.jaxws.cxf.apache.org/service">
-    <jaxws:binding>
-      <soap:soapBinding version="1.1"/>
-    </jaxws:binding>
-  </jaxws:client>
+    <bean id="messageFactory" class="org.springframework.ws.soap.saaj.SaajSoapMessageFactory">
+        <property name="soapVersion">
+            <util:constant static-field="org.springframework.ws.soap.SoapVersion.SOAP_11"/>
+        </property>
+    </bean>
 
-  <bean id="populationClient" class="se.vgregion.portal.wwwprv.service.ExtendedPopulationService" />
-  <bean id="litePopulationClient" class="se.vgregion.portal.wwwprv.service.FullPopulationService" />
+    <bean class="se.vgregion.portal.wwwprv.service.soap.LookupResidentForFullProfileResponderImpl">
+        <property name="webServiceTemplate" ref="webServiceTemplate" />
+        <property name="url" value="${population.service.url}/population/services/lookupResidentForFullProfile/v1"/>
+    </bean>
+
+    <bean class="se.vgregion.portal.wwwprv.service.soap.LookupResidentForExtendedProfileResponderImpl">
+        <property name="webServiceTemplate" ref="webServiceTemplate" />
+        <property name="url" value="${population.service.url}/population/services/lookupResidentForExtendedProfile/v1"/>
+    </bean>
+
+    <bean id="marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="contextPaths" ref="contextPaths"/>
+    </bean>
+
+    <util:list id="contextPaths">
+        <value>se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1</value>
+        <value>se.riv.population.residentmaster.lookupresidentforextendedprofileresponder.v1</value>
+    </util:list>
+
+    <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
+        <constructor-arg ref="messageFactory"/>
+
+        <property name="marshaller" ref="marshaller" />
+        <property name="unmarshaller" ref="marshaller" />
+
+        <property name="messageSender">
+            <bean class="se.vgregion.portal.wwwprv.service.soap.HttpsWebServiceMessageSenderImpl" />
+        </property>
+    </bean>
+
+    <bean class="se.vgregion.portal.wwwprv.service.soap.ConvenientSslContextFactory">
+        <constructor-arg name="keyStore" value="${population.service.cert}" />
+        <constructor-arg name="keyStorePassword" value="${population.service.password}" />
+        <constructor-arg name="keyStoreType" value="PKCS12" />
+        <constructor-arg name="trustStore" value="${user.home}/.hotell/wwwprv/truststore_siths_all.jks" />
+        <constructor-arg name="trustStorePassword" value="changeit" />
+        <constructor-arg name="trustStoreType" value="JKS" />
+    </bean>
 
 </beans>

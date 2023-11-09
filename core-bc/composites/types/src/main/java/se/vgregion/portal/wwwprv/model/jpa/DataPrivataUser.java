@@ -6,6 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -23,7 +24,7 @@ public class DataPrivataUser {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "vgr_dataprivata_user_supplier")
-    private Set<Supplier> suppliers;
+    private Set<Supplier> suppliers = new HashSet<>();
 
     public DataPrivataUser(Long liferayUserId) {
         this.liferayUserId = liferayUserId;

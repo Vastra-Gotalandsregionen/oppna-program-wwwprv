@@ -4,12 +4,13 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import riv.population.residentmaster._1.ResidentType;
 import se.riv.population.residentmaster.lookupresidentforfullprofile.v1.rivtabp21.LookupResidentForFullProfileResponderInterface;
 import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookUpSpecificationType;
 import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileResponseType;
 import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileType;
-import se.riv.population.residentmaster.v1.ResidentType;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +22,8 @@ public class FullPopulationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FullPopulationService.class);
 
-    /*@Autowired
-    private LookupResidentForExtendedProfileResponderInterface extendedProfileClient;*/
     @Autowired
-    private LookupResidentForFullProfileResponderInterface extendedProfileClient;
+    private LookupResidentForFullProfileResponderInterface lookupResidentForFullProfileResponderImpl;
 
     private static int maxSocialSecurityNumbersAlowedForWsCall = 1000;
 
@@ -38,18 +37,16 @@ public class FullPopulationService {
     public LookupResidentForFullProfileResponseType lookup(List<String> bySocialSecurityNumbers) {
         bySocialSecurityNumbers = new ArrayList<>(bySocialSecurityNumbers);
 
-        /*LookupResidentForExtendedProfileResponseType result = new LookupResidentForExtendedProfileResponseType();*/
         LookupResidentForFullProfileResponseType result = new LookupResidentForFullProfileResponseType();
+
         while (!bySocialSecurityNumbers.isEmpty()) {
-
-
             LookUpSpecificationType spec = new LookUpSpecificationType();
             LookupResidentForFullProfileType arg = new LookupResidentForFullProfileType();
             arg.setLookUpSpecification(spec);
             List<String> partial = bySocialSecurityNumbers.subList(0, Math.min(bySocialSecurityNumbers.size(), maxSocialSecurityNumbersAlowedForWsCall));
             arg.getPersonId().addAll(partial);
 
-            result.getResident().addAll(extendedProfileClient.lookupResidentForFullProfile("", arg).getResident());
+            result.getResident().addAll(lookupResidentForFullProfileResponderImpl.lookupResidentForFullProfile("", arg).getResident());
             partial.clear();
         }
 
@@ -92,7 +89,7 @@ public class FullPopulationService {
             List<ResidentType> shouldJustBeOneOrNone = null;
             for (int i = 0; i < 200; i++) {
                 try {
-                    shouldJustBeOneOrNone = extendedProfileClient.lookupResidentForFullProfile("", callArg).getResident();
+                    shouldJustBeOneOrNone = lookupResidentForFullProfileResponderImpl.lookupResidentForFullProfile("", callArg).getResident();
                     if (i > 0) {
                         LOGGER.info("Succeded with lookupResidentForExtendedProfile after " + (i + 1) + " tries.");
                     }

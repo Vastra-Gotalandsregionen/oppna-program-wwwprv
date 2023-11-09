@@ -1,10 +1,10 @@
 package se.vgregion.portal.wwwprv.service;
 
-import org.apache.cxf.common.util.StringUtils;
+import org.springframework.util.StringUtils;
+import riv.population.residentmaster._1.PersonpostTYPE;
+import riv.population.residentmaster._1.SvenskAdressTYPE;
 import se.riv.population.residentmaster.extended.v1.AdministrativIndelningType;
 import se.riv.population.residentmaster.extended.v1.ExtendedResidentType;
-import se.riv.population.residentmaster.v1.PersonpostTYPE;
-import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
 import se.vgregion.portal.wwwprv.table.Cell;
 import se.vgregion.portal.wwwprv.table.Column;
 import se.vgregion.portal.wwwprv.table.Table;

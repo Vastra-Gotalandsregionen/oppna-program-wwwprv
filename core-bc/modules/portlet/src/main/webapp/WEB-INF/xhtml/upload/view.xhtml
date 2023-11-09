@@ -40,7 +40,7 @@
             <img class="contact-spinner" src="#{request.contextPath}/image/spinner.gif"
                  style="visibility: hidden; margin-top: 10px; height: 40px;"/>
 
-            <p:poll interval="2" update="progressBarWrapperWrapper"/>
+            <p:poll interval="2" update="progressBarWrapperWrapper" onerror="pollError()" widgetVar="progressPoller"/>
 
             <h:panelGroup id="progressBarWrapperWrapper" layout="block">
                 <h:panelGroup id="progressBarWrapper" styleClass="progress-bar-wrapper" layout="block" rendered="#{not empty uploadBackingBean.progress}">
@@ -71,27 +71,34 @@
             </h:panelGroup>
         </h:form>
 
+        <h:outputScript>
+
+            function showSpinner() {
+                $(".contact-spinner").css("visibility", "visible");
+            }
+
+            function hideSpinner() {
+                $(".contact-spinner").css("visibility", "hidden");
+            }
+
+            function handleProgress(data) {
+                if (data.status === "begin") {
+                    showSpinner();
+                }
+
+                if (data.status === "complete") {
+                    hideSpinner();
+
+                }
+            }
+
+            function pollError() {
+                console.log("Flag 2");
+
+                PF('progressPoller').stop();
+            }
+        </h:outputScript>
+
     </h:body>
-
-    <script type="application/javascript">
-        function showSpinner() {
-            $(".contact-spinner").css("visibility", "visible");
-        }
-
-        function hideSpinner() {
-            $(".contact-spinner").css("visibility", "hidden");
-        }
-
-        function handleProgress(data) {
-            if (data.status === "begin") {
-                showSpinner();
-            }
-
-            if (data.status === "complete") {
-                hideSpinner();
-
-            }
-        }
-    </script>
 
 </f:view>

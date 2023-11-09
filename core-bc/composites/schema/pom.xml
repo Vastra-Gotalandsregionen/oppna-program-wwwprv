@@ -22,39 +22,6 @@ Generation time : 2015-03-12 14:47:57 CET
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 
-  <properties>
-    <apache.cxf.version>3.3.13</apache.cxf.version>
-  </properties>
-
-<!-- UNCOMMENT AND CHANGE THIS TO USE JAX-WS WSDL CODE GENERATION
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-codegen-plugin</artifactId>
-        <version>${apache.cxf.version}</version>
-        <executions>
-          <execution>
-            <id>generate-sources</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <sourceRoot>${basedir}/target/generated/wsdl</sourceRoot>
-              <wsdlOptions>
-                <wsdlOption>
-                  <wsdl>${basedir}/src/main/wsdl/AddressServices_1.0.wsdl</wsdl>
-                </wsdlOption>
-              </wsdlOptions>
-            </configuration>
-            <goals>
-              <goal>wsdl2java</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
--->
-
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -63,33 +30,35 @@ Generation time : 2015-03-12 14:47:57 CET
     </dependency>
 
     <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-frontend-jaxws</artifactId>
-      <version>${apache.cxf.version}</version>
+      <groupId>org.springframework.ws</groupId>
+      <artifactId>spring-ws-core</artifactId>
+      <version>2.4.7.RELEASE</version>
       <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-javamail_1.4_spec</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-transports-http</artifactId>
-      <version>${apache.cxf.version}</version>
+      <groupId>com.sun.xml.messaging.saaj</groupId>
+      <artifactId>saaj-impl</artifactId>
+      <version>1.5.3</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <version>2.3.8</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>se.vgregion.icc.sd.population</groupId>
       <artifactId>population-schemas</artifactId>
-      <version>1.0.11</version>
+      <version>1.0.14</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>3.0.5.RELEASE</version>
+      <version>${spring.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

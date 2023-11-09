@@ -1,9 +1,9 @@
 package se.vgregion.portal.wwwprv.service;
 
+import riv.population.residentmaster._1.PersonpostTYPE;
+import riv.population.residentmaster._1.ResidentType;
+import riv.population.residentmaster._1.SvenskAdressTYPE;
 import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileResponseType;
-import se.riv.population.residentmaster.v1.PersonpostTYPE;
-import se.riv.population.residentmaster.v1.ResidentType;
-import se.riv.population.residentmaster.v1.SvenskAdressTYPE;
 import se.vgregion.portal.wwwprv.table.Cell;
 import se.vgregion.portal.wwwprv.table.Column;
 import se.vgregion.portal.wwwprv.table.Table;

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import se.riv.population.residentmaster.lookupresidentforextendedprofileresponder.v1.LookupResidentForExtendedProfileResponseType;
 import se.riv.population.residentmaster.lookupresidentforfullprofileresponder.v1.LookupResidentForFullProfileResponseType;
 
 import java.io.File;
@@ -44,13 +45,18 @@ public class FullExtendedPopulationServiceIT {
 
     @Autowired
     private FullPopulationService populationService;
+    @Autowired
+    private ExtendedPopulationService extendedPopulationService;
 
     @Ignore
     @Test
     public void oneCallLookup() throws Exception {
         long now = System.currentTimeMillis();
         try {
-            LookupResidentForFullProfileResponseType result = populationService.lookup(ids);
+            LookupResidentForFullProfileResponseType result = populationService.lookup(ids.subList(0, 1));
+            LookupResidentForExtendedProfileResponseType lookup = extendedPopulationService.lookup(ids.subList(0, 1));
+
+
             System.out.print("result.getResident().isEmpty(): " + result.getResident().isEmpty());
         } catch (Exception e) {
             System.out.print("F: " + e.getMessage());

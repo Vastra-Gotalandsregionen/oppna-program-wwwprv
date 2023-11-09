@@ -44,6 +44,8 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
             <groupId>javax.portlet</groupId>
             <artifactId>portlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.liferay.portal</groupId>
@@ -54,14 +56,19 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
+            <version>1.1.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
         </dependency>
         <!--
           We use a Servlet Filter from spring-web to control UTF-8 encodings.
@@ -69,15 +76,18 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
@@ -114,13 +124,27 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
           <groupId>com.liferay.faces</groupId>
           <artifactId>com.liferay.faces.bridge.ext</artifactId>
-          <version>5.1.0</version>
+          <version>6.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>el-api</artifactId>
             <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Explicitly set these as provided so they won't get included as transitive dependencies -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -139,6 +163,7 @@ Generation time : 2015-03-12 14:47:57 CET
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
         </dependency>
 
     </dependencies>
