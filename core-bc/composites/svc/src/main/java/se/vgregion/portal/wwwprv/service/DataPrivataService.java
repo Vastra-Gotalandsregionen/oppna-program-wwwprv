@@ -164,6 +164,7 @@ public class DataPrivataService {
         }
     }
 
+    @Transactional
     public Node<String> retrieveRemoteFileTree() {
 
         Node<String> aggregatedTree = new Node<>();
