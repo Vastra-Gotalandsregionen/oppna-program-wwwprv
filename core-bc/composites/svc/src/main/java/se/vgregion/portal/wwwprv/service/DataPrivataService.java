@@ -183,6 +183,7 @@ public class DataPrivataService {
         return aggregatedTree;
     }
 
+    @Transactional
     public String getNamndFordelningDirectory() {
         GlobalSetting globalSetting = entityManager.find(GlobalSetting.class, "namnd-fordelnings-directory");
 

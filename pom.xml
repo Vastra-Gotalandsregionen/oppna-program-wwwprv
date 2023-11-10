@@ -36,7 +36,7 @@
         <hibernate.version>5.6.15.Final</hibernate.version>
         <liferay.version>7.4.13.u73</liferay.version>
         <spring.fw.version>4.2.9.RELEASE</spring.fw.version>
-        <spring.version>4.2.9.RELEASE</spring.version>
+        <spring.version>5.3.29</spring.version>
         <jsf.version>2.2.20</jsf.version>
     </properties>
 

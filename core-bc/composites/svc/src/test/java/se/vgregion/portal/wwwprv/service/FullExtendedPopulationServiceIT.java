@@ -56,7 +56,6 @@ public class FullExtendedPopulationServiceIT {
             LookupResidentForFullProfileResponseType result = populationService.lookup(ids.subList(0, 1));
             LookupResidentForExtendedProfileResponseType lookup = extendedPopulationService.lookup(ids.subList(0, 1));
 
-
             System.out.print("result.getResident().isEmpty(): " + result.getResident().isEmpty());
         } catch (Exception e) {
             System.out.print("F: " + e.getMessage());
