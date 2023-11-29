@@ -6,6 +6,7 @@ import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import se.vgregion.portal.wwwprv.model.jpa.FileUpload;
@@ -52,12 +53,15 @@ public class UploadBackingBean implements Notifiable {
     @Autowired
     private EmailService emailService;
 
+    @Value("${base.upload.directory}")
+    private File baseUploadDirectory;
+
     private String uploadedFileName;
     private Supplier chosenSupplier;
     private Boolean showFileUpload;
     private boolean currentlyDuplicateFileWorkflow = false;
     private File tempFile;
-    private File baseUploadDirectory = new File(System.getProperty("user.home") + "/.wwwprv");
+
     private File uploadDirectory;
     private List<FileUpload> uploadedFileList;
     private FileUpload tempFileUpload;
