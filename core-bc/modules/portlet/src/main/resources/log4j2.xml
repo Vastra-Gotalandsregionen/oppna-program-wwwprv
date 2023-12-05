@@ -6,11 +6,11 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="org.springframework.ws.client.MessageTracing.sent" level="trace">
+        <Logger name="org.springframework.ws.client.MessageTracing.sent" level="warn">
             <AppenderRef ref="Console"/>
         </Logger>
 
-        <Logger name="org.springframework.ws.client.MessageTracing.received" level="trace">
+        <Logger name="org.springframework.ws.client.MessageTracing.received" level="warn">
             <AppenderRef ref="Console"/>
         </Logger>
 
