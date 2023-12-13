@@ -158,6 +158,10 @@ public class AdminBackingBean {
             return uploaderUsers;
         }
 
+        return updateUsers();
+    }
+
+    private List<UserContainer> updateUsers() {
         ThemeDisplay themeDisplay = (ThemeDisplay) ((PortletRequest) FacesContext.getCurrentInstance()
                 .getExternalContext().getRequest()).getAttribute(WebKeys.THEME_DISPLAY);
 
@@ -304,18 +308,25 @@ public class AdminBackingBean {
     }
 
     public void toggleSupplier(UserContainer userContainer, Supplier supplier) {
+
         DataPrivataUser dataPrivataUser = userContainer.getDataPrivataUser();
-        if (dataPrivataUser.getSuppliers().contains(supplier)) {
-            dataPrivataUser.getSuppliers().remove(supplier);
-        } else {
-            dataPrivataUser.getSuppliers().add(supplier);
+
+        try {
+            if (dataPrivataUser.getSuppliers().contains(supplier)) {
+                dataPrivataUser.getSuppliers().remove(supplier);
+            } else {
+                dataPrivataUser.getSuppliers().add(supplier);
+            }
+
+            dataPrivataService.saveUser(dataPrivataUser);
+
+
+            FacesContext context = FacesContext.getCurrentInstance();
+
+            context.addMessage(null, new FacesMessage("Sparat!"));
+        } finally {
+            updateUsers();
         }
-
-        dataPrivataService.saveUser(dataPrivataUser);
-
-        FacesContext context = FacesContext.getCurrentInstance();
-
-        context.addMessage(null, new FacesMessage("Sparat!"));
     }
 
     public void toggleSupplierChooser() {
